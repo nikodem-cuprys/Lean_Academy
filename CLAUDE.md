@@ -41,13 +41,21 @@ pnpm --filter @lean-academy/adaptive-engine test
 cd packages/evidence && pnpm exec vitest run src/index.test.ts   # a single test file
 ```
 
+**E2E tests (Playwright, `apps/web/e2e/`)** need a real server already running — they don't manage one for you (see the config's own comment for why). **Run them against a production build (`next build` + `next start`), not `next dev`** — see the dev-mode CSRF gotcha below.
+
+```bash
+cd apps/web
+pnpm exec next build && DATABASE_URL="..." NEXTAUTH_SECRET="..." NEXTAUTH_URL="http://localhost:3000" AUTH_TRUST_HOST=true pnpm exec next start -p 3000 &
+pnpm exec playwright test
+```
+
 **`tsc --noEmit` on `apps/web` needs Next's route types regenerated first** if you've added/removed a route since the last `next dev`/`next build` — otherwise the typed `PageProps<'/your-route'>`/`LayoutProps<...>` helpers fail with "does not satisfy the constraint 'AppRoutes'". Run `pnpm exec next typegen` (from `apps/web`) to regenerate them without a full build.
 
 **Build order matters for apps that aren't `apps/web`.** `apps/web` transpiles workspace packages' TS source directly (via `next.config.ts`'s `transpilePackages`), but `apps/api` resolves workspace packages through their `dist/` output (their `package.json` `main`/`types` point there). Run `pnpm build` (or at least build the packages `apps/api` depends on) before `apps/api` will typecheck or run — it doesn't watch/rebuild its deps for you.
 
 The one generated artifact outside `apps/*`/`packages/*` is `prototype/lean-academy-prototype.html`. It's produced from `prototype/*.dc.html` + `prototype/canvas.json` via the Claude Code `design` skill's seed step — don't hand-edit it directly; edit the source `.dc.html`/`canvas.json` files and reseed/republish through the `design` skill.
 
-**Verifying interactive UI (timed exercises, forms with client-side state) needs a real browser** — build/typecheck/lint passing and server-rendered HTML looking right do not prove client-side interaction (timers, event listeners, animations) actually works. Check whether the Claude-in-Chrome extension is connected before claiming a screen like an exercise is verified; if it isn't, say so explicitly rather than inferring success from the build (see the N-Back exercise screen's kanban entry for what this looks like honestly reported).
+**Verifying interactive UI (timed exercises, forms with client-side state) needs a real browser** — build/typecheck/lint passing and server-rendered HTML looking right do not prove client-side interaction (timers, event listeners, animations) actually works. Try the Claude-in-Chrome extension first; if it won't connect, fall back to a real Playwright test in `apps/web/e2e/` (see the command above) rather than skipping verification — that's what caught the dev-mode CSRF bug above. Either way, say plainly what was and wasn't actually exercised rather than inferring success from the build (see the N-Back exercise screen's kanban entry for what honest partial-then-complete reporting looked like here).
 
 ## Architecture
 
@@ -67,6 +75,8 @@ Every training exercise is traceable through linked, must-stay-in-sync artifacts
 ### Auth data model: `Account` *is* the Identity/AuthProvider model
 
 `packages/db/prisma/schema.prisma` uses Auth.js's (`next-auth`) standard adapter shape — `User`/`Account`/`Session`/`VerificationToken` — rather than a bespoke `Identity` table. `Account` (one row per `(provider, providerAccountId)`) already *is* the "Identity/AuthProvider" model `project_prompt.txt` asks for: it's how a user links Google and Facebook to one account without duplicates. Email+password does not create an `Account` row — Auth.js's Credentials provider isn't an OAuth "linked account," so it uses `User.hashedPassword` directly (the standard Auth.js pattern). Auth config lives in `apps/web/src/lib/auth.ts`. Don't reintroduce a separate custom Identity table; extend `Account`/`User` instead.
+
+**Gotcha — credentials sign-in can spuriously fail under `next dev`:** immediately after registration, the browser sometimes fires two `GET /api/auth/csrf` requests back to back (React Strict Mode double-invoking a client setup effect — dev-only behavior), leaving next-auth's client holding a stale CSRF token that no longer matches the cookie, so Auth.js rejects the sign-in with `MissingCSRF`. Never reproduced under `next start` — every auth flow in this project has been verified there. If you hit a confusing "Account created, but automatic sign-in failed" in dev, this is almost certainly why; it's tracked as a real bug in `docs/kanban.md`'s Backlog, not fixed yet. Test auth flows (manually or via Playwright) against a production build until it is.
 
 ### Email verification & password reset
 
@@ -95,7 +105,7 @@ Every training exercise is traceable through linked, must-stay-in-sync artifacts
 
 ```text
 apps/
-  web/     Next.js 16 (App Router, Turbopack). Full auth flow built: /login, /signup, /verify-email, /forgot-password, /reset-password (see AuthForm and Email verification sections below). Everything else still needs building against prototype/*.dc.html.
+  web/     Next.js 16 (App Router, Turbopack). Full auth flow built: /login, /signup, /verify-email, /forgot-password, /reset-password. /train/n-back is the first real exercise. Playwright E2E tests live in apps/web/e2e/ (vitest is unit-only — see Commands). Everything else still needs building against prototype/*.dc.html.
   api/     Fastify. /health (includes a real DB connectivity check), /catalog (evidence-gated module list).
 
 packages/

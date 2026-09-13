@@ -199,6 +199,7 @@ export function NBackExercise() {
         <button
           onClick={handleTap}
           disabled={phase !== "stimulus"}
+          data-testid="respond-button"
           className="h-[84px] w-[84px] rounded-full font-body text-sm font-bold text-on-accent transition-transform active:scale-95 disabled:cursor-default"
           style={{
             background:
