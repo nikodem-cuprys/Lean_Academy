@@ -1,0 +1,235 @@
+{
+  "$schema": "Evidence registry for LeanAcademy cognitive-training modules. Every module loaded into the production exercise catalog must have a matching, productionApproved entry here. See docs/evidence-review.md for full narrative writeups and docs/product-requirements.md for how evidenceLevel gates catalog inclusion.",
+  "evidenceScale": {
+    "strong": "Several high-quality studies/reviews with reasonably consistent results.",
+    "moderate": "Credible positive evidence exists, but effects may be modest or inconsistent.",
+    "limited": "Evidence exists but has substantial uncertainty.",
+    "experimental": "Interesting research exists but efficacy has not been established.",
+    "unsupported": "Do not use as cognitive training."
+  },
+  "lastReviewed": "2026-09-13",
+  "modules": [
+    {
+      "method": "adaptive-nback-v0",
+      "displayName": "Adaptive N-Back",
+      "targetConstruct": "working memory updating",
+      "population": "healthy adults (young and older adults studied separately)",
+      "evidenceLevel": "moderate",
+      "trainedTaskImprovement": "supported",
+      "nearTransfer": "moderate — improves performance on other n-back variants and structurally similar WM tasks",
+      "farTransfer": "not established — no convincing evidence for fluid intelligence, general 'smartness', or everyday functioning",
+      "productionApproved": true,
+      "userFacingClaimLimits": [
+        "May describe as 'improves performance on this and similar working-memory tasks'",
+        "Must NOT claim IQ increase, general intelligence gain, or everyday cognitive improvement"
+      ],
+      "limitations": [
+        "Many source studies lack double-blind design or pre-registration",
+        "Near-transfer measures are sometimes nearly identical to the training task, inflating apparent effects",
+        "Far-transfer literature is inconsistent across labs"
+      ],
+      "citations": [
+        {"authors": "Soveri, Antfolk, Karlsson, Salo & Laine", "year": 2017, "title": "Working memory training revisited: A multi-level meta-analysis of n-back training studies", "venue": "Psychonomic Bulletin & Review", "url": "https://link.springer.com/article/10.3758/s13423-016-1217-0"},
+        {"authors": "Melby-Lervåg, Redick & Hulme", "year": 2016, "title": "Working Memory Training Does Not Improve Performance on Measures of Intelligence or Other Measures of \"Far Transfer\": Evidence From a Meta-Analytic Review", "venue": "Perspectives on Psychological Science", "url": "https://journals.sagepub.com/doi/10.1177/1745691616635612"},
+        {"authors": "Simons, Boot, Charness, Gathercole, Chabris, Hambrick & Stine-Morrow", "year": 2016, "title": "Do \"Brain-Training\" Programs Work?", "venue": "Psychological Science in the Public Interest, 17(3), 103–186", "url": "https://journals.sagepub.com/doi/abs/10.1177/1529100616661983"}
+      ]
+    },
+    {
+      "method": "running-memory-keep-track-v0",
+      "displayName": "Running Memory / Keep-Track",
+      "targetConstruct": "working memory updating (continuous monitoring and replacement of items)",
+      "population": "healthy adults",
+      "evidenceLevel": "limited",
+      "trainedTaskImprovement": "supported",
+      "nearTransfer": "limited — shares mechanism with n-back updating literature but has fewer dedicated training studies",
+      "farTransfer": "not established",
+      "productionApproved": true,
+      "userFacingClaimLimits": [
+        "Present as a variant updating-practice task, not as independently validated beyond the general updating-training literature"
+      ],
+      "limitations": [
+        "Fewer dedicated RCTs than n-back specifically; evidence largely inferred from the broader updating-training literature",
+        "Task parameters (list length, category count) are not standardized across the field"
+      ],
+      "citations": [
+        {"authors": "Soveri, Antfolk, Karlsson, Salo & Laine", "year": 2017, "title": "Working memory training revisited: A multi-level meta-analysis of n-back training studies", "venue": "Psychonomic Bulletin & Review", "url": "https://link.springer.com/article/10.3758/s13423-016-1217-0"}
+      ]
+    },
+    {
+      "method": "complex-span-v0",
+      "displayName": "Complex Span (operation-span-inspired)",
+      "targetConstruct": "working memory span / capacity",
+      "population": "healthy adults, children (separate literature)",
+      "evidenceLevel": "moderate",
+      "trainedTaskImprovement": "supported",
+      "nearTransfer": "moderate — substantial transfer observed when trained and untrained tasks share a serial-recall / complex-span / backward-span structure",
+      "farTransfer": "not established — no reliable improvement on reasoning, general intelligence, or Stroop-type measures",
+      "productionApproved": true,
+      "userFacingClaimLimits": [
+        "May claim improvement on this and structurally similar span tasks",
+        "Must not claim reasoning or intelligence gains"
+      ],
+      "limitations": [
+        "Original clinical complex-span batteries (e.g. operation span, reading span) are protected assessments — this module is an original implementation inspired by the paradigm, not a reproduction",
+        "Effect sizes shrink substantially once transfer target diverges structurally from the trained task"
+      ],
+      "citations": [
+        {"authors": "Melby-Lervåg & Hulme", "year": 2013, "title": "Is working memory training effective? A meta-analytic review", "venue": "Developmental Psychology, 49(2), 270–291", "url": "https://www.apa.org/pubs/journals/releases/dev-49-2-270.pdf"},
+        {"authors": "Melby-Lervåg, Redick & Hulme", "year": 2016, "title": "Working Memory Training Does Not Improve Performance on Measures of Intelligence or Other Measures of \"Far Transfer\"", "venue": "Perspectives on Psychological Science", "url": "https://journals.sagepub.com/doi/10.1177/1745691616635612"}
+      ]
+    },
+    {
+      "method": "visuospatial-sequence-recall-v0",
+      "displayName": "Spatial Sequence Recall (Corsi-inspired)",
+      "targetConstruct": "visuospatial working memory",
+      "population": "healthy adults, children, and clinical populations (Corsi task literature spans all three)",
+      "evidenceLevel": "moderate",
+      "trainedTaskImprovement": "supported",
+      "nearTransfer": "limited/modest — gains on closely related spatial-span tasks; far transfer to general cognitive ability inconsistent",
+      "farTransfer": "not established",
+      "productionApproved": true,
+      "userFacingClaimLimits": [
+        "May claim improvement on spatial sequence memory specifically",
+        "Must not claim general spatial intelligence or navigation-ability improvement"
+      ],
+      "limitations": [
+        "The Corsi Block-Tapping Task itself is a standard neuropsychological instrument; this module is an original digital implementation inspired by the paradigm, not the clinical instrument",
+        "Reported training gains (e.g. 10–15% in ADHD samples) come from clinical/adaptive-training studies, not general healthy-adult population norms"
+      ],
+      "citations": [
+        {"authors": "Various (digital Corsi task methodology)", "year": 2024, "title": "Inter-individual variability (but intra-individual stability) of overt versus covert rehearsal strategies in a digital Corsi task", "venue": "PMC", "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11305427/"},
+        {"authors": "Various", "year": 2025, "title": "Boosting Working Memory in ADHD: Adaptive Dual N-Back Training Enhances WAIS-IV Performance, but Yields Mixed Corsi Outcomes", "venue": "PMC", "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12468938/"}
+      ]
+    },
+    {
+      "method": "verbal-sequencing-v0",
+      "displayName": "Letter/Digit Sequencing & Reordering",
+      "targetConstruct": "verbal working memory",
+      "population": "healthy adults",
+      "evidenceLevel": "moderate",
+      "trainedTaskImprovement": "supported",
+      "nearTransfer": "moderate — consistent with complex-span/serial-recall transfer literature (shares mechanism)",
+      "farTransfer": "not established",
+      "productionApproved": true,
+      "userFacingClaimLimits": [
+        "May claim improvement on verbal sequencing/ordering tasks specifically"
+      ],
+      "limitations": [
+        "Treated as a verbal-domain instance of the complex-span/serial-recall literature rather than a separately validated paradigm",
+        "Digit Span itself is a protected clinical subtest (e.g. WAIS/WISC); this module is an original sequencing/reordering task, not a reproduction"
+      ],
+      "citations": [
+        {"authors": "Melby-Lervåg & Hulme", "year": 2013, "title": "Is working memory training effective? A meta-analytic review", "venue": "Developmental Psychology, 49(2), 270–291", "url": "https://www.apa.org/pubs/journals/releases/dev-49-2-270.pdf"}
+      ]
+    },
+    {
+      "method": "inhibition-flanker-gonogo-v0",
+      "displayName": "Flanker / Go-No-Go Interference Training",
+      "targetConstruct": "cognitive control (response inhibition, interference resolution)",
+      "population": "healthy adults",
+      "evidenceLevel": "limited",
+      "trainedTaskImprovement": "supported",
+      "nearTransfer": "limited — mostly restricted to tasks sharing form/function with the trained task",
+      "farTransfer": "not established",
+      "productionApproved": false,
+      "userFacingClaimLimits": [
+        "If shipped, must be framed strictly as within-task practice ('practice managing distraction on this task'), never as general focus/attention improvement"
+      ],
+      "limitations": [
+        "Recent RCTs show limited evidence of transfer even to nearby tasks after online inhibition training",
+        "Flanker/Simon/spatial-Stroop interference scores have documented weak concurrent and convergent validity across individuals, undermining their use as a reliable individual-differences outcome",
+        "Not included in MVP catalog pending stronger transfer evidence or a clearly scoped within-task-only framing"
+      ],
+      "citations": [
+        {"authors": "Various", "year": 2023, "title": "Can cognitive training capitalise on near transfer effects? Limited evidence of transfer following online inhibition training in a randomised-controlled trial", "venue": "PMC", "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10637678/"},
+        {"authors": "Rey-Mermet, Gade & Oberauer et al.", "year": 2020, "title": "Interference scores have inadequate concurrent and convergent validity: Should we stop using the flanker, Simon, and spatial Stroop tasks?", "venue": "Cognitive Research: Principles and Implications", "url": "https://link.springer.com/article/10.1186/s41235-020-0207-y"}
+      ]
+    },
+    {
+      "method": "memory-strategy-method-of-loci-v0",
+      "displayName": "Method of Loci (Memory Palace) Training",
+      "targetConstruct": "evidence-supported memory strategy / strategic encoding",
+      "population": "healthy adults, including mnemonics-naive participants",
+      "evidenceLevel": "moderate",
+      "trainedTaskImprovement": "supported — large effect on immediate and durable serial/free recall versus rehearsal, including in participants naive to the technique",
+      "nearTransfer": "supported for list/sequence recall tasks that permit spatial-imagery encoding",
+      "farTransfer": "not established for general memory ability outside strategy-compatible material",
+      "productionApproved": true,
+      "userFacingClaimLimits": [
+        "Present as teaching a real, usable memory strategy for lists/sequences, not as a general memory-boosting exercise"
+      ],
+      "limitations": [
+        "2025 systematic review rates underlying evidence quality as low-to-very-low due to risk of bias in source studies, despite consistent positive direction",
+        "Effectiveness depends on material being compatible with spatial/imagery encoding (works well for lists, less directly for abstract facts)"
+      ],
+      "citations": [
+        {"authors": "Ondřej et al.", "year": 2025, "title": "The method of loci in the context of psychological research: A systematic review and meta-analysis", "venue": "British Journal of Psychology", "url": "https://bpspsychub.onlinelibrary.wiley.com/doi/full/10.1111/bjop.12799"}
+      ]
+    },
+    {
+      "method": "reading-paced-adaptive-v0",
+      "displayName": "Paced / Adaptive Reading Training",
+      "targetConstruct": "reading efficiency (speed with maintained comprehension)",
+      "population": "healthy adult readers",
+      "evidenceLevel": "moderate",
+      "trainedTaskImprovement": "supported — modest, comprehension-preserving speed gains observed under controlled paced-reading + metacognitive training",
+      "nearTransfer": "limited/modest",
+      "farTransfer": "not established for large speed multipliers; modest gains (not doubling) are the realistic, evidence-backed target",
+      "productionApproved": true,
+      "userFacingClaimLimits": [
+        "Never report a WPM change without the paired comprehension score",
+        "Never imply reading speed can be doubled without comprehension cost"
+      ],
+      "limitations": [
+        "2023 RCT found training-group gains of roughly +35 WPM without comprehension loss — a modest, realistic effect size, not a dramatic one",
+        "Perceptual span (the region of text usable per fixation) is a hard physiological constraint (~3-4 letters left, ~14-15 letters right of fixation) that bounds how much speed gain is plausible without comprehension cost"
+      ],
+      "citations": [
+        {"authors": "Klimovich et al.", "year": 2023, "title": "Does speed-reading training work, and if so, why? Effects of speed-reading training and metacognitive training on reading speed, comprehension and eye movements", "venue": "Journal of Research in Reading", "url": "https://onlinelibrary.wiley.com/doi/full/10.1111/1467-9817.12417"},
+        {"authors": "Rayner, Slattery & Bélanger", "year": 2011, "title": "Eye movements, the perceptual span, and reading speed", "venue": "Psychonomic Bulletin & Review (PMC)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3075059/"}
+      ]
+    },
+    {
+      "method": "reading-chunking-v0",
+      "displayName": "Text Chunking Practice",
+      "targetConstruct": "reading efficiency (processing meaningful word groups)",
+      "population": "healthy adult readers",
+      "evidenceLevel": "limited",
+      "trainedTaskImprovement": "plausible but not strongly quantified in isolation from paced-reading training",
+      "nearTransfer": "limited — evidence largely inferred from perceptual-span and eye-movement literature rather than dedicated chunking-training RCTs",
+      "farTransfer": "not established",
+      "productionApproved": true,
+      "userFacingClaimLimits": [
+        "Must explicitly state this does not eliminate normal eye movements or fixations — it practices grouping, not a new visual mechanism"
+      ],
+      "limitations": [
+        "Few dedicated RCTs isolate chunking practice as a standalone intervention; most evidence comes from perceptual-span/eye-movement research rather than training-outcome studies",
+        "Framed as a supplementary technique within paced-reading training, not a standalone claim of a distinct trained ability"
+      ],
+      "citations": [
+        {"authors": "Rayner, Slattery & Bélanger", "year": 2011, "title": "Eye movements, the perceptual span, and reading speed", "venue": "Psychonomic Bulletin & Review (PMC)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3075059/"}
+      ]
+    },
+    {
+      "method": "rsvp-single-word-v0",
+      "displayName": "Single-Word RSVP ('flash word') Reading",
+      "targetConstruct": "reading speed via eliminated eye movements",
+      "population": "general readers (marketing claims largely self-reported, not independently replicated at high WPM)",
+      "evidenceLevel": "unsupported",
+      "trainedTaskImprovement": "not established at the WPM levels commonly marketed (e.g. 600 WPM)",
+      "nearTransfer": "not established",
+      "farTransfer": "not established",
+      "productionApproved": false,
+      "userFacingClaimLimits": [],
+      "limitations": [
+        "Perceptual and cognitive 'speed limit' research indicates comprehension breaks down well before commonly marketed RSVP speeds",
+        "High-WPM RSVP comprehension claims (e.g. 80%+ at 600 WPM) are vendor self-reports, not independently replicated controlled results",
+        "Eliminating eye movements/regressions removes a mechanism (re-fixation) readers normally use for comprehension monitoring and error correction",
+        "Explicitly excluded from production per the spec's 'do not implement common speed-reading myths' principle"
+      ],
+      "citations": [
+        {"authors": "Various", "year": 2016, "title": "Perceptual and Cognitive Factors Imposing \"Speed Limits\" on Reading Rate: A Study with Rapid Serial Visual Presentation", "venue": "PMC", "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4835101/"}
+      ]
+    }
+  ]
+}

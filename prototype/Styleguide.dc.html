@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap">
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{
+      --bg:oklch(98% 0.004 95); --surface:oklch(99.5% 0.002 95); --surface-2:oklch(96.2% 0.006 95);
+      --border:oklch(90% 0.008 95); --text:oklch(22% 0.02 265); --text-2:oklch(46% 0.02 265); --text-3:oklch(62% 0.015 265);
+      --accent:oklch(56% 0.19 276); --accent-strong:oklch(46% 0.19 276); --accent-soft:oklch(94% 0.035 276); --on-accent:oklch(99% 0.004 276);
+      --wm:oklch(58% 0.15 276); --wm-soft:oklch(94% 0.03 276);
+      --reading:oklch(62% 0.16 75); --reading-soft:oklch(95% 0.04 75);
+      --spatial:oklch(58% 0.10 195); --spatial-soft:oklch(94% 0.025 195);
+      --success:oklch(62% 0.14 150); --success-soft:oklch(95% 0.03 150);
+      --caution:oklch(64% 0.19 35); --caution-soft:oklch(95% 0.045 35);
+      --radius-sm:10px; --radius-md:16px; --radius-lg:24px; --radius-full:999px;
+      --shadow-card:0 1px 2px oklch(20% 0.02 265 / 0.05), 0 10px 28px oklch(20% 0.02 265 / 0.07);
+      --font-display:'Sora',system-ui,sans-serif; --font-body:'Manrope',system-ui,sans-serif; --font-num:'Space Grotesk',system-ui,sans-serif;
+    }
+    [data-theme="dark"]{
+      --bg:oklch(17% 0.012 265); --surface:oklch(21% 0.014 265); --surface-2:oklch(25% 0.016 265);
+      --border:oklch(32% 0.018 265); --text:oklch(95% 0.006 265); --text-2:oklch(78% 0.012 265); --text-3:oklch(60% 0.014 265);
+      --accent:oklch(74% 0.15 276); --accent-strong:oklch(82% 0.13 276); --accent-soft:oklch(32% 0.06 276); --on-accent:oklch(14% 0.02 276);
+      --wm:oklch(74% 0.13 276); --wm-soft:oklch(30% 0.05 276);
+      --reading:oklch(78% 0.13 75); --reading-soft:oklch(33% 0.06 75);
+      --spatial:oklch(72% 0.09 195); --spatial-soft:oklch(30% 0.04 195);
+      --success:oklch(72% 0.13 150); --success-soft:oklch(30% 0.05 150);
+      --caution:oklch(74% 0.16 35); --caution-soft:oklch(34% 0.07 35);
+      --shadow-card:0 1px 2px oklch(0% 0 0 / 0.35), 0 10px 28px oklch(0% 0 0 / 0.4);
+    }
+    *{box-sizing:border-box;}
+    a{color:var(--accent);text-decoration:none;}
+    .swatch{width:64px;height:64px;border-radius:var(--radius-md);border:1px solid var(--border);}
+    .label{font-family:var(--font-body);font-size:12px;color:var(--text-2);margin-top:8px;}
+    .sub{font-family:var(--font-body);font-size:11px;color:var(--text-3);}
+    .section-title{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--text);margin:0 0 4px;}
+    .section-sub{font-family:var(--font-body);font-size:13px;color:var(--text-2);margin:0 0 20px;}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-full);font-family:var(--font-body);font-weight:600;font-size:13px;cursor:pointer;border:1.5px solid var(--border);color:var(--text-2);background:var(--surface);transition:all .15s ease;}
+    .pill.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-strong);}
+    .btn-primary{background:var(--accent);color:var(--on-accent);border:none;border-radius:var(--radius-full);font-family:var(--font-body);font-weight:700;font-size:14px;padding:12px 24px;cursor:pointer;}
+    .btn-secondary{background:transparent;color:var(--text);border:1.5px solid var(--border);border-radius:var(--radius-full);font-family:var(--font-body);font-weight:600;font-size:14px;padding:12px 24px;cursor:pointer;}
+    .badge{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:var(--radius-full);font-family:var(--font-body);font-weight:600;font-size:12.5px;}
+    .dot{width:8px;height:8px;border-radius:999px;}
+  </style>
+</helmet>
+<div class="la" data-theme="{{theme}}" style="width:1200px;min-height:1900px;background:var(--bg);color:var(--text);font-family:var(--font-body);padding:56px;">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:48px;">
+    <div>
+      <div style="font-family:var(--font-display);font-weight:700;font-size:28px;letter-spacing:-0.02em;">LeanAcademy</div>
+      <div style="font-family:var(--font-body);font-size:14px;color:var(--text-2);margin-top:4px;">Design tokens &amp; components — reference sheet</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-family:var(--font-body);font-size:13px;color:var(--text-2);">Light</span>
+      <div onClick="{{toggleTheme}}" style="width:46px;height:26px;border-radius:999px;background:{{trackBg}};position:relative;cursor:pointer;border:1px solid var(--border);">
+        <div style="width:20px;height:20px;border-radius:999px;background:var(--surface);position:absolute;top:2px;left:{{knobPos}};box-shadow:0 1px 3px oklch(0% 0 0 / 0.3);transition:left .15s ease;"></div>
+      </div>
+      <span style="font-family:var(--font-body);font-size:13px;color:var(--text-2);">Dark</span>
+    </div>
+  </div>
+
+  <div style="margin-bottom:44px;">
+    <div class="section-title">Color</div>
+    <div class="section-sub">Neutral surfaces + one primary action color, plus per-domain accents sharing chroma/lightness, varying hue.</div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+      <div><div class="swatch" style="background:var(--bg);"></div><div class="label">Background</div></div>
+      <div><div class="swatch" style="background:var(--surface);"></div><div class="label">Surface</div></div>
+      <div><div class="swatch" style="background:var(--surface-2);"></div><div class="label">Surface 2</div></div>
+      <div><div class="swatch" style="background:var(--border);"></div><div class="label">Border</div></div>
+      <div><div class="swatch" style="background:var(--text);"></div><div class="label">Text</div></div>
+      <div><div class="swatch" style="background:var(--accent);"></div><div class="label">Accent (primary action)</div></div>
+      <div><div class="swatch" style="background:var(--wm);"></div><div class="label">Working Memory</div></div>
+      <div><div class="swatch" style="background:var(--reading);"></div><div class="label">Reading</div></div>
+      <div><div class="swatch" style="background:var(--spatial);"></div><div class="label">Spatial</div></div>
+      <div><div class="swatch" style="background:var(--success);"></div><div class="label">Success</div></div>
+      <div><div class="swatch" style="background:var(--caution);"></div><div class="label">Caution</div></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:44px;">
+    <div class="section-title">Typography</div>
+    <div class="section-sub">Sora for display, Manrope for UI/body, Space Grotesk for numeric stats.</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="font-family:var(--font-display);font-weight:700;font-size:36px;">Train what matters</div>
+      <div style="font-family:var(--font-display);font-weight:600;font-size:22px;">Today's training — 12 min</div>
+      <div style="font-family:var(--font-body);font-size:15px;color:var(--text-2);max-width:560px;">Body copy in Manrope, used for descriptions, explanations, and anything a user reads at length. Legible at small sizes with generous line height.</div>
+      <div style="font-family:var(--font-num);font-weight:600;font-size:40px;color:var(--accent);">282 <span style="font-size:18px;color:var(--text-2);">WPM</span></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:44px;">
+    <div class="section-title">Spacing</div>
+    <div class="section-sub">4px base unit — 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64.</div>
+    <div style="display:flex;align-items:flex-end;gap:10px;">
+      <div style="width:4px;height:20px;background:var(--accent);"></div>
+      <div style="width:8px;height:20px;background:var(--accent);"></div>
+      <div style="width:12px;height:20px;background:var(--accent);"></div>
+      <div style="width:16px;height:20px;background:var(--accent);"></div>
+      <div style="width:24px;height:20px;background:var(--accent);"></div>
+      <div style="width:32px;height:20px;background:var(--accent);"></div>
+      <div style="width:48px;height:20px;background:var(--accent);"></div>
+      <div style="width:64px;height:20px;background:var(--accent);"></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:44px;">
+    <div class="section-title">Buttons &amp; badges</div>
+    <div class="section-sub">One obvious primary action; evidence badges use a muted, non-alarming scale — never a red/green pass-fail treatment.</div>
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;">
+      <button class="btn-primary">Start Training</button>
+      <button class="btn-secondary">Choose another level</button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <span class="badge" style="background:var(--accent-soft);color:var(--accent-strong);"><span class="dot" style="background:var(--accent);"></span>Strong evidence</span>
+      <span class="badge" style="background:var(--surface-2);color:var(--text-2);"><span class="dot" style="background:var(--text-2);"></span>Moderate evidence</span>
+      <span class="badge" style="background:var(--surface-2);color:var(--text-3);"><span class="dot" style="background:var(--text-3);border:1px solid var(--text-3);"></span>Limited evidence</span>
+      <span class="badge" style="background:transparent;color:var(--text-3);border:1.5px dashed var(--border);"><span class="dot" style="background:transparent;border:1.5px dashed var(--text-3);"></span>Experimental</span>
+    </div>
+  </div>
+
+  <div style="margin-bottom:44px;">
+    <div class="section-title">Paired reading stat</div>
+    <div class="section-sub">Speed and comprehension are never shown apart.</div>
+    <div class="card" style="display:inline-flex;gap:28px;padding:20px 28px;">
+      <div>
+        <div class="sub">READING PACE</div>
+        <div style="font-family:var(--font-num);font-weight:600;font-size:26px;">245 → 282 <span style="font-size:13px;color:var(--text-2);font-family:var(--font-body);">WPM</span></div>
+      </div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div>
+        <div class="sub">COMPREHENSION</div>
+        <div style="font-family:var(--font-num);font-weight:600;font-size:26px;color:var(--success);">87% → 89%</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:44px;">
+    <div class="section-title">Streak indicator</div>
+    <div class="card" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2.5c1.2 3.4-2.6 4.4-2.6 7.6a2.6 2.6 0 005.2 0c0-.9-.6-1.8-.9-2.6 1.9 1 3.3 3 3.3 5.3a5.2 5.2 0 01-10.4 0c0-4.6 3.3-5.6 5.4-10.3z" stroke="var(--caution)" stroke-width="1.5" fill="var(--caution-soft)"/></svg>
+      <span style="font-family:var(--font-num);font-weight:600;font-size:15px;">8-day streak</span>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-title">Level selector</div>
+    <div class="section-sub">Plain-language levels with a pre-selected recommendation and an Auto default — never raw task parameters.</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="pill {{isBeginner}}" onClick="{{pickBeginner}}">Beginner</div>
+      <div class="pill {{isIntermediate}}" onClick="{{pickIntermediate}}">Intermediate <span style="font-size:10px;color:var(--accent);">· Recommended</span></div>
+      <div class="pill {{isAdvanced}}" onClick="{{pickAdvanced}}">Advanced</div>
+      <div class="pill {{isExpert}}" onClick="{{pickExpert}}">Expert</div>
+      <div class="pill {{isCustom}}" onClick="{{pickCustom}}">Custom</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { dark: false, level: "Intermediate" };
+  }
+  pick(level) { this.setState({ level }); }
+  renderVals() {
+    const dark = this.state.dark;
+    const level = this.state.level;
+    const cls = (name) => (level === name ? "active" : "");
+    return {
+      theme: dark ? "dark" : "light",
+      trackBg: dark ? "var(--accent)" : "var(--border)",
+      knobPos: dark ? "22px" : "2px",
+      toggleTheme: () => this.setState({ dark: !this.state.dark }),
+      isBeginner: cls("Beginner"), isIntermediate: cls("Intermediate"), isAdvanced: cls("Advanced"),
+      isExpert: cls("Expert"), isCustom: cls("Custom"),
+      pickBeginner: () => this.pick("Beginner"), pickIntermediate: () => this.pick("Intermediate"),
+      pickAdvanced: () => this.pick("Advanced"), pickExpert: () => this.pick("Expert"), pickCustom: () => this.pick("Custom"),
+    };
+  }
+}
+</script>
+</body>
+</html>

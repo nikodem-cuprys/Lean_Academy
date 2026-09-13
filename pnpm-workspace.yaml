@@ -1,0 +1,13 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+# These packages have postinstall scripts pnpm blocks by default (supply-
+# chain hardening). All are needed to function: Prisma fetches its
+# query-engine binaries, esbuild/unrs-resolver fetch native platform
+# binaries (used by vitest/eslint tooling).
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+  unrs-resolver: true

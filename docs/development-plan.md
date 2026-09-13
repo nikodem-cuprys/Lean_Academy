@@ -1,0 +1,133 @@
+# Development Plan — LeanAcademy
+
+_Phased roadmap per `project_prompt.txt`. Sizes use T-shirt estimates (XS/S/M/L/XL) since developer capacity is unknown — translate to a schedule once team size is known. Each phase lists Objective / Deliverables / Exit Criteria / Dependencies._
+
+## Sizing legend
+
+XS = hours, S = ~1 day, M = ~2-4 days, L = ~1-2 weeks, XL = ~3+ weeks, all assuming one full-time senior generalist engineer; adjust down with more people, up with less focus time.
+
+---
+
+## Phase 0 — Research
+
+**Objective:** Ground every training method in real evidence before any of it becomes a feature.
+**Deliverables:** `docs/evidence-review.md`, `data/evidence-registry.json`, competitor analysis, this document, `docs/kanban.md`, `docs/product-requirements.md`.
+**Exit criteria:** Every candidate training domain has a documented evidence-scale rating and an explicit include/exclude decision.
+**Dependencies:** None.
+**Size:** M (first pass complete this session; ongoing refinement is continuous, not a one-time gate).
+**Status:** First pass complete — see `docs/evidence-review.md`. Follow-up items tracked at the bottom of that file (task-switching deep dive, skimming/scanning research, 2026 replication check).
+
+## Phase 1 — UX Foundation
+
+**Objective:** Validate the experience before building a large exercise catalog.
+**Deliverables:** User journeys, information architecture, wireframes (`docs/ux-strategy.md`), design system (`docs/design-system.md`), an interactive prototype, usability-test results.
+**Exit criteria:** The critical path (Landing → first exercise) has been prototyped and walked through against the usability-testing scenarios in `docs/ux-strategy.md`; no scenario requires unassisted-user instructions to complete.
+**Dependencies:** Phase 0 (need to know what exercises exist to design their screens).
+**Size:** L (docs done this session; interactive prototype + usability pass is separate follow-up work, ideally via the `design` skill — see `env_development.md`).
+
+## Phase 2 — Technical Foundation
+
+**Objective:** Stand up the repository, database, auth, API, and shared engines the whole product depends on.
+**Deliverables:** Repo scaffold (`apps/web`, `apps/api`, `packages/*` per the architecture sketch below), Postgres schema, auth (email + Google + Facebook via OAuth/PKCE), trial engine, adaptive engine skeleton, evidence-registry loader, base analytics events.
+**Exit criteria:** A user can register, log in via all three methods, and the app reads the evidence registry to decide what's in the catalog (even with zero real exercises yet).
+**Dependencies:** Phase 1 (screens/IA inform API/data shape); Phase 0 (registry shape).
+**Size:** L.
+
+## Phase 3 — Web MVP
+
+**Objective:** Ship the smallest version of the real product: a handful of outstanding exercises plus reading training, end to end.
+**Deliverables:** `adaptive-nback-v0`, `complex-span-v0`, `visuospatial-sequence-recall-v0`, `verbal-sequencing-v0` (or a trimmed subset — see MVP Philosophy below), `reading-paced-adaptive-v0` with baseline/calibration, daily session flow, basic progress view, `/science` pages.
+**Exit criteria:** Matches the WEB SUCCESS CRITERIA in `project_prompt.txt` — account creation, all three auth methods, fast onboarding, intuitive level selection, evidence-supported WM exercises, reading-efficiency training with adaptive difficulty, daily training, understandable progress, science pages, multi-day return capability, legitimate achievements (if Phase 5 pulled forward for one), works on desktop and mobile browsers.
+**Dependencies:** Phase 2.
+**Size:** XL.
+
+## Phase 4 — UX Polish
+
+**Objective:** Take the MVP from functional to premium.
+**Deliverables:** Animation pass, feedback pass, onboarding refinement from real usage, accessibility audit, mobile-responsive-web pass, performance optimization, a second usability-testing round.
+**Exit criteria:** New-user 3-second screen-comprehension bar met on every core screen; Core Web Vitals-equivalent performance targets met (see `docs/testing.md` for how these get verified).
+**Dependencies:** Phase 3.
+**Size:** L.
+
+## Phase 5 — Engagement
+
+**Objective:** Make the daily habit sticky, honestly.
+**Deliverables:** Daily activity system, streaks (with protection, non-manipulative copy), XP (with anti-grind caps), training levels (explicitly not framed as cognitive ability), achievements, weekly challenges, personal bests.
+**Exit criteria:** Every gamification element maps to a real action or real performance; none implies a cognitive-ability claim (spot-checked against `SCIENTIFIC PROGRESS LANGUAGE` in `project_prompt.txt`).
+**Dependencies:** Phase 3/4 (needs real training data to gamify).
+**Size:** L.
+
+## Phase 6 — Advanced Measurement
+
+**Objective:** Separate practiced-task improvement from genuine transfer with more rigor.
+**Deliverables:** Transfer assessments (different tasks/forms than training), alternate forms to avoid pure practice effects, confidence intervals on scores, deeper analytics, longitudinal reports.
+**Exit criteria:** The Progress page's "Similar Cognitive Tasks" and "Broader Transfer" sections have real assessment data behind them, not placeholders.
+**Dependencies:** Phase 3 (need weeks of trained-task data first).
+**Size:** L.
+
+## Phase 7 — Monetization
+
+**Objective:** Sustainable revenue without compromising scientific credibility.
+**Deliverables:** `docs/monetization-plan.md` (done this session, draft-level), Stripe integration, entitlement system, free/premium feature split, pricing experiments.
+**Exit criteria:** A user can subscribe and cancel with equal ease; no scientific claim or basic progress view is paywalled; see the Gamification Monetization Rule in `project_prompt.txt`.
+**Dependencies:** Phase 3 (need something worth paying for) and ideally Phase 5 (retention mechanics in place before optimizing conversion).
+**Size:** L.
+
+## Phase 8 — Mobile MVP
+
+**Objective:** Native-quality iOS/Android apps sharing the web account/data.
+**Deliverables:** Cross-platform framework evaluation and decision (see `docs/mobile-plan.md`), shared account system, shared training history, core exercises + reading training ported natively, push notifications (optional, non-manipulative).
+**Exit criteria:** Matches MOBILE SUCCESS CRITERIA in `project_prompt.txt` — install, log into the same account, synchronized progress, complete training, native-quality interactions, optional reminders, same achievements, seamless continuation across web/mobile.
+**Dependencies:** Phase 3 (web MVP must be validated first — do not start mobile before this per the spec).
+**Size:** XL.
+
+## Phase 9 — Mobile Expansion
+
+**Objective:** Take mobile from "works" to "native-grade."
+**Deliverables:** Limited offline training with secure sync, widgets where appropriate, advanced haptics, native performance optimization, app-store subscriptions.
+**Exit criteria:** Offline sessions sync without duplicate/conflicting records.
+**Dependencies:** Phase 8.
+**Size:** L.
+
+## Phase 10 — Advanced Product
+
+**Objective:** Expand the validated core.
+**Deliverables:** New evidence-approved tasks (re-run the Phase 0 process per task), optional social features (consistency/XP-based, never "intelligence rankings" — see `project_prompt.txt` LEAGUES section), research participation options, personalized training plans.
+**Exit criteria:** N/A — ongoing; gated by re-running Phase 0's evidence process for anything new.
+**Dependencies:** Everything before it. Do not jump here early.
+**Size:** Ongoing.
+
+---
+
+## MVP Philosophy (governs Phase 3 scope decisions)
+
+Per `project_prompt.txt`: build ~3-5 outstanding evidence-supported exercises plus excellent adaptive reading training — not twenty mediocre games. Candidate trim for Phase 3, in priority order: (1) Adaptive N-Back, (2) Complex Span, (3) Reading (paced/adaptive + chunking as a technique within it), (4) Spatial Sequence Recall, (5) Verbal Sequencing — with Verbal Sequencing as the first cut if scope needs to shrink further, since it's the least differentiated from Complex Span mechanically.
+
+## Reference architecture (target for Phase 2)
+
+```text
+apps/
+  web/
+  mobile/        (Phase 8+)
+  api/
+
+packages/
+  cognitive-engine/
+  reading-engine/
+  trial-engine/
+  adaptive-engine/
+  psychometrics/
+  evidence/
+  design-system/
+  shared/
+
+docs/
+data/
+```
+
+## Cross-cutting risks
+
+- **Technical:** timing-sensitive tasks (`performance.now()`-based) must behave consistently across browsers/devices — needs early device-testing investment, not a Phase 4 afterthought for the timing layer specifically.
+- **Research:** far-transfer claims are contested field-wide; any new module added in Phase 10+ must re-run the full Phase 0 evidence process, not get grandfathered in.
+- **UX:** the temptation to add "just one more metric" to Home/Progress screens recurs every phase — the 3-second-comprehension rule is the standing check against it.
+- **Launch criteria (web):** all items in `project_prompt.txt`'s INITIAL PRODUCT SUCCESS CRITERIA verified via `docs/testing.md`, plus a clean security review (`docs/security.md`) and accessibility pass.

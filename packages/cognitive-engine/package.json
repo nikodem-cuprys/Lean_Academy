@@ -1,0 +1,21 @@
+{
+  "name": "@lean-academy/cognitive-engine",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "lint": "echo \"(no lint configured yet)\""
+  },
+  "dependencies": {
+    "@lean-academy/adaptive-engine": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

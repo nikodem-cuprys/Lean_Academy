@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{
+      --bg:oklch(98% 0.004 95); --surface:oklch(99.5% 0.002 95); --surface-2:oklch(96.2% 0.006 95);
+      --border:oklch(90% 0.008 95); --text:oklch(22% 0.02 265); --text-2:oklch(46% 0.02 265); --text-3:oklch(62% 0.015 265);
+      --accent:oklch(56% 0.19 276); --accent-strong:oklch(46% 0.19 276); --accent-soft:oklch(94% 0.035 276); --on-accent:oklch(99% 0.004 276);
+      --radius-sm:10px; --radius-md:16px; --radius-lg:24px; --radius-full:999px;
+      --font-display:'Sora',system-ui,sans-serif; --font-body:'Manrope',system-ui,sans-serif;
+    }
+    [data-theme="dark"]{
+      --bg:oklch(17% 0.012 265); --surface:oklch(21% 0.014 265); --surface-2:oklch(25% 0.016 265);
+      --border:oklch(32% 0.018 265); --text:oklch(95% 0.006 265); --text-2:oklch(78% 0.012 265); --text-3:oklch(60% 0.014 265);
+      --accent:oklch(74% 0.15 276); --accent-strong:oklch(82% 0.13 276); --accent-soft:oklch(32% 0.06 276); --on-accent:oklch(14% 0.02 276);
+    }
+    *{box-sizing:border-box;}
+    .oauth-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border-radius:var(--radius-md);border:1.5px solid var(--border);background:var(--surface);font-family:var(--font-body);font-weight:600;font-size:14.5px;color:var(--text);cursor:pointer;}
+    input{width:100%;padding:13px 14px;border-radius:var(--radius-md);border:1.5px solid var(--border);font-family:var(--font-body);font-size:14.5px;color:var(--text);background:var(--surface);}
+    input::placeholder{color:var(--text-3);}
+    .tab{flex:1;text-align:center;padding:10px 0;font-family:var(--font-body);font-weight:700;font-size:14px;cursor:pointer;color:var(--text-3);border-bottom:2.5px solid transparent;}
+    .tab.active{color:var(--text);border-color:var(--accent);}
+  </style>
+</helmet>
+<div class="la" data-theme="{{theme}}" style="width:390px;height:844px;overflow-y:auto;background:var(--bg);color:var(--text);font-family:var(--font-body);display:flex;flex-direction:column;padding:28px 24px;">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:36px;">
+    <div style="font-family:var(--font-display);font-weight:700;font-size:18px;">LeanAcademy</div>
+    <div onClick="{{toggleTheme}}" style="width:30px;height:30px;border-radius:999px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--border);">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="var(--text-2)" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="4.2" stroke="var(--text-2)" stroke-width="1.6"/></svg>
+    </div>
+  </div>
+
+  <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:28px;">
+    <div class="tab {{loginActive}}" onClick="{{showLogin}}">Log in</div>
+    <div class="tab {{signupActive}}" onClick="{{showSignup}}">Sign up</div>
+  </div>
+
+  <div style="font-family:var(--font-display);font-weight:700;font-size:23px;margin-bottom:6px;">{{heading}}</div>
+  <div style="font-size:13.5px;color:var(--text-2);margin-bottom:28px;">{{subheading}}</div>
+
+  <div style="display:flex;flex-direction:column;gap:11px;margin-bottom:22px;">
+    <button class="oauth-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.3c0-.85-.08-1.66-.22-2.44H12v4.62h6.46c-.28 1.5-1.13 2.78-2.4 3.63v3h3.88c2.27-2.09 3.56-5.17 3.56-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.9l-3.88-3c-1.08.72-2.45 1.15-4.06 1.15-3.12 0-5.77-2.11-6.72-4.94H1.27v3.1C3.24 21.3 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.31A7.2 7.2 0 014.9 12c0-.8.14-1.58.38-2.31v-3.1H1.27A11.96 11.96 0 000 12c0 1.93.46 3.76 1.27 5.41l4.01-3.1z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0 7.28 0 3.24 2.7 1.27 6.59l4.01 3.1C6.23 6.86 8.88 4.75 12 4.75z"/></svg>
+      Continue with Google
+    </button>
+    <button class="oauth-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.09 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.89v2.25h3.32l-.53 3.49h-2.79V24C19.61 23.09 24 18.1 24 12.07z"/></svg>
+      Continue with Facebook
+    </button>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+    <div style="flex:1;height:1px;background:var(--border);"></div>
+    <div style="font-size:12px;color:var(--text-3);">or</div>
+    <div style="flex:1;height:1px;background:var(--border);"></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:11px;">
+    <sc-if value="{{signup}}" hint-placeholder-val="{{false}}">
+      <input placeholder="Name" />
+    </sc-if>
+    <input placeholder="Email" />
+    <input placeholder="Password" type="password" />
+  </div>
+
+  <button style="width:100%;padding:14px;margin-top:20px;background:var(--accent);color:var(--on-accent);border:none;border-radius:var(--radius-full);font-family:var(--font-body);font-weight:700;font-size:15px;cursor:pointer;">{{ctaLabel}}</button>
+
+  <div style="font-size:12px;color:var(--text-3);text-align:center;margin-top:18px;line-height:1.5;">By continuing you agree to our Terms and Privacy Policy.</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { signup: false, dark: false };
+  }
+  renderVals() {
+    const signup = this.state.signup;
+    return {
+      loginActive: !signup ? "active" : "",
+      signupActive: signup ? "active" : "",
+      heading: signup ? "Create your account" : "Welcome back",
+      subheading: signup ? "Start with a free 6-minute session." : "Log in to continue your training.",
+      ctaLabel: signup ? "Create account" : "Log in",
+      signup: signup,
+      showLogin: () => this.setState({ signup: false }),
+      showSignup: () => this.setState({ signup: true }),
+      theme: this.state.dark ? "dark" : "light",
+      toggleTheme: () => this.setState({ dark: !this.state.dark }),
+    };
+  }
+}
+</script>
+</body>
+</html>

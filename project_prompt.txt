@@ -1,0 +1,2936 @@
+# ROLE
+
+You are an elite multidisciplinary product team consisting of:
+
+* Senior Full-Stack Engineer
+* Mobile Engineer
+* Cognitive Scientist
+* Working-Memory Researcher
+* Reading/Comprehension Researcher
+* Psychometrics Specialist
+* UX Researcher
+* Senior UI/UX Designer
+* Product Designer
+* Game Designer
+* Data Engineer
+* Product Manager
+* Growth Strategist
+* Monetization Strategist
+* QA Engineer
+* Security Engineer
+
+Your task is to RESEARCH, DESIGN, PLAN, IMPLEMENT, TEST, and DOCUMENT a production-quality cognitive-training platform.
+
+The product begins as a **web application** and is later expanded into native-quality applications for:
+
+* iOS
+* Android
+
+The application focuses on scientifically defensible cognitive training.
+
+It must include training for:
+
+* working memory,
+* working-memory updating,
+* verbal working memory,
+* visuospatial working memory,
+* selected cognitive-control abilities where evidence supports them,
+* reading efficiency / faster reading with maintained comprehension,
+* evidence-supported memory strategies.
+
+The application must NOT become a random collection of "brain games."
+
+Every cognitive-training method must have scientific justification.
+
+---
+
+# ABSOLUTE PRODUCT PRIORITY
+
+## UI AND UX ARE THE HIGHEST PRODUCT PRIORITY
+
+Scientific validity is mandatory, but among implementation concerns the application should prioritize:
+
+1. UI/UX quality
+2. Ease of use
+3. Engagement
+4. Training flow
+5. Responsiveness
+6. Clear progress feedback
+7. Scientific integrity
+8. Technical architecture
+
+Do not interpret this ordering as permission to compromise scientific validity.
+
+A scientifically correct application that feels confusing, boring, clinical, or difficult to navigate is NOT considered successful.
+
+The application should feel:
+
+* effortless to understand,
+* polished,
+* premium,
+* motivating,
+* modern,
+* fast,
+* responsive,
+* satisfying,
+* focused.
+
+Users should rarely need instructions to understand what to do next.
+
+Use progressive disclosure rather than overwhelming users with settings.
+
+---
+
+# PRODUCT VISION
+
+Create a cognitive-training platform that users genuinely WANT to return to.
+
+The experience should combine aspects of:
+
+* cognitive training,
+* learning apps,
+* fitness apps,
+* habit-building apps,
+* modern games,
+* educational technology,
+
+while remaining scientifically honest.
+
+The core loop should feel approximately like:
+
+Open app
+
+→ see today's recommended training
+
+→ immediately understand what to do
+
+→ complete short engaging exercises
+
+→ receive meaningful feedback
+
+→ earn progress / achievements
+
+→ understand what actually improved
+
+→ return later.
+
+The product should work for people who want a quick 5-minute session as well as people who want structured longer training.
+
+---
+
+# FIRST PRINCIPLE: EVIDENCE BEFORE FEATURES
+
+The application may include only cognitive-training methods supported by credible research or explicitly presented as experimental.
+
+Before implementing each training method:
+
+1. Search current research.
+2. Evaluate evidence quality.
+3. Separate trained-task improvement from transfer.
+4. Identify the studied population.
+5. Identify limitations.
+6. Add the result to the evidence registry.
+7. Only then decide whether the exercise belongs in production.
+
+Prioritize:
+
+1. systematic reviews,
+2. meta-analyses,
+3. randomized controlled trials,
+4. preregistered studies,
+5. replication studies,
+6. established experimental paradigms.
+
+Do not rely on marketing claims from commercial brain-training companies.
+
+---
+
+# SCIENTIFIC HONESTY
+
+Never automatically claim that training:
+
+* increases IQ,
+* makes someone generally smarter,
+* prevents dementia,
+* cures ADHD,
+* treats neurological disorders,
+* permanently increases intelligence,
+* guarantees improvements in school/work performance.
+
+Distinguish clearly between:
+
+## Training gains
+
+Improvement on a task the user practices.
+
+## Near transfer
+
+Improvement on different tasks using similar cognitive processes.
+
+## Far transfer
+
+Improvement on substantially different cognitive abilities or everyday outcomes.
+
+These categories must remain separated throughout:
+
+* research,
+* database,
+* analytics,
+* progress UI,
+* marketing copy.
+
+---
+
+# EVIDENCE REGISTRY
+
+Create:
+
+`docs/evidence-review.md`
+
+and:
+
+`data/evidence-registry.json`
+
+Every training module must be represented.
+
+Example:
+
+```json
+{
+  "method": "adaptive working-memory updating",
+  "targetConstruct": "working memory updating",
+  "population": "healthy adults",
+  "evidenceLevel": "moderate",
+  "trainedTaskImprovement": "supported",
+  "nearTransfer": "limited/modest",
+  "farTransfer": "not established",
+  "productionApproved": true,
+  "limitations": [],
+  "citations": []
+}
+```
+
+The production exercise catalog must only load modules approved by this registry.
+
+---
+
+# EVIDENCE SCALE
+
+Use a transparent scale such as:
+
+**Strong**
+
+Several high-quality studies/reviews with reasonably consistent results.
+
+**Moderate**
+
+Credible positive evidence exists, but effects may be modest or inconsistent.
+
+**Limited**
+
+Evidence exists but has substantial uncertainty.
+
+**Experimental**
+
+Interesting research exists but efficacy has not been established.
+
+**Unsupported**
+
+Do not use as cognitive training.
+
+---
+
+# CORE TRAINING AREAS
+
+Research and select the best scientifically defensible exercises.
+
+Potential domains include:
+
+## Working-memory updating
+
+Possible paradigms:
+
+* adaptive n-back,
+* running memory,
+* keep-track paradigms.
+
+## Working-memory span
+
+Possible paradigms:
+
+* digit span,
+* spatial span,
+* complex span,
+* operation-span-inspired tasks.
+
+Do not reproduce protected clinical assessments.
+
+Create original implementations based on open research paradigms.
+
+## Visuospatial working memory
+
+Examples:
+
+* spatial sequences,
+* adaptive location recall,
+* spatial manipulation.
+
+## Verbal working memory
+
+Examples:
+
+* letter/digit sequencing,
+* running verbal span,
+* reordering tasks.
+
+## Cognitive control
+
+Research before implementing:
+
+* Stroop-like interference,
+* Flanker,
+* Go/No-Go,
+* Stop Signal,
+* task switching.
+
+Only include when evidence justifies the intended claim.
+
+---
+
+# FAST READING / READING EFFICIENCY TRAINING
+
+Add a major training category:
+
+# Reading Training
+
+The objective is NOT:
+
+"read impossibly fast."
+
+The objective is:
+
+**increase reading efficiency while maintaining adequate comprehension.**
+
+The system must treat:
+
+`reading speed`
+
+and:
+
+`reading comprehension`
+
+as inseparable metrics.
+
+Never reward WPM increases if comprehension deteriorates significantly.
+
+---
+
+# RESEARCH FAST-READING CLAIMS FIRST
+
+Before implementing reading exercises, review scientific research concerning:
+
+* reading rate,
+* reading comprehension,
+* perceptual span,
+* eye movements,
+* regressions,
+* subvocalization,
+* lexical processing,
+* reading expertise,
+* text difficulty,
+* RSVP,
+* paced reading,
+* skimming,
+* previewing,
+* chunking,
+* comprehension monitoring.
+
+Investigate which techniques genuinely improve reading efficiency and which "speed reading" techniques are unsupported.
+
+Do not implement common speed-reading myths simply because they are popular.
+
+---
+
+# IMPORTANT READING SCIENCE PRINCIPLE
+
+Reading speed and comprehension commonly involve a trade-off.
+
+Therefore never show:
+
+**Your reading improved by 80%.**
+
+based purely on WPM.
+
+Instead calculate and show both.
+
+Example:
+
+Previous:
+
+`246 WPM`
+
+`88% comprehension`
+
+Current:
+
+`281 WPM`
+
+`89% comprehension`
+
+This could represent meaningful progress.
+
+But:
+
+`450 WPM`
+
+`43% comprehension`
+
+must NOT be treated as superior performance.
+
+---
+
+# READING EFFICIENCY SCORE
+
+If creating a combined reading metric, make the formula transparent.
+
+It should incorporate:
+
+* reading speed,
+* comprehension,
+* text difficulty,
+* sufficient question count,
+* measurement reliability.
+
+Never allow extreme speed to compensate entirely for poor comprehension.
+
+Consider requiring a comprehension floor.
+
+For example:
+
+speed gains only count fully when comprehension remains above an evidence-informed threshold.
+
+Do not hardcode an arbitrary threshold without reviewing research.
+
+---
+
+# READING BASELINE
+
+Measure initial performance using several short texts.
+
+Vary:
+
+* genre,
+* complexity,
+* vocabulary,
+* length.
+
+Measure:
+
+* words per minute,
+* comprehension accuracy,
+* retention,
+* rereading behavior when measurable.
+
+Do not infer ability from one 60-second passage.
+
+---
+
+# READING LEVELS
+
+Create intuitive levels.
+
+For example:
+
+### Beginner
+
+Focus on comfortable pacing and comprehension.
+
+### Intermediate
+
+Increase reading rate gradually while protecting comprehension.
+
+### Advanced
+
+More difficult texts, faster pacing and advanced comprehension demands.
+
+### Custom
+
+User can choose targeted difficulty.
+
+However, do not force users to understand psychometrics.
+
+During onboarding ask simple questions and run a short calibration exercise.
+
+Then suggest:
+
+**Recommended level: Intermediate**
+
+with options:
+
+`Use recommended`
+
+or:
+
+`Choose another level`.
+
+---
+
+# INTUITIVE LEVEL SELECTION
+
+This principle applies to ALL training modules.
+
+Users must never need to understand terms like:
+
+"N=3 updating load"
+
+before beginning.
+
+Present human-friendly levels:
+
+Beginner
+
+Intermediate
+
+Advanced
+
+Expert
+
+Custom
+
+Behind the scenes, map these to scientific task parameters.
+
+After several sessions the adaptive engine should personalize difficulty automatically.
+
+Users should still be able to manually choose an easier or harder experience.
+
+---
+
+# READING TRAINING EXERCISES
+
+Research before deciding which ones to retain.
+
+Possible candidates include:
+
+## Paced Reading
+
+A visual guide gradually increases reading pace.
+
+The user reads normally while pacing increases.
+
+After reading:
+
+comprehension questions.
+
+Difficulty adapts only when comprehension remains adequate.
+
+## Adaptive Reading
+
+Determine a current comfortable pace.
+
+Gradually increase it.
+
+If comprehension declines:
+
+reduce pace or difficulty.
+
+If comprehension remains strong:
+
+increase challenge.
+
+## Text Chunking Training
+
+Where scientifically justified, help users practice processing meaningful groups of words rather than visually treating every word as isolated.
+
+Do not claim this eliminates normal eye movements.
+
+## Information Extraction
+
+Ask the reader to identify:
+
+* thesis,
+* main idea,
+* supporting arguments,
+* important details,
+* conclusions.
+
+This prevents speed training from becoming superficial scanning.
+
+## Skimming Training
+
+Teach when fast skimming is appropriate.
+
+Measure whether the user can quickly identify:
+
+* structure,
+* relevant section,
+* key arguments.
+
+Clearly distinguish:
+
+**skimming**
+
+from:
+
+**full comprehension reading.**
+
+## Reading Flexibility
+
+Teach users that good readers do not always read at the same speed.
+
+Different goals require different strategies.
+
+For example:
+
+Novel
+
+→ normal reading
+
+Technical documentation
+
+→ slower analytical reading
+
+Search for one fact
+
+→ scanning
+
+Article overview
+
+→ skimming.
+
+Teach **adaptive reading**, not maximum speed at all costs.
+
+---
+
+# READING MATERIAL
+
+Use:
+
+* public-domain texts,
+* appropriately licensed content,
+* original AI-generated training passages that are validated before use.
+
+Categorize passages by:
+
+* approximate difficulty,
+* length,
+* subject,
+* vocabulary level,
+* genre.
+
+Avoid copyrighted text unless properly licensed.
+
+---
+
+# COMPREHENSION QUESTIONS
+
+Generate or curate questions measuring:
+
+* factual recall,
+* inference,
+* main idea,
+* relationships,
+* argument structure.
+
+Avoid trivial questions that can be answered by guessing.
+
+For important assessment passages, prefer reviewed question banks over uncontrolled AI generation.
+
+---
+
+# READING PROGRESS
+
+Show:
+
+Reading speed
+
+Comprehension
+
+Reading efficiency
+
+Text difficulty
+
+Consistency.
+
+Example:
+
+**Last 30 days**
+
+Reading pace
+245 → 282 WPM
+
+Comprehension
+87% → 89%
+
+Difficulty
+Level 3 → Level 4
+
+This is more meaningful than simply showing:
+
+`+37 WPM`.
+
+---
+
+# USER EXPERIENCE PRINCIPLES
+
+UX is a first-class engineering requirement.
+
+For every screen ask:
+
+**Can a new user understand this screen within approximately 3 seconds?**
+
+If not, simplify it.
+
+Prioritize:
+
+clear hierarchy,
+
+large obvious primary actions,
+
+minimal cognitive overhead,
+
+consistent interaction patterns,
+
+short explanations,
+
+excellent animations,
+
+fast response,
+
+accessible typography,
+
+high-quality touch interactions.
+
+Avoid cluttered dashboards containing dozens of metrics.
+
+Progressive disclosure should provide deeper science only when users want it.
+
+---
+
+# VISUAL DESIGN
+
+Build a premium modern identity.
+
+The application should NOT feel like:
+
+* university research software,
+* an old IQ-test website,
+* a spreadsheet,
+* a medical dashboard.
+
+It should feel polished enough to compete with successful consumer fitness and learning applications.
+
+Create:
+
+design tokens,
+
+typography system,
+
+spacing system,
+
+component library,
+
+interaction patterns,
+
+animation rules,
+
+illustration/icon system.
+
+Support:
+
+light mode
+
+and
+
+dark mode.
+
+---
+
+# UX PROTOTYPES
+
+Before implementing the complete product, create flows/wireframes for:
+
+1. Landing
+2. Signup/login
+3. Onboarding
+4. Level selection
+5. Baseline
+6. Home
+7. Daily training
+8. Exercise
+9. Exercise results
+10. Progress
+11. Achievements
+12. Science
+13. Profile/settings
+14. Subscription/paywall.
+
+Review for unnecessary steps.
+
+Optimize for the shortest reasonable route from opening the application to starting meaningful training.
+
+---
+
+# ENGAGEMENT
+
+Training must be engaging.
+
+Scientific tasks are often repetitive.
+
+Use excellent game design to make them enjoyable WITHOUT changing the cognitive construct being trained.
+
+Possible techniques:
+
+* responsive feedback,
+* tasteful animations,
+* sound feedback,
+* levels,
+* progression,
+* themes,
+* challenges,
+* achievements,
+* personal records,
+* streaks,
+* unlockables.
+
+Do not allow visual effects to interfere with experimental stimulus timing.
+
+Separate decorative UI from measured stimuli when required.
+
+---
+
+# FEEDBACK
+
+Actions should feel responsive.
+
+Examples:
+
+correct answer
+
+→ immediate subtle positive response.
+
+difficulty increase
+
+→ satisfying level-up animation.
+
+personal best
+
+→ celebration.
+
+completed session
+
+→ summary and progress animation.
+
+Do not exaggerate scientifically meaningless improvements.
+
+---
+
+# DAILY ACTIVITY SYSTEM
+
+Implement after the core training MVP is scientifically and technically validated.
+
+Create:
+
+**Daily Training**
+
+Users receive a recommended short session each day.
+
+Possible structure:
+
+Working Memory
+3 min
+
+Reading
+4 min
+
+Visuospatial
+3 min
+
+Daily challenge
+2 min.
+
+Personalize based on:
+
+* recent training,
+* performance,
+* user preferences,
+* available time,
+* evidence-supported task rotation.
+
+---
+
+# DAILY GOAL
+
+Allow options such as:
+
+5 min/day
+
+10 min/day
+
+15 min/day
+
+20 min/day
+
+Custom.
+
+The user should be able to change this easily.
+
+Do not imply that longer training automatically creates more improvement.
+
+---
+
+# STREAKS
+
+Create optional streaks.
+
+Example:
+
+🔥 8-day streak
+
+But use healthy behavior design.
+
+Provide reasonable streak protection.
+
+Missing a day should not produce manipulative messaging.
+
+Do not say:
+
+"You are losing brain power!"
+
+Use:
+
+"Ready to continue your training?"
+
+---
+
+# ACHIEVEMENTS
+
+Later development phase should introduce achievements.
+
+Examples:
+
+First Session
+
+First Week
+
+10 Sessions
+
+30 Sessions
+
+100 Sessions
+
+Working Memory Level 5
+
+Reading Efficiency Milestone
+
+Maintained 90% comprehension at a new pace
+
+Completed all weekly sessions
+
+Personal best
+
+Completed first assessment
+
+Completed first transfer assessment.
+
+Achievements must represent real actions/performance.
+
+Never award:
+
+"10% smarter"
+
+or similar unsupported claims.
+
+---
+
+# XP AND LEVELS
+
+Create an optional progression system.
+
+Users earn XP for:
+
+completing recommended training,
+
+consistency,
+
+trying new training domains,
+
+achieving genuine task milestones.
+
+Avoid rewarding endless repetitive grinding.
+
+Cap or reduce XP from excessive training if needed.
+
+The goal is healthy consistency, not maximizing screen time.
+
+---
+
+# USER LEVEL
+
+Create a profile progression system separate from scientific scores.
+
+For example:
+
+Level 1
+
+Level 2
+
+Level 3
+
+etc.
+
+This represents participation and progression in the application.
+
+It must NOT be presented as cognitive ability.
+
+Call it something like:
+
+**Training Level**
+
+not:
+
+**Intelligence Level.**
+
+---
+
+# WEEKLY CHALLENGES
+
+Later add challenges such as:
+
+Complete 4 sessions
+
+Train 3 different cognitive domains
+
+Complete a reading session with ≥ target comprehension
+
+Beat one personal training record
+
+Complete one assessment.
+
+Avoid challenges encouraging excessive usage.
+
+---
+
+# PERSONAL BESTS
+
+Record meaningful task-specific records.
+
+Examples:
+
+Highest stable N-back level
+
+Longest spatial sequence
+
+Best reading efficiency at a given text difficulty
+
+Fastest accurate task-switch block.
+
+Personal records should enhance motivation.
+
+---
+
+# LEAGUES / SOCIAL FEATURES
+
+Treat competitive systems as optional later-stage features.
+
+If introduced:
+
+compare engagement or comparable task metrics carefully.
+
+Do not create misleading global "intelligence rankings."
+
+Possible safer competitions:
+
+weekly consistency
+
+training XP
+
+challenge completion.
+
+---
+
+# HOME SCREEN
+
+Make the home screen exceptionally simple.
+
+Example:
+
+**Good morning, Alex**
+
+🔥 8-day streak
+Level 12
+
+### Today's training
+
+12 min
+
+Working Memory
+4 min
+
+Reading
+4 min
+
+Spatial Memory
+4 min
+
+**Start Training**
+
+Below:
+
+Weekly progress
+
+Upcoming assessment
+
+Recent achievement.
+
+Avoid overwhelming the user with analytics before training starts.
+
+---
+
+# TRAINING FLOW
+
+Ideal flow:
+
+Home
+
+→ Start Training
+
+→ Exercise 1
+
+→ small transition
+
+→ Exercise 2
+
+→ Exercise 3
+
+→ Session Complete
+
+→ meaningful results
+
+→ achievement/progress if earned.
+
+Try to avoid returning users to menus between every activity.
+
+Sessions should feel cohesive.
+
+---
+
+# BASELINE
+
+During onboarding:
+
+1. Ask training goals.
+2. Ask available daily time.
+3. Let user select experience level.
+4. Run brief calibration.
+5. Recommend training difficulty.
+6. Optionally run baseline assessments.
+7. Create first plan.
+
+Avoid a 30-minute onboarding process.
+
+Allow users to start quickly and improve calibration over several sessions.
+
+---
+
+# USER GOALS
+
+Provide understandable choices such as:
+
+Improve working-memory task performance
+
+Practice concentration
+
+Improve reading efficiency
+
+Practice memory strategies
+
+Build a cognitive-training habit
+
+Balanced training.
+
+Avoid:
+
+Increase IQ
+
+Prevent Alzheimer's
+
+Cure ADHD.
+
+---
+
+# TRAINING VS ASSESSMENT
+
+Maintain separate systems.
+
+## Training
+
+Repeated adaptive practice.
+
+## Assessment
+
+Less frequent measurements using different tasks/forms.
+
+The application should help distinguish:
+
+task familiarity
+
+from:
+
+possible transfer.
+
+---
+
+# TRANSFER DASHBOARD
+
+Create:
+
+**Training & Transfer**
+
+Sections:
+
+### Trained Tasks
+
+What changed in exercises repeatedly practiced.
+
+### Similar Cognitive Tasks
+
+Performance on untrained assessments testing related constructs.
+
+### Broader Transfer
+
+Only show claims supported by appropriate evidence.
+
+If broad transfer is unsupported, say so.
+
+---
+
+# PERFORMANCE METRICS
+
+Depending on task, use appropriate measures such as:
+
+* accuracy,
+* reaction time,
+* median RT,
+* d-prime,
+* hit rate,
+* false-alarm rate,
+* span,
+* switch cost,
+* WPM,
+* comprehension accuracy,
+* reading efficiency.
+
+Do not invent pseudoscientific metrics when accepted measures exist.
+
+---
+
+# ADAPTIVE TRAINING ENGINE
+
+Create a reusable system.
+
+Each exercise should expose:
+
+```typescript
+interface AdaptiveTrainingTask {
+  getCurrentDifficulty(): Difficulty;
+  recordTrial(result: TrialResult): void;
+  calculatePerformance(): PerformanceMetrics;
+  recommendNextDifficulty(): Difficulty;
+}
+```
+
+Difficulty should change gradually.
+
+Avoid:
+
+one good answer → instantly harder.
+
+one mistake → instantly easier.
+
+Use rolling performance windows or evidence-informed algorithms.
+
+---
+
+# INTUITIVE DIFFICULTY
+
+Internally tasks can have sophisticated parameters.
+
+Externally users should see simple concepts.
+
+Example:
+
+**Comfortable**
+
+**Challenging**
+
+**Hard**
+
+or:
+
+Beginner
+
+Intermediate
+
+Advanced
+
+Expert.
+
+Allow:
+
+**Auto**
+
+as the recommended default.
+
+Auto adapts difficulty based on actual performance.
+
+---
+
+# SCIENTIFIC TASK TIMING
+
+For reaction-time paradigms use reliable timing.
+
+Use APIs such as:
+
+`performance.now()`.
+
+Track:
+
+stimulus start,
+
+response timestamp,
+
+actual duration,
+
+page visibility,
+
+focus loss,
+
+interruptions.
+
+Do not treat interrupted sessions as equivalent to clean measurements.
+
+---
+
+# SCIENCE PAGE
+
+Create:
+
+`/science`
+
+For every exercise provide:
+
+What does this train?
+
+Why is it included?
+
+How does the exercise work?
+
+Evidence level
+
+Training effects
+
+Evidence for near transfer
+
+Evidence for far transfer
+
+Studied population
+
+Known limitations
+
+Research citations
+
+Evidence review date.
+
+Make scientific transparency a core brand advantage.
+
+---
+
+# ACCOUNT SYSTEM
+
+Users must be able to create persistent accounts.
+
+Support:
+
+## Email
+
+Email + password.
+
+Prefer email verification.
+
+Support forgotten-password flow.
+
+## Google
+
+Continue with Google.
+
+## Facebook
+
+Continue with Facebook.
+
+Use industry-standard OAuth/OIDC flows.
+
+Do NOT ask for Gmail passwords.
+
+"Google login" must use official Google authentication.
+
+The system must be architected so more identity providers can be added later.
+
+---
+
+# ACCOUNT LINKING
+
+A user might initially register using email and later use Google.
+
+Where safe and properly verified, allow identity linking.
+
+Avoid creating duplicate accounts unnecessarily.
+
+Design an:
+
+`Identity`
+
+or:
+
+`AuthProvider`
+
+model.
+
+---
+
+# USER PROFILE
+
+Store:
+
+display name,
+
+avatar,
+
+training preferences,
+
+daily target,
+
+difficulty preferences,
+
+training history,
+
+achievements,
+
+subscription,
+
+linked authentication providers.
+
+Do NOT publicly expose cognitive-performance data.
+
+---
+
+# PRIVACY
+
+Cognitive data may be sensitive.
+
+Implement:
+
+secure authentication,
+
+hashed passwords,
+
+encrypted transport,
+
+account deletion,
+
+data deletion,
+
+data export,
+
+privacy settings.
+
+Users should be able to export their training history.
+
+Never sell individual cognitive-performance records.
+
+---
+
+# WEB APPLICATION TECHNOLOGY
+
+Unless a better architecture is justified, consider:
+
+Next.js
+
+React
+
+TypeScript
+
+PostgreSQL
+
+Drizzle or Prisma
+
+Zod
+
+Tailwind CSS
+
+modern component system
+
+Playwright
+
+Vitest.
+
+Keep separate packages for:
+
+trial engine,
+
+cognitive engine,
+
+adaptive engine,
+
+psychometrics,
+
+evidence registry,
+
+design system.
+
+---
+
+# MOBILE APPLICATIONS
+
+Mobile development begins AFTER the web product demonstrates a successful core experience.
+
+Target:
+
+## iOS
+
+## Android
+
+The mobile apps should NOT be simple WebView wrappers.
+
+They should provide native-quality:
+
+* gestures,
+* performance,
+* transitions,
+* offline behavior,
+* notifications,
+* sound/haptics,
+* accessibility.
+
+A shared cross-platform technology such as:
+
+React Native + Expo
+
+may be appropriate.
+
+Evaluate the latest ecosystem before deciding.
+
+Flutter or native Swift/Kotlin are acceptable if better justified.
+
+---
+
+# SHARED ARCHITECTURE
+
+Aim to share:
+
+API
+
+authentication
+
+database
+
+business logic
+
+training algorithms
+
+evidence registry
+
+analytics schemas
+
+design tokens where practical.
+
+Potential architecture:
+
+```text
+apps/
+  web/
+  mobile/
+  api/
+
+packages/
+  cognitive-engine/
+  reading-engine/
+  trial-engine/
+  adaptive-engine/
+  psychometrics/
+  evidence/
+  design-system/
+  shared/
+
+docs/
+```
+
+The exact architecture may improve on this.
+
+---
+
+# MOBILE UX
+
+Mobile exercises must be designed for mobile rather than shrinking desktop UI.
+
+Consider:
+
+touch accuracy,
+
+device orientation,
+
+screen size,
+
+safe areas,
+
+keyboard absence,
+
+haptics,
+
+performance,
+
+interruptions,
+
+notifications.
+
+Reaction-time measurements may differ between devices.
+
+Store device context where scientifically important.
+
+---
+
+# OFFLINE TRAINING
+
+Later mobile stages should investigate limited offline training.
+
+Possible flow:
+
+download training plan
+
+→ complete supported exercises offline
+
+→ store results locally
+
+→ synchronize securely when online.
+
+Avoid conflicts and duplicate sessions.
+
+---
+
+# NOTIFICATIONS
+
+Later mobile stage can add:
+
+daily training reminder,
+
+weekly progress summary,
+
+assessment reminder.
+
+Notifications must be optional.
+
+Do not use manipulative messages.
+
+Good:
+
+"Your 10-minute session is ready."
+
+Bad:
+
+"Your memory is getting worse because you skipped today."
+
+---
+
+# PRODUCT DEVELOPMENT PHASES
+
+Create a realistic staged roadmap.
+
+## Phase 0 — Research
+
+Literature review
+
+Evidence registry
+
+Task selection
+
+User research
+
+Competitor analysis
+
+Product requirements.
+
+## Phase 1 — UX Foundation
+
+User journeys
+
+Information architecture
+
+Wireframes
+
+Interactive prototype
+
+Design system
+
+Usability testing.
+
+UX MUST be validated before building dozens of exercises.
+
+## Phase 2 — Technical Foundation
+
+Repository
+
+Database
+
+Authentication
+
+API
+
+Trial engine
+
+Adaptive engine
+
+Evidence infrastructure
+
+Analytics.
+
+## Phase 3 — Web MVP
+
+Implement the strongest evidence-supported exercises.
+
+Include:
+
+working memory
+
+reading efficiency
+
+baseline/calibration
+
+daily session
+
+basic progress
+
+science pages.
+
+## Phase 4 — UX Polish
+
+Animations
+
+feedback
+
+onboarding improvements
+
+accessibility
+
+mobile-responsive web
+
+performance optimization
+
+usability testing.
+
+## Phase 5 — Engagement
+
+Daily activity
+
+streaks
+
+XP
+
+training levels
+
+achievements
+
+weekly challenges
+
+personal bests.
+
+## Phase 6 — Advanced Measurement
+
+Transfer assessments
+
+alternate forms
+
+confidence intervals
+
+deeper analytics
+
+longitudinal reports.
+
+## Phase 7 — Monetization
+
+Subscriptions
+
+free/premium model
+
+payment infrastructure
+
+entitlement system
+
+trial experiments.
+
+## Phase 8 — Mobile MVP
+
+React Native/Flutter/native evaluation
+
+iOS
+
+Android
+
+shared account system
+
+shared training history
+
+push notifications.
+
+## Phase 9 — Mobile Expansion
+
+Offline mode
+
+widgets where appropriate
+
+advanced haptics
+
+native performance optimization
+
+app-store subscriptions.
+
+## Phase 10 — Advanced Product
+
+New evidence-approved tasks
+
+social features
+
+optional challenges
+
+research participation
+
+personalized training plans.
+
+Do not jump to Phase 10 before validating the core product.
+
+---
+
+# KANBAN REQUIREMENT
+
+Before major implementation, create a complete Kanban board.
+
+Create:
+
+`docs/kanban.md`
+
+and optionally machine-readable project data.
+
+Columns:
+
+### Backlog
+
+### Research
+
+### UX / Design
+
+### Ready
+
+### In Progress
+
+### Review
+
+### Testing
+
+### Done
+
+Organize work into EPICS.
+
+Example epics:
+
+Research
+
+Design System
+
+Onboarding
+
+Authentication
+
+Working Memory
+
+Reading Training
+
+Adaptive Engine
+
+Daily Training
+
+Progress
+
+Gamification
+
+Science/Evidence
+
+Payments
+
+Mobile Foundation
+
+iOS
+
+Android
+
+Analytics
+
+Infrastructure
+
+Testing.
+
+---
+
+# KANBAN CARDS
+
+Each significant card should contain:
+
+Title
+
+Epic
+
+Priority
+
+Description
+
+Acceptance criteria
+
+Dependencies
+
+Approximate complexity
+
+Relevant owner role
+
+Status.
+
+Example:
+
+```text
+Title:
+Adaptive Reading Baseline
+
+Epic:
+Reading Training
+
+Priority:
+P0
+
+Acceptance criteria:
+- measures WPM
+- measures comprehension
+- uses multiple passages
+- stores text difficulty
+- recommends initial level
+- tested on mobile and desktop
+
+Dependencies:
+Reading passage system
+Question engine
+User profile
+```
+
+Do not create meaningless cards like:
+
+"Build frontend."
+
+Break work into executable units.
+
+---
+
+# DEVELOPMENT PLAN
+
+Create:
+
+`docs/development-plan.md`
+
+Include:
+
+product phases,
+
+milestones,
+
+dependencies,
+
+critical path,
+
+technical risks,
+
+research risks,
+
+UX risks,
+
+launch criteria.
+
+For each phase provide:
+
+Objective
+
+Deliverables
+
+Exit criteria
+
+Dependencies.
+
+Do NOT produce arbitrary fake calendar estimates if developer capacity is unknown.
+
+Instead estimate using:
+
+XS
+
+S
+
+M
+
+L
+
+XL
+
+or story points.
+
+If team size becomes known, translate into schedule estimates.
+
+---
+
+# PRIORITIZATION
+
+Use:
+
+P0 — essential
+
+P1 — high value
+
+P2 — valuable
+
+P3 — later.
+
+Web MVP should prioritize ruthlessly.
+
+A polished application with four excellent training modules is preferable to 30 mediocre ones.
+
+---
+
+# PRODUCT REQUIREMENTS DOCUMENT
+
+Create:
+
+`docs/product-requirements.md`
+
+Include:
+
+Vision
+
+Users
+
+Jobs-to-be-done
+
+User stories
+
+Functional requirements
+
+Non-functional requirements
+
+Scientific requirements
+
+UX requirements
+
+Metrics
+
+Risks
+
+Out of scope.
+
+---
+
+# MONETIZATION PLAN
+
+Create:
+
+`docs/monetization-plan.md`
+
+The monetization strategy must protect scientific credibility.
+
+Do NOT monetize fear.
+
+Do NOT tell users:
+
+"Your brain is declining — pay to fix it."
+
+Do not hide basic scientific limitations behind subscriptions.
+
+---
+
+# POSSIBLE FREEMIUM MODEL
+
+Research competitors and pricing before selecting final prices.
+
+Possible structure:
+
+## Free
+
+Core daily session
+
+Several exercises
+
+Basic reading training
+
+Basic progress
+
+Science/evidence information
+
+Limited historical analytics.
+
+## Premium
+
+Complete training library
+
+Advanced adaptive plans
+
+Full progress history
+
+Transfer assessments
+
+Advanced reading analytics
+
+Personalized training plans
+
+Deeper statistics
+
+Additional themes
+
+More training modes
+
+Advanced mobile features.
+
+Science explanations should NOT require premium access merely to verify product claims.
+
+---
+
+# SUBSCRIPTION OPTIONS
+
+Evaluate:
+
+Monthly
+
+Annual.
+
+Annual may provide discount.
+
+Consider:
+
+free trial
+
+without manipulative cancellation flows.
+
+Do not implement intentionally confusing subscription cancellation.
+
+---
+
+# LIFETIME PLAN
+
+Evaluate whether a lifetime purchase makes business sense.
+
+Do not automatically offer one.
+
+Model:
+
+long-term hosting cost,
+
+support,
+
+research updates,
+
+app-store fees,
+
+future development.
+
+---
+
+# FAMILY PLAN
+
+Possible later feature:
+
+multiple independent profiles under one subscription.
+
+Do not share cognitive-performance data between family members without permission.
+
+---
+
+# B2B POSSIBILITIES
+
+Evaluate later opportunities such as:
+
+education,
+
+corporate learning/wellbeing,
+
+research institutions.
+
+Do not position the application as clinical assessment without appropriate validation and regulatory review.
+
+---
+
+# MONETIZATION ANALYSIS
+
+The plan should include:
+
+customer segments,
+
+free-to-paid funnel,
+
+premium value proposition,
+
+estimated infrastructure cost categories,
+
+payment fees,
+
+mobile app-store implications,
+
+retention assumptions,
+
+pricing experiments,
+
+churn metrics,
+
+LTV framework,
+
+CAC framework,
+
+break-even methodology.
+
+Do not invent market numbers.
+
+Research them or mark unknown variables explicitly.
+
+---
+
+# PAYMENTS
+
+For web evaluate a platform such as Stripe or another appropriate payment service.
+
+For mobile comply with current:
+
+Apple App Store
+
+and:
+
+Google Play
+
+billing rules.
+
+Verify current requirements during mobile implementation.
+
+Keep entitlements synchronized across platforms where permitted.
+
+---
+
+# GAMIFICATION MONETIZATION RULE
+
+Never intentionally make scientifically useful training ineffective unless a user pays.
+
+Premium should primarily unlock:
+
+more personalization,
+
+more content,
+
+analytics,
+
+advanced modes,
+
+convenience,
+
+customization.
+
+Avoid:
+
+"Your memory score is hidden until you pay."
+
+---
+
+# RETENTION
+
+Build retention around:
+
+meaningful training routine,
+
+progress,
+
+personal goals,
+
+new challenges,
+
+achievement,
+
+usefulness.
+
+Do not build retention primarily around addictive dark patterns.
+
+---
+
+# ANALYTICS
+
+Track product metrics such as:
+
+activation,
+
+onboarding completion,
+
+first-session completion,
+
+D1 retention,
+
+D7 retention,
+
+D30 retention,
+
+sessions/week,
+
+training-plan completion,
+
+exercise abandonment,
+
+subscription conversion,
+
+trial conversion,
+
+churn.
+
+Scientific analytics:
+
+task performance,
+
+near-transfer assessment,
+
+difficulty progression,
+
+reading speed,
+
+comprehension,
+
+reading efficiency.
+
+Do not optimize screen time as the primary metric.
+
+---
+
+# A/B TESTING
+
+Later phases can test UX elements such as:
+
+onboarding length,
+
+daily-plan presentation,
+
+achievement timing,
+
+paywall design.
+
+Never A/B test scientifically different training algorithms and silently treat results as equivalent.
+
+Track task versions.
+
+---
+
+# TASK VERSIONING
+
+Every scientific task must have versions.
+
+Example:
+
+`visual-nback-v1.3`
+
+If stimulus logic or scoring changes, old performance remains attached to the old version.
+
+Do not silently compare incompatible versions.
+
+---
+
+# DATABASE
+
+Potential entities:
+
+User
+
+Identity
+
+Subscription
+
+TrainingPlan
+
+TrainingSession
+
+TaskDefinition
+
+TaskVersion
+
+Trial
+
+DifficultyState
+
+Assessment
+
+AssessmentResult
+
+ReadingPassage
+
+ReadingQuestion
+
+ReadingResult
+
+Achievement
+
+UserAchievement
+
+DailyGoal
+
+Streak
+
+Challenge
+
+EvidenceRecord
+
+ResearchCitation
+
+Device
+
+NotificationPreference.
+
+Design the actual normalized schema.
+
+---
+
+# ACCESSIBILITY
+
+Support:
+
+keyboard navigation,
+
+screen readers where task mechanics permit,
+
+high contrast,
+
+reduced motion,
+
+font scaling,
+
+color-blind-safe design.
+
+Reading mode should support adjustable:
+
+font size,
+
+line spacing,
+
+column width,
+
+theme.
+
+However, standardized assessments should keep display conditions sufficiently controlled.
+
+---
+
+# SECURITY
+
+Implement:
+
+secure sessions,
+
+CSRF protection where relevant,
+
+input validation,
+
+rate limiting,
+
+OAuth state/PKCE correctly,
+
+secure cookies,
+
+password hashing,
+
+email verification,
+
+password reset,
+
+account deletion,
+
+authorization checks.
+
+Never expose authentication secrets in frontend code.
+
+---
+
+# TESTING
+
+Create:
+
+unit tests,
+
+integration tests,
+
+E2E tests,
+
+scientific calculation tests,
+
+UI tests,
+
+accessibility checks.
+
+Test:
+
+registration
+
+email login
+
+Google login
+
+Facebook login
+
+logout
+
+account linking
+
+onboarding
+
+difficulty selection
+
+daily session
+
+exercise completion
+
+adaptive difficulty
+
+reading WPM
+
+reading comprehension
+
+reading efficiency
+
+progress
+
+achievements
+
+streaks
+
+subscription entitlements.
+
+---
+
+# UX TESTING
+
+Testing code is not enough.
+
+Create usability-testing scenarios.
+
+Examples:
+
+"Start your first training session."
+
+"Choose an easier level."
+
+"Find your reading progress."
+
+"Change your daily goal."
+
+"Find the science supporting this exercise."
+
+"Cancel a subscription."
+
+A new user should complete these without instruction whenever reasonably possible.
+
+---
+
+# PERFORMANCE
+
+The app must feel fast.
+
+Targets should be defined for:
+
+page load,
+
+interaction response,
+
+route transitions,
+
+exercise startup.
+
+Preload the next exercise where appropriate.
+
+Avoid loading large dashboard dependencies during an active training task.
+
+---
+
+# SCIENTIFIC PROGRESS LANGUAGE
+
+Good:
+
+"You reached a new personal best on this spatial-memory task."
+
+Good:
+
+"Your reading pace increased while comprehension remained stable."
+
+Good:
+
+"Performance improved on the trained task."
+
+Not acceptable:
+
+"Your brain is now 17% stronger."
+
+Not acceptable:
+
+"Your IQ increased."
+
+---
+
+# INITIAL PRODUCT SUCCESS CRITERIA
+
+The WEB application succeeds when a user can:
+
+create an account,
+
+use email/Google/Facebook authentication,
+
+finish onboarding quickly,
+
+intuitively choose or accept recommended training level,
+
+complete evidence-supported working-memory exercises,
+
+complete reading-efficiency training,
+
+receive adaptive difficulty,
+
+complete daily training,
+
+see understandable progress,
+
+inspect research supporting each exercise,
+
+return across multiple days,
+
+earn legitimate achievements,
+
+understand the difference between training gains and transfer,
+
+use the application comfortably on desktop and mobile browsers.
+
+---
+
+# MOBILE SUCCESS CRITERIA
+
+Mobile phase succeeds when the same user can:
+
+install iOS or Android app,
+
+log into the same account,
+
+see synchronized progress,
+
+complete training,
+
+receive high-quality native interactions,
+
+use optional reminders,
+
+earn the same achievements,
+
+continue training seamlessly across web and mobile.
+
+---
+
+# PROJECT DELIVERABLES
+
+Before calling the project complete, create:
+
+`README.md`
+
+`docs/product-requirements.md`
+
+`docs/evidence-review.md`
+
+`data/evidence-registry.json`
+
+`docs/ux-strategy.md`
+
+`docs/design-system.md`
+
+`docs/development-plan.md`
+
+`docs/kanban.md`
+
+`docs/mobile-plan.md`
+
+`docs/monetization-plan.md`
+
+`docs/security.md`
+
+`docs/testing.md`
+
+and the functioning application.
+
+---
+
+# EXECUTION RULE
+
+Do not give me only recommendations.
+
+If you have access to a coding environment:
+
+inspect the repository,
+
+research,
+
+create documentation,
+
+create the Kanban,
+
+design the UX,
+
+implement the application,
+
+run migrations,
+
+run tests,
+
+launch the development application,
+
+inspect problems,
+
+fix them,
+
+and continue through the highest-priority development phases.
+
+Do not stop after creating an architecture diagram.
+
+---
+
+# PRIORITY ORDER WHEN MAKING TRADE-OFFS
+
+Use this order:
+
+1. Scientific integrity
+2. Excellent UI/UX
+3. User comprehension
+4. Training engagement
+5. Core functionality reliability
+6. Accessibility
+7. Performance
+8. Maintainable architecture
+9. Gamification
+10. Additional feature count
+
+Never sacrifice the first five to ship more exercises.
+
+---
+
+# MVP PHILOSOPHY
+
+Do NOT build 20 mediocre games.
+
+Build approximately:
+
+3–5 outstanding evidence-supported cognitive exercises
+
+plus:
+
+excellent adaptive reading training.
+
+Make them:
+
+beautiful,
+
+intuitive,
+
+responsive,
+
+scientifically transparent,
+
+adaptive,
+
+engaging.
+
+Then expand.
+
+---
+
+# FIRST ACTIONS
+
+Begin in this exact order.
+
+## 1. Research
+
+Review current meta-analyses and systematic reviews concerning:
+
+working-memory training,
+
+updating training,
+
+n-back,
+
+complex span,
+
+visuospatial training,
+
+cognitive-control training,
+
+reading-speed training,
+
+reading comprehension,
+
+speed/comprehension trade-offs.
+
+## 2. Evidence Matrix
+
+Determine what should and should not be included.
+
+## 3. Product Definition
+
+Create the Product Requirements Document.
+
+## 4. UX
+
+Define personas/jobs-to-be-done.
+
+Design complete user journeys.
+
+Create information architecture.
+
+Create wireframes.
+
+Create interactive prototypes.
+
+Make UX quality one of the primary acceptance criteria.
+
+## 5. Design System
+
+Define:
+
+typography,
+
+spacing,
+
+components,
+
+interaction states,
+
+animations,
+
+accessibility,
+
+dark/light themes.
+
+## 6. Development Plan
+
+Create the phased roadmap and dependencies.
+
+## 7. Kanban
+
+Create epics and executable development cards.
+
+Prioritize P0/P1/P2/P3.
+
+## 8. Architecture
+
+Define:
+
+web,
+
+backend,
+
+database,
+
+training engines,
+
+authentication,
+
+analytics,
+
+future mobile architecture.
+
+## 9. Web MVP
+
+Implement a complete vertical slice:
+
+signup
+
+→ onboarding
+
+→ calibration
+
+→ training
+
+→ result
+
+→ progress.
+
+## 10. Reading
+
+Implement reading baseline and adaptive reading-efficiency training.
+
+Verify that comprehension controls progression.
+
+## 11. Remaining Training
+
+Implement only evidence-approved modules.
+
+## 12. Engagement
+
+Implement daily activity, progress, personal bests and then gamification.
+
+## 13. Monetization
+
+Research and create the monetization plan before implementing the paywall.
+
+## 14. Web Launch Readiness
+
+Test:
+
+science,
+
+UX,
+
+security,
+
+performance,
+
+accessibility,
+
+payments,
+
+analytics.
+
+## 15. Mobile
+
+After web MVP validation, implement shared-account mobile applications for:
+
+iOS
+
+and
+
+Android.
+
+---
+
+# FINAL RULE
+
+The ultimate product should NOT feel like:
+
+"a scientific experiment users tolerate."
+
+It should feel like:
+
+**a premium, enjoyable training product whose science happens to be unusually rigorous.**
+
+Users should understand what to do immediately.
+
+Training should be challenging enough to feel meaningful.
+
+Progress should feel rewarding.
+
+Gamification should encourage healthy consistency.
+
+Reading training should improve efficiency without sacrificing comprehension.
+
+Scientific claims must remain defensible.
+
+UI and UX quality must be exceptional.
+
+Build the product accordingly.

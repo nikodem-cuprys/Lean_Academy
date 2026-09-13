@@ -1,0 +1,486 @@
+// Normalized schema for the entities listed in project_prompt.txt's
+// DATABASE section. A few relation/join tables were added beyond that
+// literal list where normalization requires them (ChallengeProgress,
+// TaskVersion <-> TaskDefinition) — noted inline.
+//
+// EvidenceRecord/ResearchCitation mirror data/evidence-registry.json.
+// The registry JSON file (loaded via packages/evidence) remains the
+// reviewed source of truth that ships with the app; these tables exist
+// so the science pages and any future admin tooling can query evidence
+// data relationally. Keep them in sync with the registry — see
+// docs/evidence-review.md's sync rule in CLAUDE.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Identity & account ----------
+//
+// Account is Auth.js's (NextAuth) standard linked-provider model — it IS
+// the "Identity"/"AuthProvider" model project_prompt.txt asks for: one
+// row per (provider, providerAccountId), letting a user link Google and
+// Facebook to the same account without ever creating a duplicate. Using
+// Auth.js's own adapter schema here (rather than a bespoke Identity
+// table) means the OAuth/PKCE code paths are the well-tested library
+// implementation, not hand-rolled — see docs/security.md's requirement
+// for correct OAuth/PKCE. Email+password does not create an Account row
+// (Credentials isn't a "linked account" in Auth.js's model); it uses
+// User.hashedPassword directly, the standard Auth.js Credentials pattern.
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  accounts               Account[]
+  sessions               Session[]
+  subscription            Subscription?
+  trainingPlans           TrainingPlan[]
+  trainingSessions        TrainingSession[]
+  difficultyStates        DifficultyState[]
+  assessmentResults       AssessmentResult[]
+  readingResults          ReadingResult[]
+  userAchievements        UserAchievement[]
+  challengeProgress       ChallengeProgress[]
+  dailyGoal               DailyGoal?
+  streak                  Streak?
+  devices                 Device[]
+  notificationPreference  NotificationPreference?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+}
+
+/// Used for both email verification links and password-reset links.
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum SubscriptionPlan {
+  FREE
+  PREMIUM_MONTHLY
+  PREMIUM_ANNUAL
+  LIFETIME
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                 SubscriptionPlan   @default(FREE)
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodEnd     DateTime?
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
+
+// ---------- Training plan & sessions ----------
+
+enum DifficultyLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+  CUSTOM
+  AUTO
+}
+
+/// A revision of a user's training direction (from onboarding, or later
+/// changed in settings). Kept as a history, not a single mutable row, so
+/// the app can show "your plan changed on <date>" if useful later.
+model TrainingPlan {
+  id               String          @id @default(cuid())
+  userId           String
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goals            Json // string[] of selected goals, see docs/product-requirements.md USER GOALS
+  experienceLevel  String? // self-reported onboarding answer, plain text
+  difficultyLevel  DifficultyLevel @default(AUTO)
+  active           Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+
+  trainingSessions TrainingSession[]
+
+  @@index([userId, active])
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+model TrainingSession {
+  id                  String        @id @default(cuid())
+  userId              String
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trainingPlanId      String?
+  trainingPlan        TrainingPlan? @relation(fields: [trainingPlanId], references: [id])
+  status              SessionStatus @default(IN_PROGRESS)
+  startedAt           DateTime      @default(now())
+  completedAt         DateTime?
+  totalDurationSeconds Int?
+
+  trials         Trial[]
+  readingResults ReadingResult[]
+
+  @@index([userId, startedAt])
+}
+
+// ---------- Task catalog & versioning ----------
+
+enum TrainingDomain {
+  WORKING_MEMORY
+  READING
+  SPATIAL
+  VERBAL
+  COGNITIVE_CONTROL
+  MEMORY_STRATEGY
+}
+
+/// One row per exercise "family" (e.g. adaptive n-back). The `method`
+/// field is the same id used as the `method` key in
+/// data/evidence-registry.json — keep them identical.
+model TaskDefinition {
+  id          String         @id @default(cuid())
+  method      String         @unique
+  displayName String
+  domain      TrainingDomain
+  createdAt   DateTime       @default(now())
+
+  versions TaskVersion[]
+}
+
+/// Every scientific task must have versions (project_prompt.txt TASK
+/// VERSIONING). Trials reference a TaskVersion, never a bare
+/// TaskDefinition, so historical scores never silently mix across
+/// incompatible stimulus/scoring changes.
+model TaskVersion {
+  id               String         @id @default(cuid())
+  taskDefinitionId String
+  taskDefinition   TaskDefinition @relation(fields: [taskDefinitionId], references: [id], onDelete: Cascade)
+  version          String // e.g. "1.3"
+  releasedAt       DateTime       @default(now())
+  changelog        String?
+
+  trials            Trial[]
+  difficultyStates  DifficultyState[]
+
+  @@unique([taskDefinitionId, version])
+}
+
+/// The atomic scientific measurement record for reaction-time /
+/// accuracy-based tasks. wasInterrupted flags a trial where focus/
+/// visibility was lost mid-stimulus (see docs/product-requirements.md's
+/// timing-integrity requirement) — exclude these from clean-data analysis
+/// rather than deleting them, so the interruption itself stays visible.
+model Trial {
+  id                  String          @id @default(cuid())
+  trainingSessionId   String
+  trainingSession     TrainingSession @relation(fields: [trainingSessionId], references: [id], onDelete: Cascade)
+  taskVersionId       String
+  taskVersion         TaskVersion     @relation(fields: [taskVersionId], references: [id])
+  difficultyAtTrial   Int
+  correct             Boolean
+  reactionTimeMs      Int?
+  stimulusStartedAt   DateTime
+  respondedAt         DateTime?
+  wasInterrupted      Boolean         @default(false)
+  /// Task-specific extra data (e.g. n-back N, dice values shown).
+  metadata            Json?
+
+  @@index([trainingSessionId])
+  @@index([taskVersionId])
+}
+
+/// A user's current difficulty per task, persisted so the next session
+/// can resume from it instead of restarting the adaptive engine cold.
+model DifficultyState {
+  id                String      @id @default(cuid())
+  userId            String
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskVersionId     String
+  taskVersion       TaskVersion @relation(fields: [taskVersionId], references: [id])
+  currentDifficulty Int
+  updatedAt         DateTime    @updatedAt
+
+  @@unique([userId, taskVersionId])
+}
+
+// ---------- Assessments (separate from repeated training) ----------
+
+enum AssessmentType {
+  BASELINE
+  NEAR_TRANSFER
+  FAR_TRANSFER
+  PERIODIC
+}
+
+model Assessment {
+  id          String         @id @default(cuid())
+  name        String
+  description String?
+  type        AssessmentType
+
+  results AssessmentResult[]
+}
+
+model AssessmentResult {
+  id           String     @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  takenAt      DateTime   @default(now())
+  /// Flexible because different assessments produce different measures
+  /// (accuracy, span, d-prime, ...) — see docs/product-requirements.md
+  /// Performance Metrics.
+  scoreSummary Json
+  notes        String?
+
+  @@index([userId, assessmentId])
+}
+
+// ---------- Reading ----------
+
+enum ReadingSource {
+  PUBLIC_DOMAIN
+  LICENSED
+  AI_GENERATED_VALIDATED
+}
+
+model ReadingPassage {
+  id              String        @id @default(cuid())
+  title           String
+  bodyText        String
+  genre           String?
+  difficultyLevel Int
+  wordCount       Int
+  source          ReadingSource
+  createdAt       DateTime      @default(now())
+
+  questions ReadingQuestion[]
+  results   ReadingResult[]
+}
+
+enum ReadingQuestionType {
+  FACTUAL
+  INFERENCE
+  MAIN_IDEA
+  RELATIONSHIP
+  ARGUMENT_STRUCTURE
+}
+
+model ReadingQuestion {
+  id                 String              @id @default(cuid())
+  readingPassageId   String
+  readingPassage     ReadingPassage      @relation(fields: [readingPassageId], references: [id], onDelete: Cascade)
+  questionText       String
+  questionType       ReadingQuestionType
+  choices            Json // string[]
+  correctChoiceIndex Int
+}
+
+/// wpm and comprehensionAccuracy are always stored together and must
+/// always be displayed together — see the Reading Science Principle in
+/// docs/product-requirements.md. readingEfficiencyScore applies the
+/// comprehension-floor formula from that doc; it's nullable because it's
+/// only meaningful once enough passages/questions exist for reliability.
+model ReadingResult {
+  id                     String           @id @default(cuid())
+  userId                 String
+  user                   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trainingSessionId      String?
+  trainingSession        TrainingSession? @relation(fields: [trainingSessionId], references: [id])
+  readingPassageId       String
+  readingPassage         ReadingPassage   @relation(fields: [readingPassageId], references: [id])
+  wpm                    Float
+  comprehensionAccuracy  Float
+  readingEfficiencyScore Float?
+  completedAt            DateTime         @default(now())
+
+  @@index([userId, completedAt])
+}
+
+// ---------- Gamification ----------
+
+model Achievement {
+  id          String @id @default(cuid())
+  key         String @unique
+  title       String
+  description String
+  iconKey     String
+
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  earnedAt      DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+}
+
+model DailyGoal {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetMinutes Int      @default(10)
+  updatedAt     DateTime @updatedAt
+}
+
+model Streak {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentStreakDays  Int      @default(0)
+  longestStreakDays  Int      @default(0)
+  lastActiveDate     DateTime?
+  updatedAt          DateTime @updatedAt
+}
+
+enum ChallengeType {
+  WEEKLY
+}
+
+model Challenge {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  type        ChallengeType
+  /// e.g. { "kind": "complete_sessions", "count": 4 }
+  criteria    Json
+  startsAt    DateTime
+  endsAt      DateTime
+
+  /// Join table — not in the spec's literal entity list, but required to
+  /// normalize many-users-to-many-challenges participation/progress.
+  progress ChallengeProgress[]
+}
+
+model ChallengeProgress {
+  id            String    @id @default(cuid())
+  challengeId   String
+  challenge     Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  progressValue Int       @default(0)
+  completedAt   DateTime?
+
+  @@unique([challengeId, userId])
+}
+
+// ---------- Evidence (relational mirror of data/evidence-registry.json) ----------
+
+enum EvidenceLevel {
+  STRONG
+  MODERATE
+  LIMITED
+  EXPERIMENTAL
+  UNSUPPORTED
+}
+
+model EvidenceRecord {
+  id                     String        @id @default(cuid())
+  method                 String        @unique // matches TaskDefinition.method
+  evidenceLevel          EvidenceLevel
+  trainedTaskImprovement String
+  nearTransfer           String
+  farTransfer            String
+  productionApproved     Boolean
+  lastReviewed           DateTime
+
+  citations ResearchCitation[]
+}
+
+model ResearchCitation {
+  id               String         @id @default(cuid())
+  evidenceRecordId String
+  evidenceRecord   EvidenceRecord @relation(fields: [evidenceRecordId], references: [id], onDelete: Cascade)
+  authors          String
+  year             Int
+  title            String
+  venue            String
+  url              String
+}
+
+// ---------- Devices & notifications (mobile-phase groundwork) ----------
+
+enum DevicePlatform {
+  WEB
+  IOS
+  ANDROID
+}
+
+model Device {
+  id         String         @id @default(cuid())
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform   DevicePlatform
+  pushToken  String?
+  lastSeenAt DateTime       @default(now())
+  createdAt  DateTime       @default(now())
+
+  @@index([userId])
+}
+
+model NotificationPreference {
+  id                          String   @id @default(cuid())
+  userId                      String   @unique
+  user                        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyReminderEnabled        Boolean  @default(false)
+  weeklySummaryEnabled        Boolean  @default(false)
+  assessmentReminderEnabled   Boolean  @default(false)
+  updatedAt                   DateTime @updatedAt
+}
