@@ -23,18 +23,19 @@ Evidence review is never really "finished" — new modules in Phase 10 re-trigge
 - Use the **`design`** skill to turn `docs/ux-strategy.md`'s screen list into an actual clickable, multi-artboard prototype before real implementation starts. This is worth doing before Phase 2/3 — the spec is explicit that UX must be validated before building a large exercise catalog, and a prototype is far cheaper to iterate on than shipped code.
 - Use **Plan Mode** (what produced this very file) any time you're about to make an architecture-affecting decision — database schema, adaptive-engine interface, auth provider model. It forces an explicit plan you can review before code gets written, which is cheap insurance on decisions that are expensive to reverse later.
 
-### Phase 2 — Technical Foundation
+### Phase 2 — Technical Foundation (done)
 
 - This is where you'll want the **`Plan`** subagent most: architecture decisions (monorepo tooling, Drizzle vs Prisma, schema design) benefit from a dedicated design pass rather than being decided inline.
 - Once there's a real app, the **`run`** skill launches and drives it so you can see things actually working in a browser rather than trusting test output alone.
 - Before merging any auth/security-adjacent work, run the **`security-review`** skill — this project's threat model (`docs/security.md`) includes OAuth/PKCE correctness and cognitive-data privacy, both worth a dedicated pass beyond normal code review.
 
-### Phase 3+ — Implementation (Web MVP onward)
+### Phase 3+ — Implementation (Web MVP onward, current phase)
 
 - Run **`code-review`** (or **`simplify`** for pure cleanup passes) before considering a chunk of work done, especially anything touching the adaptive engine or scoring calculations — these are the places where a subtle bug becomes a scientific-integrity problem, not just a normal bug.
 - For UI/UX work specifically, remember the project's own priority order: UI/UX quality sits above technical architecture in the trade-off list in `project_prompt.txt`. When you're deciding where to spend review time, weight it accordingly.
 - Once there's real data to show (progress charts, WPM/comprehension pairs, evidence-level badges), load the **`dataviz`** skill before building any chart — it has specific guidance for building trustworthy, accessible visualizations, which matters extra here since a misleading chart (e.g. a WPM line without its paired comprehension line) is exactly the failure mode `docs/product-requirements.md` warns against.
 - For recurring validation passes (e.g. "re-run the prohibited-claims copy check every time UI copy changes"), consider **`/loop`** rather than remembering to ask manually each time.
+- **Verify every new exercise screen in a real browser before calling it done.** Claude-in-Chrome is the first thing to try; when it won't connect (it hasn't yet, either time this has come up), fall back to a real Playwright spec in `apps/web/e2e/` run against a production build (`next build && next start`) — that's what caught the dev-mode CSRF race and is the pattern both N-Back and Complex Span followed. Passing `typecheck`/`build`/`lint` proves the server-rendered shell is correct, not that timers, event listeners, or a multi-step client-side flow actually work.
 
 ### Phase 7 — Monetization
 
@@ -50,18 +51,18 @@ Evidence review is never really "finished" — new modules in Phase 10 re-trigge
 
 Matched to when they'll actually matter, so you're not front-loading things you won't touch for months:
 
-**Now / Phase 2:**
+**Already useful, Phase 2 (done):**
 
 - **TypeScript** — the whole stack is TS; if you're going to read/steer any code, this is the one that pays off immediately.
 - **Next.js (App Router)** — routing, server components vs. client components, and where timing-sensitive exercise code needs to be client-side (this matters for the reaction-time integrity requirements in `docs/product-requirements.md`).
 - **PostgreSQL basics + Prisma** (the ORM already chosen and scaffolded in `packages/db`) — you don't need deep DBA skills, but understanding `packages/db/prisma/schema.prisma` will help you sanity-check migrations and review future schema changes.
 - **OAuth 2.0 / OIDC + PKCE, at a conceptual level** — you don't need to implement it yourself, but understanding what "PKCE" and "authorization code flow" mean will let you actually evaluate whether the auth implementation is sound, not just take it on faith.
 
-**Phase 3-4:**
+**Now / Phase 3 (current):**
 
 - **Zod** (or whichever validator is chosen) — worth understanding since it's the boundary between "user input" and "trusted data" throughout the app, which matters a lot for the anti-cheat/data-integrity notes in `docs/security.md`.
 - **Tailwind CSS** — enough to read component code and judge whether the design-system tokens in `docs/design-system.md` are actually being used consistently, versus one-off magic values creeping in.
-- **Playwright and Vitest, at a reading level** — you don't need to write test suites yourself, but being able to read a failing test and understand what it's asserting will make you much faster at triaging "is this actually broken."
+- **Playwright and Vitest, at a reading level** — you don't need to write test suites yourself, but being able to read a failing test and understand what it's asserting will make you much faster at triaging "is this actually broken." Both `apps/web/e2e/n-back.spec.ts` and `apps/web/e2e/complex-span.spec.ts` are good real examples to start from.
 
 **Phase 6:**
 
@@ -88,9 +89,9 @@ Matched to when they'll actually matter, so you're not front-loading things you 
 
 ## 4. Suggested learning order (matched to the roadmap, not front-loaded)
 
-1. TypeScript + Next.js basics (Phase 2 is now underway — see `docs/kanban.md`)
-2. Postgres + Prisma, OAuth/PKCE concepts (also Phase 2 — the schema and auth config are already scaffolded in `packages/db` and `apps/web/src/lib/auth.ts`; worth reading those alongside learning the concepts)
-3. Zod + Tailwind, enough Playwright/Vitest to read tests (Phase 3-4)
+1. TypeScript + Next.js basics (Phase 2, done — the auth flow and first two exercises are built on these)
+2. Postgres + Prisma, OAuth/PKCE concepts (also Phase 2, done — the schema and auth config are in `packages/db` and `apps/web/src/lib/auth.ts`; worth reading those alongside learning the concepts)
+3. Zod + Tailwind, enough Playwright/Vitest to read tests (Phase 3, now underway — see `docs/kanban.md`)
 4. Psychometrics vocabulary deepening (Phase 6)
 5. Stripe subscription model (Phase 7)
 6. Expo/React Native (Phase 8, and only after the framework re-evaluation confirms the choice)

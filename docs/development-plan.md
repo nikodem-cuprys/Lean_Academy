@@ -24,6 +24,7 @@ XS = hours, S = ~1 day, M = ~2-4 days, L = ~1-2 weeks, XL = ~3+ weeks, all assum
 **Exit criteria:** The critical path (Landing → first exercise) has been prototyped and walked through against the usability-testing scenarios in `docs/ux-strategy.md`; no scenario requires unassisted-user instructions to complete.
 **Dependencies:** Phase 0 (need to know what exercises exist to design their screens).
 **Size:** L (docs done this session; interactive prototype + usability pass is separate follow-up work, ideally via the `design` skill — see `env_development.md`).
+**Status:** Docs and interactive prototype both done — see `docs/ux-strategy.md` and `prototype/` (multi-artboard Design Component canvas, including dark mode and desktop/website screens). A dedicated usability-testing pass against real users has not happened; screens have instead been validated implicitly by building real, working `apps/web` UI against the prototype and verifying it in a browser (see Phase 3's status below). Doesn't block Phase 3 work.
 
 ## Phase 2 — Technical Foundation
 
@@ -41,7 +42,7 @@ XS = hours, S = ~1 day, M = ~2-4 days, L = ~1-2 weeks, XL = ~3+ weeks, all assum
 **Exit criteria:** Matches the WEB SUCCESS CRITERIA in `project_prompt.txt` — account creation, all three auth methods, fast onboarding, intuitive level selection, evidence-supported WM exercises, reading-efficiency training with adaptive difficulty, daily training, understandable progress, science pages, multi-day return capability, legitimate achievements (if Phase 5 pulled forward for one), works on desktop and mobile browsers.
 **Dependencies:** Phase 2.
 **Size:** XL.
-**Status:** Started. First exercise (Adaptive N-Back) is implemented end to end — engine logic unit-tested, `/train/n-back` playable and auth-gated — but not yet click-verified in a live browser (see `docs/kanban.md`'s Backlog). Everything else in this phase's Deliverables list is still open; see `docs/kanban.md`'s Ready/Backlog sections for the sequenced remainder (Complex Span, Spatial Sequence Recall, Reading, baseline/calibration, session orchestration, Progress, Science).
+**Status:** In progress. First two exercises (Adaptive N-Back and Complex Span) are implemented end to end — engine logic unit-tested, `/train/n-back` and `/train/complex-span` playable and auth-gated — and both are click-verified in a real Chromium browser via Playwright against a production build (see `docs/kanban.md`'s Done section for what was and wasn't exercised). Everything else in this phase's Deliverables list is still open; see `docs/kanban.md`'s Ready/Backlog sections for the sequenced remainder (Spatial Sequence Recall, Reading, baseline/calibration, session orchestration, Progress, Science).
 
 ## Phase 4 — UX Polish
 

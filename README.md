@@ -6,7 +6,7 @@ The product begins as a **web application** and later expands to native-quality 
 
 ## Current status
 
-**Phase 2 — Technical Foundation, in progress.** The pnpm-workspace monorepo scaffold, Prisma schema, evidence-registry loader, and adaptive-engine skeleton are done; auth backend/config works but the login/signup UI and real email delivery are still open. See `docs/development-plan.md` for the full phase roadmap, `docs/kanban.md` for the live "what's next" board, and `CLAUDE.md` for how to build/run/test this repo.
+**Phase 2 — Technical Foundation is complete for MVP purposes; Phase 3 — Web MVP is in progress.** The pnpm-workspace monorepo scaffold, Prisma schema, evidence-registry loader, adaptive-engine skeleton, and the full auth flow (register/login/OAuth wiring, login/signup UI, real email verification + password reset delivery) are all done and verified against a real database and real SMTP. Of Phase 3's exercise lineup, Adaptive N-Back and Complex Span are both implemented end to end and verified in a real Chromium browser via Playwright; Spatial Sequence Recall, Reading, and the rest of the Web MVP surface are still open. See `docs/development-plan.md` for the full phase roadmap, `docs/kanban.md` for the live "what's next" board, and `CLAUDE.md` for how to build/run/test this repo.
 
 ## Non-negotiable principles
 
@@ -37,4 +37,4 @@ Next.js 16 (App Router) + React + TypeScript, PostgreSQL via Prisma, Zod, Tailwi
 
 ## Next steps
 
-See `docs/kanban.md` → **Ready** for the next executable batch (running the first real Prisma migration, the login/signup UI, and email delivery), and `prototype/` for the approved visual reference the real screens should be built against.
+See `docs/kanban.md` → **Backlog — rest of Phase 3** for the next executable card (Spatial Sequence Recall, mirroring the N-Back/Complex Span engine-then-screen pattern), and `prototype/` for the approved visual reference the real screens should be built against.

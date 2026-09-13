@@ -1,6 +1,6 @@
 # UX Strategy — LeanAcademy
 
-_Phase 1 (UX Foundation) draft. Per `project_prompt.txt`: UX must be validated before building dozens of exercises — this document, plus an interactive prototype (recommend building it with the Claude Code `design` skill once this direction is approved), is the Phase 1 deliverable._
+_Phase 1 (UX Foundation) deliverable. Per `project_prompt.txt`: UX must be validated before building dozens of exercises — this document plus the interactive prototype under `prototype/` (built with the Claude Code `design` skill; see `prototype/canvas.json` and the generated `prototype/lean-academy-prototype.html`) together satisfy that requirement. `apps/web`'s real screens are built to match the prototype, not redesigned from scratch — see `CLAUDE.md`'s `prototype/` section._
 
 ## Personas / jobs-to-be-done
 

@@ -1,6 +1,6 @@
 # Design System — LeanAcademy
 
-_Phase 1 (UX Foundation) draft. Defines the visual/interaction language referenced by `docs/ux-strategy.md`. Implementation-ready tokens (actual hex/rem values) should be finalized during Phase 2 alongside the chosen component library, but the structure and rules below should not change lightly once set._
+_Phase 1 (UX Foundation) deliverable. Defines the visual/interaction language referenced by `docs/ux-strategy.md`. Implementation-ready tokens (oklch color values, type scale, spacing/radius) were finalized during Phase 2 and now live in three places that must stay in sync: `prototype/Styleguide.dc.html` (source of truth for values), `packages/design-system/src/tokens.ts`, and `apps/web/src/app/globals.css` (which re-exposes them to Tailwind v4 via `@theme inline` — see `CLAUDE.md`'s "Design tokens in apps/web" section). The structure and rules below should not change lightly now that real screens depend on them._
 
 ## Brand direction
 
