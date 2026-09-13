@@ -10,6 +10,25 @@ type Mode = "login" | "signup";
 const inputClass =
   "w-full rounded-md border border-border bg-surface px-3.5 py-3 font-body text-[14.5px] text-text placeholder:text-text-3 focus:outline-none focus:ring-2 focus:ring-accent";
 
+/**
+ * signIn() can spuriously fail under `next dev` (never seen under
+ * `next start`) when some other Auth.js request elsewhere in the app —
+ * typically a React Strict Mode double-invoked effect, dev-only — races
+ * the CSRF cookie signIn() itself just fetched. See CLAUDE.md's
+ * "credentials sign-in can spuriously fail under next dev" note. One
+ * short-delayed retry resolves it; a genuine wrong-password failure
+ * just fails the same way again, so this never masks a real error.
+ */
+async function signInWithCsrfRaceRetry(credentials: {
+  email: string;
+  password: string;
+}) {
+  const first = await signIn("credentials", { ...credentials, redirect: false });
+  if (!first?.error) return first;
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  return signIn("credentials", { ...credentials, redirect: false });
+}
+
 export function AuthForm({ initialMode }: { initialMode: Mode }) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(initialMode);
@@ -50,11 +69,7 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
         }
       }
 
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+      const result = await signInWithCsrfRaceRetry({ email, password });
 
       if (result?.error) {
         setError(
