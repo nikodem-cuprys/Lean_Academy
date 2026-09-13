@@ -4,54 +4,102 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-LeanAcademy is a scientifically-grounded cognitive-training platform (working memory + reading-efficiency training), currently in **Phase 0/1 (Research & Planning / UX Foundation)** per `docs/development-plan.md`. There is no application code yet — no package.json, no build system, no tests. The repository currently holds:
+LeanAcademy is a scientifically-grounded cognitive-training platform (working memory + reading-efficiency training), currently early in **Phase 2 (Technical Foundation)** per `docs/development-plan.md` — see `docs/kanban.md`'s Done/In Progress/Ready sections for exactly what's built vs. remaining. The repository holds:
 
-- the full research/product/planning documentation set the project requires before implementation begins;
-- an interactive design-canvas prototype under `prototype/` (static Design Component HTML — a visual mockup, not application code).
+- the full research/product/planning documentation set (`docs/*`, `data/evidence-registry.json`);
+- an interactive design-canvas prototype under `prototype/` (static Design Component HTML — the approved visual reference the real UI should be built against);
+- a pnpm-workspace monorepo: `apps/{web,api}` + 8 `packages/*`.
 
-Full original product spec: `project_prompt.txt`. Do not assume a Next.js/React app exists — check `docs/kanban.md`'s "Ready (Phase 2 — Technical Foundation)" section for the planned repo scaffold before adding build tooling.
+Full original product spec: `project_prompt.txt`.
 
 ## Commands
 
-None yet. There is nothing to build, lint, or test until Phase 2 scaffolds a real codebase — update this section with real commands once that happens.
+Run from the repo root unless noted. This is a pnpm workspace — always use `pnpm`, not `npm`/`yarn`.
 
-The one generated artifact in the repo is `prototype/lean-academy-prototype.html`. It's produced from `prototype/*.dc.html` + `prototype/canvas.json` via the Claude Code `design` skill's seed step — don't hand-edit it directly; edit the source `.dc.html`/`canvas.json` files and reseed/republish through the `design` skill.
+```bash
+pnpm install              # install everything
+pnpm dev                  # apps/web dev server (Next.js)
+pnpm build                # build every app + package
+pnpm typecheck            # tsc --noEmit across every app + package
+pnpm test                 # vitest across every package (apps have no tests yet)
+pnpm lint                 # eslint (apps/web) + placeholders elsewhere
+
+pnpm db:generate          # regenerate the Prisma client after editing schema.prisma
+pnpm db:migrate           # run/create a Prisma migration (needs DATABASE_URL — see .env.example)
+pnpm --filter @lean-academy/db seed   # sync EvidenceRecord/ResearchCitation from data/evidence-registry.json
+```
+
+**Single-package commands** (run inside that package, or `pnpm --filter <name> <script>` from root):
+
+```bash
+pnpm --filter @lean-academy/evidence test        # e.g. run just the evidence-registry tests
+pnpm --filter @lean-academy/adaptive-engine test
+cd packages/evidence && pnpm exec vitest run src/index.test.ts   # a single test file
+```
+
+**Build order matters for apps that aren't `apps/web`.** `apps/web` transpiles workspace packages' TS source directly (via `next.config.ts`'s `transpilePackages`), but `apps/api` resolves workspace packages through their `dist/` output (their `package.json` `main`/`types` point there). Run `pnpm build` (or at least build the packages `apps/api` depends on) before `apps/api` will typecheck or run — it doesn't watch/rebuild its deps for you.
+
+The one generated artifact outside `apps/*`/`packages/*` is `prototype/lean-academy-prototype.html`. It's produced from `prototype/*.dc.html` + `prototype/canvas.json` via the Claude Code `design` skill's seed step — don't hand-edit it directly; edit the source `.dc.html`/`canvas.json` files and reseed/republish through the `design` skill.
 
 ## Architecture
 
 ### The evidence-gating chain (the project's central mechanic)
 
-Every training exercise is traceable through two linked, must-stay-in-sync files:
+Every training exercise is traceable through linked, must-stay-in-sync artifacts:
 
 1. `docs/evidence-review.md` — narrative literature review per training domain: evidence quality, trained-task improvement vs. near transfer vs. far transfer (kept strictly separate), studied population, limitations, citations.
-2. `data/evidence-registry.json` — the machine-readable mirror (`modules[]`, each keyed by a `method` id like `adaptive-nback-v0`, carrying `evidenceLevel`, `trainedTaskImprovement`/`nearTransfer`/`farTransfer`, `productionApproved`, `citations`). The rule is that only `productionApproved: true` modules may ever load in the production exercise catalog.
+2. `data/evidence-registry.json` — the machine-readable mirror (`modules[]`, each keyed by a `method` id like `adaptive-nback-v0`). Only `productionApproved: true` modules may ever load in the production exercise catalog.
+3. `packages/evidence` — loads and Zod-validates the JSON (`loadEvidenceRegistry` for real Node processes like `apps/api`; `parseEvidenceRegistry` for code a frontend bundler packages — see the gotcha below) and exposes `getApprovedModules`/`isModuleApproved` as the one gate the catalog is allowed to go through.
+4. `packages/db`'s `EvidenceRecord`/`ResearchCitation` Prisma models — a relational mirror kept in sync by `packages/db/prisma/seed.ts`, for querying evidence data alongside the rest of the DB (e.g. from `/science` pages once they're built). The JSON file stays the actual reviewed source of truth; this table is a synced cache, not a second place to edit evidence content.
 
-**Adding, changing, or excluding a training method requires updating both files together, in the same change** — never one without the other. Two modules are deliberately `productionApproved: false` (`inhibition-flanker-gonogo-v0`, `rsvp-single-word-v0`, evidence reviewed in `docs/evidence-review.md` §6 and §10) — don't flip these without a real literature pass, not just an editorial decision.
+**Adding, changing, or excluding a training method requires updating `docs/evidence-review.md` and `data/evidence-registry.json` together, in the same change**, then re-running the db seed. Two modules are deliberately `productionApproved: false` (`inhibition-flanker-gonogo-v0`, `rsvp-single-word-v0`, reviewed in `docs/evidence-review.md` §6 and §10) — don't flip these without a real literature pass.
 
-`docs/product-requirements.md` and `docs/kanban.md` reference registry entries by their `method` id, so renaming one means updating references elsewhere too.
+**Gotcha:** Next.js's server bundle virtualizes `__dirname` (rewrites it to a synthetic path), which breaks naive `fs.readFileSync(__dirname + ...)` resolution. That's why `packages/evidence` is split into a pure `parseEvidenceRegistry(data)` and an fs-based `loadEvidenceRegistry(path?)` — `apps/web` imports `data/evidence-registry.json` directly (bundled as a static asset) and calls `parseEvidenceRegistry`; `apps/api` (a plain Node process, not bundled) uses `loadEvidenceRegistry`. Keep this split if you touch either function.
+
+### Auth data model: `Account` *is* the Identity/AuthProvider model
+
+`packages/db/prisma/schema.prisma` uses Auth.js's (`next-auth`) standard adapter shape — `User`/`Account`/`Session`/`VerificationToken` — rather than a bespoke `Identity` table. `Account` (one row per `(provider, providerAccountId)`) already *is* the "Identity/AuthProvider" model `project_prompt.txt` asks for: it's how a user links Google and Facebook to one account without duplicates. Email+password does not create an `Account` row — Auth.js's Credentials provider isn't an OAuth "linked account," so it uses `User.hashedPassword` directly (the standard Auth.js pattern). Auth config lives in `apps/web/src/lib/auth.ts`. Don't reintroduce a separate custom Identity table; extend `Account`/`User` instead.
 
 ### Documentation map
 
 - `README.md` — entry point and full doc index.
 - `docs/product-requirements.md` — vision, users, requirements, metrics, scientific claim limits.
 - `docs/evidence-review.md` + `data/evidence-registry.json` — see above.
-- `docs/ux-strategy.md` — user journeys, information architecture, the critical-path screen list the prototype implements.
-- `docs/design-system.md` — tokens, typography, motion, accessibility rules the prototype follows.
-- `docs/development-plan.md` — the Phase 0–10 roadmap; check this before assuming what stage of work is appropriate for a given request.
-- `docs/kanban.md` — the live "what's next" board; more current than the development plan for day-to-day priority, and the source of the first executable Phase 2 cards.
+- `docs/ux-strategy.md` — user journeys, IA, the critical-path screen list `prototype/` implements.
+- `docs/design-system.md` — tokens, typography, motion, accessibility rules; the source values live in `packages/design-system/src/tokens.ts` and must match `prototype/Styleguide.dc.html`.
+- `docs/development-plan.md` — the Phase 0–10 roadmap; check this before assuming what stage of work is appropriate.
+- `docs/kanban.md` — the live "what's next" board; more current than the development plan for day-to-day priority.
 - `docs/mobile-plan.md`, `docs/monetization-plan.md`, `docs/security.md`, `docs/testing.md` — later-phase plans, already drafted ahead of need.
-- `env_development.md` — operator-facing guide to which Claude Code skills/subagents fit which project phase; read before starting non-trivial work here.
+- `env_development.md` — operator-facing guide to which Claude Code skills/subagents fit which project phase.
 
-### Non-negotiable content rules (apply to any doc, copy, or future code change)
+### Non-negotiable content rules (apply to any doc, copy, or code change)
 
 - Never let copy claim IQ increase, general intelligence gain, dementia prevention, ADHD cure, or similar unsupported outcomes — see "SCIENTIFIC PROGRESS LANGUAGE" in `project_prompt.txt` and the Scientific Honesty section of `docs/product-requirements.md`.
 - Keep trained-task gains, near transfer, and far transfer as three separate, never-conflated concepts wherever they appear (docs, data, UI copy).
 - Reading-related copy or metrics must never show WPM without its paired comprehension figure alongside it.
+- Difficulty is always shown to users in plain language (Beginner/Intermediate/Advanced/Expert/Custom/Auto — see `packages/shared/src/difficulty.ts`), never as the raw internal `Difficulty` number from `packages/adaptive-engine`.
+
+### Monorepo layout
+
+```text
+apps/
+  web/     Next.js 16 (App Router, Turbopack). Auth.js wired; real screens not built yet — build against prototype/*.dc.html.
+  api/     Fastify. /health, /catalog (evidence-gated module list).
+
+packages/
+  db/                 Prisma schema + client singleton (see Auth data model above).
+  evidence/            Evidence registry loader/validator/catalog gate.
+  adaptive-engine/     RollingWindowAdaptiveEngine implementing project_prompt.txt's AdaptiveTrainingTask interface; gradual, window-based difficulty changes only.
+  design-system/       Color/type/spacing tokens transcribed from prototype/Styleguide.dc.html — keep both in sync.
+  shared/              Cross-cutting plain-language labels (difficulty levels, training domains).
+  cognitive-engine/    Placeholder — will hold the WM exercise implementations (n-back, complex span, etc.), wrapping adaptive-engine.
+  reading-engine/      Placeholder — paced/adaptive reading + Reading Efficiency Score.
+  trial-engine/        Placeholder — shared stimulus/timing runtime (performance.now(), focus-loss detection).
+  psychometrics/       Placeholder — accepted psychometric calculations (d-prime, span scoring, etc.).
+```
+
+Every `packages/*` has `build`/`typecheck`/`test`/`lint` scripts (`test` uses `--passWithNoTests` on the still-empty placeholders, so `pnpm test` at the root stays green — replace that flag once a package gets its first test file rather than leaving it there out of habit).
 
 ### `prototype/` (design canvas)
 
-Self-contained `*.dc.html` "Design Component" artboards — one per screen (landing, auth, three onboarding steps, calibration, level select, home in mobile/desktop/dark variants, six-plus exercise types, results, progress in mobile/desktop, science, achievements, a design-tokens reference sheet) — plus `canvas.json` (the layout manifest) and the generated `lean-academy-prototype.html`. Each `.dc.html` file is fully independent: there is no shared runtime state or imported stylesheet between artboards, so a token or component change has to be applied by hand to every file that uses it (search for the CSS variable or class name across `prototype/*.dc.html`).
-
-### Suggested (not yet implemented) tech direction
-
-Per `docs/development-plan.md`'s reference architecture: Next.js, React, TypeScript, PostgreSQL, Drizzle or Prisma, Zod, Tailwind CSS, Playwright, Vitest — as a monorepo separating `apps/{web,api,mobile}` from `packages/{cognitive-engine,reading-engine,trial-engine,adaptive-engine,psychometrics,evidence,design-system,shared}`. None of this exists yet; confirm with the user before scaffolding it.
+Self-contained `*.dc.html` "Design Component" artboards — one per screen — plus `canvas.json` (the layout manifest) and the generated `lean-academy-prototype.html`. Each `.dc.html` file is fully independent: no shared runtime state or stylesheet between artboards, so a token/component change has to be applied by hand everywhere it's used (grep the CSS variable or class name across `prototype/*.dc.html`). This is the approved visual reference — build `apps/web`'s real screens to match it, don't redesign from scratch.

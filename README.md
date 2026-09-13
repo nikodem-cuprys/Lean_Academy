@@ -6,7 +6,7 @@ The product begins as a **web application** and later expands to native-quality 
 
 ## Current status
 
-**Phase 0/1 — Research & Planning.** No application code exists yet; this repository currently holds the research, product, UX, and planning foundation the spec requires before implementation begins. See `docs/development-plan.md` for the full phase roadmap and `docs/kanban.md` for the live "what's next" board.
+**Phase 2 — Technical Foundation, in progress.** The pnpm-workspace monorepo scaffold, Prisma schema, evidence-registry loader, and adaptive-engine skeleton are done; auth backend/config works but the login/signup UI and real email delivery are still open. See `docs/development-plan.md` for the full phase roadmap, `docs/kanban.md` for the live "what's next" board, and `CLAUDE.md` for how to build/run/test this repo.
 
 ## Non-negotiable principles
 
@@ -31,10 +31,10 @@ The product begins as a **web application** and later expands to native-quality 
 | [`docs/testing.md`](./docs/testing.md) | Test strategy across all layers, launch readiness gate |
 | [`env_development.md`](./env_development.md) | For the operator: how to use this Claude Code environment to move this specific project forward faster |
 
-## Suggested technology direction (confirm at Phase 2)
+## Technology stack
 
-Next.js, React, TypeScript, PostgreSQL, Drizzle or Prisma, Zod, Tailwind CSS, Playwright, Vitest — organized as a monorepo separating `apps/{web,api,mobile}` from `packages/{cognitive-engine,reading-engine,trial-engine,adaptive-engine,psychometrics,evidence,design-system,shared}`. See `docs/development-plan.md` for the full reference architecture and `docs/mobile-plan.md` for the mobile-specific evaluation (React Native/Expo recommended, re-confirm at Phase 8).
+Next.js 16 (App Router) + React + TypeScript, PostgreSQL via Prisma, Zod, Tailwind CSS, Auth.js, Fastify (`apps/api`), Vitest — a pnpm-workspace monorepo separating `apps/{web,api}` from 8 `packages/*`. See `CLAUDE.md` for the concrete layout and commands, and `docs/mobile-plan.md` for the mobile-specific evaluation (React Native/Expo recommended, re-confirm at Phase 8).
 
 ## Next steps
 
-See `docs/kanban.md` → **Ready (Phase 2 — Technical Foundation)** for the first executable batch of implementation cards, and `docs/ux-strategy.md` for the interactive-prototype work that should validate the critical path before that implementation begins in earnest.
+See `docs/kanban.md` → **Ready** for the next executable batch (running the first real Prisma migration, the login/signup UI, and email delivery), and `prototype/` for the approved visual reference the real screens should be built against.

@@ -54,7 +54,7 @@ Matched to when they'll actually matter, so you're not front-loading things you 
 
 - **TypeScript** — the whole stack is TS; if you're going to read/steer any code, this is the one that pays off immediately.
 - **Next.js (App Router)** — routing, server components vs. client components, and where timing-sensitive exercise code needs to be client-side (this matters for the reaction-time integrity requirements in `docs/product-requirements.md`).
-- **PostgreSQL basics + one ORM** (Drizzle is the lighter-weight, more SQL-transparent option; Prisma is more batteries-included) — you don't need deep DBA skills, but understanding the schema in `docs/kanban.md`'s Database Schema card will help you sanity-check migrations.
+- **PostgreSQL basics + Prisma** (the ORM already chosen and scaffolded in `packages/db`) — you don't need deep DBA skills, but understanding `packages/db/prisma/schema.prisma` will help you sanity-check migrations and review future schema changes.
 - **OAuth 2.0 / OIDC + PKCE, at a conceptual level** — you don't need to implement it yourself, but understanding what "PKCE" and "authorization code flow" mean will let you actually evaluate whether the auth implementation is sound, not just take it on faith.
 
 **Phase 3-4:**
@@ -88,8 +88,8 @@ Matched to when they'll actually matter, so you're not front-loading things you 
 
 ## 4. Suggested learning order (matched to the roadmap, not front-loaded)
 
-1. TypeScript + Next.js basics (Phase 2 is coming soon)
-2. Postgres + your chosen ORM, OAuth/PKCE concepts (also Phase 2)
+1. TypeScript + Next.js basics (Phase 2 is now underway — see `docs/kanban.md`)
+2. Postgres + Prisma, OAuth/PKCE concepts (also Phase 2 — the schema and auth config are already scaffolded in `packages/db` and `apps/web/src/lib/auth.ts`; worth reading those alongside learning the concepts)
 3. Zod + Tailwind, enough Playwright/Vitest to read tests (Phase 3-4)
 4. Psychometrics vocabulary deepening (Phase 6)
 5. Stripe subscription model (Phase 7)

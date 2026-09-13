@@ -21,6 +21,31 @@ _Companion to `docs/development-plan.md`. Columns: Backlog · Research · UX/Des
 - **[Payments] Monetization plan v0** — Owner: Monetization Strategist. Output: `docs/monetization-plan.md`.
 - **[Infrastructure] Security plan v0** — Owner: Security Engineer. Output: `docs/security.md`.
 - **[Testing] Test strategy v0** — Owner: QA Engineer. Output: `docs/testing.md`.
+- **[Infrastructure] Repository & Monorepo Scaffold** — pnpm workspaces (`apps/{web,api}` + 8 `packages/*`). apps/web (Next.js 16, App Router) boots and renders real evidence-registry + auth-session data; apps/api (Fastify) serves `/health` and `/catalog`. `pnpm build`/`typecheck`/`test`/`lint` all pass at the repo root. Owner: Senior Full-Stack Engineer. See CLAUDE.md's Commands section for the real commands this unblocked.
+- **[Infrastructure] Database Schema v0** — Prisma schema in `packages/db/prisma/schema.prisma` covering every entity in `project_prompt.txt`'s DATABASE section. Two justified deviations: (1) `User`/`Account`/`Session`/`VerificationToken` follow Auth.js's standard adapter shape rather than a bespoke `Identity` table — `Account` already *is* the per-provider "Identity/AuthProvider" model the spec asked for, and reusing Auth.js's schema means the OAuth/PKCE code path is library-tested, not hand-rolled; (2) added `ChallengeProgress` as the join table normalization requires (not in the spec's literal entity list). Migrations not yet run against a live Postgres instance — do that (`pnpm db:migrate`) before this is truly done; schema is verified via `prisma generate`, not yet via a real migration. Owner: Data Engineer.
+- **[Science/Evidence] Evidence Registry Loader & Catalog Gate** — `packages/evidence` (Zod-validated, throws loudly on malformed/missing data). Split into `parseEvidenceRegistry` (pure, bundler-safe) and `loadEvidenceRegistry` (fs-based, Node-only) after discovering Next.js's server bundle virtualizes `__dirname`, which broke naive fs reads from bundled code — apps/web imports the JSON directly and parses it; apps/api reads it from disk. 9 tests, including one proving a non-approved module id is rejected. Owner: Data Engineer.
+- **[Adaptive Engine] Adaptive Engine Skeleton** — `packages/adaptive-engine`'s `RollingWindowAdaptiveEngine` implements the exact `AdaptiveTrainingTask` interface from `project_prompt.txt`. 10 tests, including ones proving no single-trial difficulty swings and correct min/max clamping. Not yet wired to a real exercise (that's `packages/cognitive-engine`'s job, still a placeholder). Owner: Senior Full-Stack Engineer / Psychometrics Specialist.
+
+### In Progress
+
+```text
+Title: Authentication (Email + Google + Facebook)
+Epic: Authentication
+Priority: P0
+Description: Email+password with verification and reset flow, plus Google and Facebook OAuth/OIDC via PKCE. Account model (Auth.js standard shape, see Database Schema v0's Done note) supports account linking without duplicate accounts.
+Acceptance criteria:
+- [x] Google and Facebook "Continue with" flows use official OAuth (Auth.js providers), never ask for provider passwords
+- [x] a user who signs up with email can later link Google/Facebook to the same account (Auth.js Account model, unique on [provider, providerAccountId])
+- [x] secrets never exposed to frontend code (server-only env vars, read in src/lib/auth.ts)
+- [x] register (POST /api/auth/register: validates, hashes with bcrypt, creates User) and log in (Credentials provider, bcrypt compare) work
+- [ ] verify email — no email delivery is wired up yet; accounts are created with emailVerified unset. Do not fake this by marking it done.
+- [ ] reset password — no reset-request/consume flow built yet
+- [ ] real login/signup UI — apps/web currently has no form, only the API routes; prototype/Login.dc.html is the approved design to implement against
+Dependencies: Database Schema v0 (done)
+Complexity: L
+Owner: Senior Full-Stack Engineer / Security Engineer
+Status: In Progress — backend/config done, UI + email delivery remain (see Ready below for the split-out follow-up cards)
+```
 
 ### Backlog (Phase 3+ and beyond — not yet Ready)
 
@@ -35,83 +60,51 @@ _Companion to `docs/development-plan.md`. Columns: Backlog · Research · UX/Des
 
 ---
 
-## Ready (Phase 2 — Technical Foundation) — first executable batch
+## Ready — next executable batch
 
 ```text
-Title: Repository & Monorepo Scaffold
+Title: Run the first real Prisma migration
 Epic: Infrastructure
 Priority: P0
-Description: Initialize the actual codebase per the reference architecture in docs/development-plan.md (apps/web, apps/api, packages/{cognitive-engine,reading-engine,trial-engine,adaptive-engine,psychometrics,evidence,design-system,shared}). Confirm Next.js/TS/Tailwind stack or document a justified deviation.
+Description: Database Schema v0's schema.prisma is written and prisma generate succeeds, but no migration has run against a real Postgres instance yet (none was available in the scaffolding environment). Stand up a dev Postgres (local or hosted), set DATABASE_URL, and run the first migration.
 Acceptance criteria:
-- git repo initialized
-- monorepo tooling chosen and configured (workspaces)
-- apps/web boots to a blank page
-- packages/evidence exposes a typed loader for data/evidence-registry.json
-Dependencies: none (first Phase 2 card)
-Complexity: M
-Owner: Senior Full-Stack Engineer
-Status: Backlog (Ready once Phase 1 prototype/usability pass is at least directionally validated)
-```
-
-```text
-Title: Database Schema v0
-Epic: Infrastructure
-Priority: P0
-Description: Design and migrate the normalized Postgres schema for the entities listed in project_prompt.txt's DATABASE section (User, Identity, Subscription, TrainingPlan, TrainingSession, TaskDefinition, TaskVersion, Trial, DifficultyState, Assessment, AssessmentResult, ReadingPassage, ReadingQuestion, ReadingResult, Achievement, UserAchievement, DailyGoal, Streak, Challenge, EvidenceRecord, ResearchCitation, Device, NotificationPreference).
-Acceptance criteria:
-- schema covers every entity in the spec's list
-- TaskVersion relationship prevents mixing scores across incompatible task versions
-- migrations run cleanly from empty database
-Dependencies: Repository & Monorepo Scaffold
-Complexity: L
-Owner: Data Engineer
-Status: Backlog
-```
-
-```text
-Title: Authentication (Email + Google + Facebook)
-Epic: Authentication
-Priority: P0
-Description: Email+password with verification and reset flow, plus Google and Facebook OAuth/OIDC via PKCE. Identity/AuthProvider model supports account linking without duplicate accounts.
-Acceptance criteria:
-- register, verify email, log in, reset password all work
-- Google and Facebook "Continue with" flows use official OAuth, never ask for provider passwords
-- a user who signs up with email can later link Google/Facebook to the same account
-- secrets never exposed to frontend code
-Dependencies: Database Schema v0
-Complexity: L
-Owner: Senior Full-Stack Engineer / Security Engineer
-Status: Backlog
-```
-
-```text
-Title: Adaptive Engine Skeleton
-Epic: Adaptive Engine
-Priority: P0
-Description: Implement the shared AdaptiveTrainingTask interface (getCurrentDifficulty, recordTrial, calculatePerformance, recommendNextDifficulty) with rolling-window difficulty adjustment, in packages/adaptive-engine, with no real exercise wired in yet (test against a synthetic task).
-Acceptance criteria:
-- interface matches project_prompt.txt's ADAPTIVE TRAINING ENGINE spec
-- difficulty changes gradually across a rolling window, never on a single trial
-- unit tests cover the adaptation curve against synthetic trial sequences
-Dependencies: Repository & Monorepo Scaffold
-Complexity: M
-Owner: Senior Full-Stack Engineer / Psychometrics Specialist
-Status: Backlog
-```
-
-```text
-Title: Evidence Registry Loader & Catalog Gate
-Epic: Science/Evidence
-Priority: P0
-Description: packages/evidence loads and validates data/evidence-registry.json (schema-checked with Zod) and exposes the set of productionApproved module ids; the exercise catalog can only ever load modules present in that approved set.
-Acceptance criteria:
-- malformed or missing registry entries fail loudly at build/boot, not silently
-- catalog loader has a test proving a non-approved module id cannot be loaded
-- /science pages render directly from this loader (no separate hand-maintained copy of the data)
-Dependencies: Repository & Monorepo Scaffold
+- pnpm db:migrate runs cleanly from an empty database
+- pnpm --filter @lean-academy/db seed populates EvidenceRecord/ResearchCitation from data/evidence-registry.json without error
+- a basic smoke query (e.g. count Users) succeeds from apps/api
+Dependencies: Database Schema v0 (done)
 Complexity: S
 Owner: Data Engineer
-Status: Backlog
+Status: Ready
+```
+
+```text
+Title: Auth: login/signup UI
+Epic: Authentication
+Priority: P0
+Description: Implement the actual /login and /signup pages in apps/web against the approved design in prototype/Login.dc.html (email/password fields, Continue with Google, Continue with Facebook, the login/signup tab toggle), wired to the existing Credentials/OAuth providers in src/lib/auth.ts and the POST /api/auth/register route.
+Acceptance criteria:
+- visually matches prototype/Login.dc.html (tokens from packages/design-system)
+- all three sign-in paths (email, Google, Facebook) work end to end against a real DB
+- form validation errors are shown inline, not just thrown as raw API errors
+Dependencies: Run the first real Prisma migration
+Complexity: M
+Owner: Senior Full-Stack Engineer / Senior UI/UX Designer
+Status: Ready
+```
+
+```text
+Title: Auth: email verification + password reset delivery
+Epic: Authentication
+Priority: P0
+Description: Wire up real email delivery (a transactional email provider — evaluate at implementation time) for the VerificationToken flow already modeled in packages/db/prisma/schema.prisma: verification-on-signup and forgot-password. Nothing here should be faked with a console.log stand-in once this card is marked Done.
+Acceptance criteria:
+- signup sends a real verification email; clicking the link sets User.emailVerified
+- "forgot password" sends a reset link; using it updates hashedPassword and invalidates the token
+- tokens expire and are single-use
+Dependencies: Run the first real Prisma migration
+Complexity: M
+Owner: Senior Full-Stack Engineer / Security Engineer
+Status: Ready
 ```
 
 ---
