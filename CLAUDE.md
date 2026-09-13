@@ -85,8 +85,8 @@ Every training exercise is traceable through linked, must-stay-in-sync artifacts
 
 ```text
 apps/
-  web/     Next.js 16 (App Router, Turbopack). Auth.js wired; real screens not built yet — build against prototype/*.dc.html.
-  api/     Fastify. /health, /catalog (evidence-gated module list).
+  web/     Next.js 16 (App Router, Turbopack). Auth.js wired; /login + /signup built (see AuthForm below). Everything else still needs building against prototype/*.dc.html.
+  api/     Fastify. /health (includes a real DB connectivity check), /catalog (evidence-gated module list).
 
 packages/
   db/                 Prisma schema + client singleton (see Auth data model above).
@@ -101,6 +101,14 @@ packages/
 ```
 
 Every `packages/*` has `build`/`typecheck`/`test`/`lint` scripts (`test` uses `--passWithNoTests` on the still-empty placeholders, so `pnpm test` at the root stays green — replace that flag once a package gets its first test file rather than leaving it there out of habit).
+
+### Design tokens in `apps/web`
+
+`apps/web/src/app/globals.css` defines the same tokens as `packages/design-system/src/tokens.ts` / `prototype/Styleguide.dc.html` as plain CSS custom properties (light in `:root`, dark under `@media (prefers-color-scheme: dark)`), then re-exposes them to Tailwind v4 via `@theme inline` — so `bg-accent`, `text-text-2`, `rounded-lg`, `font-display`, etc. are real Tailwind utilities that resolve to our actual palette, not Tailwind's defaults. Fonts (Sora/Manrope) are loaded via `next/font/google` in `layout.tsx` and exposed the same way. This is a third place the tokens now live — keep it in sync with the other two when the palette changes. There's no manual light/dark toggle in the app (unlike the prototype, which has one per screen for design review); the real app follows system preference only, for now.
+
+`apps/web/src/components/AuthForm.tsx` is the first real screen component (used by both `/login` and `/signup`) — it's the pattern to follow for the rest: read the matching `prototype/*.dc.html` for exact copy/layout/states, then rebuild with Tailwind utilities against these tokens rather than inline styles.
+
+**Auth.js host trust:** requests get rejected with `UntrustedHost` unless `AUTH_TRUST_HOST=true` is set — `next dev` trusts automatically, but `next start` (production mode, including local testing of a production build) and most self-hosted deployments behind a reverse proxy don't. It's in `.env`/`.env.example`; don't remove it when testing a production build locally.
 
 ### `prototype/` (design canvas)
 

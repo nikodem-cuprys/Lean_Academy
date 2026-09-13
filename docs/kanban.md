@@ -26,6 +26,7 @@ _Companion to `docs/development-plan.md`. Columns: Backlog · Research · UX/Des
 - **[Science/Evidence] Evidence Registry Loader & Catalog Gate** — `packages/evidence` (Zod-validated, throws loudly on malformed/missing data). Split into `parseEvidenceRegistry` (pure, bundler-safe) and `loadEvidenceRegistry` (fs-based, Node-only) after discovering Next.js's server bundle virtualizes `__dirname`, which broke naive fs reads from bundled code — apps/web imports the JSON directly and parses it; apps/api reads it from disk. 9 tests, including one proving a non-approved module id is rejected. Owner: Data Engineer.
 - **[Adaptive Engine] Adaptive Engine Skeleton** — `packages/adaptive-engine`'s `RollingWindowAdaptiveEngine` implements the exact `AdaptiveTrainingTask` interface from `project_prompt.txt`. 10 tests, including ones proving no single-trial difficulty swings and correct min/max clamping. Not yet wired to a real exercise (that's `packages/cognitive-engine`'s job, still a placeholder). Owner: Senior Full-Stack Engineer / Psychometrics Specialist.
 - **[Infrastructure] Run the first real Prisma migration** — a local PostgreSQL 17 server (already installed, Windows service) now backs local dev: a dedicated `lean_academy` login role + database were created (not the `postgres` superuser), `pnpm db:migrate` applied migration `20260913190003_init` cleanly, and `pnpm --filter @lean-academy/db seed` synced all 10 evidence records. `apps/api`'s `/health` now does a real `SELECT 1` through Prisma and reports `{"status":"ok","db":"connected"}`. Credentials live in `.env` (repo root) and `packages/db/.env` (Prisma CLI doesn't read the root one — see CLAUDE.md) — both gitignored, neither committed. Owner: Data Engineer.
+- **[Authentication] Auth: login/signup UI** — `/login` and `/signup` in `apps/web`, built as a shared `<AuthForm>` client component matching `prototype/Login.dc.html` (tab toggle, OAuth buttons, divider, fields, all styled from real design tokens now wired into `apps/web`'s Tailwind theme via `globals.css`). Verified against the real DB, not just rendered: registered a test user through `POST /api/auth/register`, confirmed a wrong password is rejected and the correct one succeeds and sets a session cookie (replicated the CSRF+cookie dance `next-auth/react`'s `signIn()` does internally), confirmed duplicate-email registration returns 409, then deleted the test user. Google/Facebook buttons call `signIn()` correctly but the actual OAuth redirect is unverified — there are no real OAuth app credentials configured (`GOOGLE_CLIENT_ID`/`FACEBOOK_CLIENT_ID` are still blank in `.env`), so don't treat that path as proven yet. Also discovered and documented: Auth.js rejects requests with `UntrustedHost` under `next start`/production mode unless `AUTH_TRUST_HOST=true` is set (`next dev` trusts automatically) — added to `.env`/`.env.example`. Email verification and password reset remain separately tracked below (not part of this card). Owner: Senior Full-Stack Engineer / Senior UI/UX Designer.
 
 ### In Progress
 
@@ -39,13 +40,13 @@ Acceptance criteria:
 - [x] a user who signs up with email can later link Google/Facebook to the same account (Auth.js Account model, unique on [provider, providerAccountId])
 - [x] secrets never exposed to frontend code (server-only env vars, read in src/lib/auth.ts)
 - [x] register (POST /api/auth/register: validates, hashes with bcrypt, creates User) and log in (Credentials provider, bcrypt compare) work
+- [x] real login/signup UI — /login and /signup in apps/web, matching prototype/Login.dc.html (see the Done card for what was actually verified vs. not)
 - [ ] verify email — no email delivery is wired up yet; accounts are created with emailVerified unset. Do not fake this by marking it done.
 - [ ] reset password — no reset-request/consume flow built yet
-- [ ] real login/signup UI — apps/web currently has no form, only the API routes; prototype/Login.dc.html is the approved design to implement against
 Dependencies: Database Schema v0 (done)
 Complexity: L
 Owner: Senior Full-Stack Engineer / Security Engineer
-Status: In Progress — backend/config done, UI + email delivery remain (see Ready below for the split-out follow-up cards)
+Status: In Progress — backend/config + UI done, email delivery remains (see Ready below)
 ```
 
 ### Backlog (Phase 3+ and beyond — not yet Ready)
@@ -62,21 +63,6 @@ Status: In Progress — backend/config done, UI + email delivery remain (see Rea
 ---
 
 ## Ready — next executable batch
-
-```text
-Title: Auth: login/signup UI
-Epic: Authentication
-Priority: P0
-Description: Implement the actual /login and /signup pages in apps/web against the approved design in prototype/Login.dc.html (email/password fields, Continue with Google, Continue with Facebook, the login/signup tab toggle), wired to the existing Credentials/OAuth providers in src/lib/auth.ts and the POST /api/auth/register route.
-Acceptance criteria:
-- visually matches prototype/Login.dc.html (tokens from packages/design-system)
-- all three sign-in paths (email, Google, Facebook) work end to end against a real DB
-- form validation errors are shown inline, not just thrown as raw API errors
-Dependencies: Run the first real Prisma migration (done)
-Complexity: M
-Owner: Senior Full-Stack Engineer / Senior UI/UX Designer
-Status: Ready
-```
 
 ```text
 Title: Auth: email verification + password reset delivery

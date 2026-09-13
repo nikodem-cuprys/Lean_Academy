@@ -1,26 +1,69 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens — transcribed from packages/design-system/src/tokens.ts,
+ * which is itself transcribed from prototype/Styleguide.dc.html. All
+ * three must stay in sync (see CLAUDE.md's Monorepo layout section).
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --color-bg: oklch(98% 0.004 95);
+  --color-surface: oklch(99.5% 0.002 95);
+  --color-surface-2: oklch(96.2% 0.006 95);
+  --color-border: oklch(90% 0.008 95);
+  --color-text: oklch(22% 0.02 265);
+  --color-text-2: oklch(46% 0.02 265);
+  --color-text-3: oklch(62% 0.015 265);
+  --color-accent: oklch(56% 0.19 276);
+  --color-accent-strong: oklch(46% 0.19 276);
+  --color-accent-soft: oklch(94% 0.035 276);
+  --color-on-accent: oklch(99% 0.004 276);
+  --color-caution: oklch(64% 0.19 35);
+  --color-caution-soft: oklch(95% 0.045 35);
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-bg: oklch(17% 0.012 265);
+    --color-surface: oklch(21% 0.014 265);
+    --color-surface-2: oklch(25% 0.016 265);
+    --color-border: oklch(32% 0.018 265);
+    --color-text: oklch(95% 0.006 265);
+    --color-text-2: oklch(78% 0.012 265);
+    --color-text-3: oklch(60% 0.014 265);
+    --color-accent: oklch(74% 0.15 276);
+    --color-accent-strong: oklch(82% 0.13 276);
+    --color-accent-soft: oklch(32% 0.06 276);
+    --color-on-accent: oklch(14% 0.02 276);
+    --color-caution: oklch(74% 0.16 35);
+    --color-caution-soft: oklch(34% 0.07 35);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-border: var(--color-border);
+  --color-text: var(--color-text);
+  --color-text-2: var(--color-text-2);
+  --color-text-3: var(--color-text-3);
+  --color-accent: var(--color-accent);
+  --color-accent-strong: var(--color-accent-strong);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-on-accent: var(--color-on-accent);
+  --color-caution: var(--color-caution);
+  --color-caution-soft: var(--color-caution-soft);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-full: var(--radius-full);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
 }

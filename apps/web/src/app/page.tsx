@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { parseEvidenceRegistry, getApprovedModules } from "@lean-academy/evidence";
 import { auth } from "@/lib/auth";
 // Imported (not read via fs) because Next's server bundle virtualizes
@@ -30,6 +31,11 @@ export default async function HomePage() {
         <dt className="text-neutral-500">Signed in</dt>
         <dd>{session?.user ? session.user.email : "no"}</dd>
       </dl>
+      {!session?.user && (
+        <Link href="/login" className="text-sm font-semibold text-accent underline">
+          Log in or sign up →
+        </Link>
+      )}
     </main>
   );
 }
