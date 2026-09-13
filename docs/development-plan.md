@@ -32,7 +32,7 @@ XS = hours, S = ~1 day, M = ~2-4 days, L = ~1-2 weeks, XL = ~3+ weeks, all assum
 **Exit criteria:** A user can register, log in via all three methods, and the app reads the evidence registry to decide what's in the catalog (even with zero real exercises yet).
 **Dependencies:** Phase 1 (screens/IA inform API/data shape); Phase 0 (registry shape).
 **Size:** L.
-**Status:** In progress — repo scaffold, Postgres schema (migration not yet run), evidence-registry loader, and adaptive-engine skeleton are done; auth backend/config is done but login/signup UI and real email delivery are not. See `docs/kanban.md`'s In Progress / Ready sections for exact remaining scope.
+**Status:** Complete for MVP purposes. Repo scaffold, Postgres schema + first migration, evidence-registry loader, adaptive-engine skeleton, and the full auth flow (register/login, login/signup UI, real email verification + password reset delivery) are all done and verified against a real database and real SMTP. Three small, honestly-tracked loose ends remain in `docs/kanban.md`'s Backlog (OAuth redirect unverified without real provider credentials, rate limiting not yet broadened to every auth endpoint, no session invalidation on password reset) — none block starting Phase 3.
 
 ## Phase 3 — Web MVP
 

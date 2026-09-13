@@ -27,27 +27,7 @@ _Companion to `docs/development-plan.md`. Columns: Backlog · Research · UX/Des
 - **[Adaptive Engine] Adaptive Engine Skeleton** — `packages/adaptive-engine`'s `RollingWindowAdaptiveEngine` implements the exact `AdaptiveTrainingTask` interface from `project_prompt.txt`. 10 tests, including ones proving no single-trial difficulty swings and correct min/max clamping. Not yet wired to a real exercise (that's `packages/cognitive-engine`'s job, still a placeholder). Owner: Senior Full-Stack Engineer / Psychometrics Specialist.
 - **[Infrastructure] Run the first real Prisma migration** — a local PostgreSQL 17 server (already installed, Windows service) now backs local dev: a dedicated `lean_academy` login role + database were created (not the `postgres` superuser), `pnpm db:migrate` applied migration `20260913190003_init` cleanly, and `pnpm --filter @lean-academy/db seed` synced all 10 evidence records. `apps/api`'s `/health` now does a real `SELECT 1` through Prisma and reports `{"status":"ok","db":"connected"}`. Credentials live in `.env` (repo root) and `packages/db/.env` (Prisma CLI doesn't read the root one — see CLAUDE.md) — both gitignored, neither committed. Owner: Data Engineer.
 - **[Authentication] Auth: login/signup UI** — `/login` and `/signup` in `apps/web`, built as a shared `<AuthForm>` client component matching `prototype/Login.dc.html` (tab toggle, OAuth buttons, divider, fields, all styled from real design tokens now wired into `apps/web`'s Tailwind theme via `globals.css`). Verified against the real DB, not just rendered: registered a test user through `POST /api/auth/register`, confirmed a wrong password is rejected and the correct one succeeds and sets a session cookie (replicated the CSRF+cookie dance `next-auth/react`'s `signIn()` does internally), confirmed duplicate-email registration returns 409, then deleted the test user. Google/Facebook buttons call `signIn()` correctly but the actual OAuth redirect is unverified — there are no real OAuth app credentials configured (`GOOGLE_CLIENT_ID`/`FACEBOOK_CLIENT_ID` are still blank in `.env`), so don't treat that path as proven yet. Also discovered and documented: Auth.js rejects requests with `UntrustedHost` under `next start`/production mode unless `AUTH_TRUST_HOST=true` is set (`next dev` trusts automatically) — added to `.env`/`.env.example`. Email verification and password reset remain separately tracked below (not part of this card). Owner: Senior Full-Stack Engineer / Senior UI/UX Designer.
-
-### In Progress
-
-```text
-Title: Authentication (Email + Google + Facebook)
-Epic: Authentication
-Priority: P0
-Description: Email+password with verification and reset flow, plus Google and Facebook OAuth/OIDC via PKCE. Account model (Auth.js standard shape, see Database Schema v0's Done note) supports account linking without duplicate accounts.
-Acceptance criteria:
-- [x] Google and Facebook "Continue with" flows use official OAuth (Auth.js providers), never ask for provider passwords
-- [x] a user who signs up with email can later link Google/Facebook to the same account (Auth.js Account model, unique on [provider, providerAccountId])
-- [x] secrets never exposed to frontend code (server-only env vars, read in src/lib/auth.ts)
-- [x] register (POST /api/auth/register: validates, hashes with bcrypt, creates User) and log in (Credentials provider, bcrypt compare) work
-- [x] real login/signup UI — /login and /signup in apps/web, matching prototype/Login.dc.html (see the Done card for what was actually verified vs. not)
-- [ ] verify email — no email delivery is wired up yet; accounts are created with emailVerified unset. Do not fake this by marking it done.
-- [ ] reset password — no reset-request/consume flow built yet
-Dependencies: Database Schema v0 (done)
-Complexity: L
-Owner: Senior Full-Stack Engineer / Security Engineer
-Status: In Progress — backend/config + UI done, email delivery remains (see Ready below)
-```
+- **[Authentication] Auth: email verification + password reset delivery** — real SMTP delivery via `nodemailer`, not a console.log stand-in: locally it sends to `maildev` (`pnpm dev:mail`, a genuine local SMTP server + web UI at `http://localhost:1080` — see `CLAUDE.md`), and the same code points at a real transactional provider in production via the same `SMTP_*` env vars. Reuses Auth.js's `VerificationToken` table for both flows (`apps/web/src/lib/tokens.ts`), with the identifier prefixed by purpose (`verify:`/`reset:` + email) so they can't collide; tokens are stored as a SHA-256 hash, never plaintext, and deleted on first use. New routes: `/verify-email` (server component, verifies on render), `/forgot-password` + `/reset-password` (forms), plus `POST /api/auth/forgot-password` and `POST /api/auth/reset-password`. `forgot-password` always returns the same generic message regardless of whether the account exists or has a password at all, to prevent email enumeration, and is rate-limited (3 requests / 15 min per email) via a new minimal in-memory limiter (`apps/web/src/lib/rate-limit.ts` — single-instance only, not the full rate-limiting requirement from `docs/security.md`, which still needs a shared store for login/register). Verified against the real DB and real SMTP end to end, not just rendered: registered a user, fetched the actual email from maildev's API, followed the real verification link (`emailVerified` got set, token deleted, reusing the same link correctly failed), requested a password reset for both a real and a nonexistent email (identical response, only one email actually sent), used the real reset link to change the password (old password then rejected, new one accepted), confirmed reusing the reset link fails, and confirmed the rate limiter caps repeated requests. One known, documented gap: sessions use the JWT strategy, so a password reset does not invalidate sessions already issued on other devices — closing that would need database sessions or a revocation list. Owner: Senior Full-Stack Engineer / Security Engineer.
 
 ### Backlog (Phase 3+ and beyond — not yet Ready)
 
@@ -59,25 +39,15 @@ Status: In Progress — backend/config + UI done, email delivery remains (see Re
 - **[Mobile Foundation] React Native/Expo vs Flutter spike** — Correctly sequenced after Web MVP validation (Phase 8).
 - **[iOS] / [Android] app shells** — Blocked on Mobile Foundation.
 - **[Analytics] Full product + scientific analytics pipeline** — Needs schema design once real usage exists to instrument.
+- **[Authentication] Verify the real Google/Facebook OAuth redirect** — needs real OAuth app credentials (`GOOGLE_CLIENT_ID`/`FACEBOOK_CLIENT_ID` etc. in `.env`) registered with each provider; everything up to that point is implemented and code-reviewed but the actual redirect/callback round-trip has never been exercised.
+- **[Infrastructure] Broaden rate limiting beyond forgot-password/reset-password** — `docs/security.md` calls for rate limiting on login and register too; only the two newest endpoints have it (`apps/web/src/lib/rate-limit.ts`), and even that's in-memory/single-instance only — a real deployment needs a shared store (Redis, etc.).
+- **[Authentication] Invalidate other sessions on password reset** — sessions use the JWT strategy, so resetting a password doesn't revoke sessions already issued on other devices. Needs database sessions or a token-revocation list.
 
 ---
 
 ## Ready — next executable batch
 
-```text
-Title: Auth: email verification + password reset delivery
-Epic: Authentication
-Priority: P0
-Description: Wire up real email delivery (a transactional email provider — evaluate at implementation time) for the VerificationToken flow already modeled in packages/db/prisma/schema.prisma: verification-on-signup and forgot-password. Nothing here should be faked with a console.log stand-in once this card is marked Done.
-Acceptance criteria:
-- signup sends a real verification email; clicking the link sets User.emailVerified
-- "forgot password" sends a reset link; using it updates hashedPassword and invalidates the token
-- tokens expire and are single-use
-Dependencies: Run the first real Prisma migration (done)
-Complexity: M
-Owner: Senior Full-Stack Engineer / Security Engineer
-Status: Ready
-```
+Empty — every Phase 2 (Technical Foundation) card is Done. Three small, honest loose ends are tracked in Backlog below rather than blocking Phase 3 kickoff. Next up is starting Phase 3 (Web MVP): see `docs/development-plan.md`'s MVP Philosophy trim (Adaptive N-Back, Complex Span, Spatial Sequence Recall, Reading) and pick the first real exercise to implement against `packages/cognitive-engine`/`packages/reading-engine`.
 
 ---
 

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@lean-academy/db";
+import { createVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/email";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -33,10 +35,21 @@ export async function POST(request: Request) {
     data: { email, name, hashedPassword },
   });
 
-  // TODO(Phase 2 follow-up, tracked separately in docs/kanban.md): send a
-  // real verification email. This intentionally does not fake working
-  // email infrastructure — the account is created but emailVerified stays
-  // null until that's wired up.
+  let emailSent = true;
+  try {
+    const token = await createVerificationToken(email);
+    await sendVerificationEmail(email, token);
+  } catch (err) {
+    // The account is real either way — don't roll it back just because
+    // mail delivery failed (e.g. maildev isn't running locally). Surface
+    // it in the response so the UI can say something honest instead of
+    // implying an email that never sent.
+    console.error("Failed to send verification email:", err);
+    emailSent = false;
+  }
 
-  return NextResponse.json({ id: user.id, email: user.email }, { status: 201 });
+  return NextResponse.json(
+    { id: user.id, email: user.email, emailSent },
+    { status: 201 }
+  );
 }

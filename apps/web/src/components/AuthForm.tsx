@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 
 type Mode = "login" | "signup";
@@ -208,6 +209,15 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
               : "Log in"}
         </button>
       </form>
+
+      {!signup && (
+        <Link
+          href="/forgot-password"
+          className="mt-4 block text-center text-[13px] font-semibold text-accent"
+        >
+          Forgot your password?
+        </Link>
+      )}
 
       <div className="mt-4.5 text-center text-xs leading-relaxed text-text-3">
         By continuing you agree to our Terms and Privacy Policy.

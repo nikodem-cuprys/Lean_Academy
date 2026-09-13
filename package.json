@@ -6,7 +6,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "pnpm --filter web dev",
+    "dev": "pnpm --filter @lean-academy/web dev",
+    "dev:mail": "maildev",
     "build": "pnpm -r --filter=./apps/* --filter=./packages/* build",
     "typecheck": "pnpm -r --filter=./apps/* --filter=./packages/* typecheck",
     "test": "pnpm -r --filter=./packages/* test",
@@ -15,6 +16,7 @@
     "db:migrate": "pnpm --filter @lean-academy/db migrate"
   },
   "devDependencies": {
+    "maildev": "2.2.1",
     "typescript": "^5.6.3"
   }
 }

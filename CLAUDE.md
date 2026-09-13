@@ -27,6 +27,8 @@ pnpm lint                 # eslint (apps/web) + placeholders elsewhere
 pnpm db:generate          # regenerate the Prisma client after editing schema.prisma
 pnpm db:migrate           # run/create a Prisma migration (needs DATABASE_URL — see .env.example)
 pnpm --filter @lean-academy/db seed   # sync EvidenceRecord/ResearchCitation from data/evidence-registry.json
+
+pnpm dev:mail             # maildev — a real local SMTP server + web UI at http://localhost:1080, for viewing verification/reset emails sent in dev
 ```
 
 **Local Postgres:** a PostgreSQL 17 server runs locally (Windows service `postgresql-x64-17`) with a dedicated `lean_academy` login role + database (not the `postgres` superuser — that stays a separate, unshared credential). `DATABASE_URL` needs to be in **two** places: `.env` at the repo root (read by `apps/web`/`apps/api` at runtime) *and* `packages/db/.env` (the Prisma CLI only reads `.env` from its own CWD/schema directory, not the monorepo root — copy it there too if you rotate the password). Both files are gitignored; see `.env.example` for the shape. The `lean_academy` role has `CREATEDB` so `prisma migrate dev` can create its shadow database — don't revoke that or migrations will fail with `P3014`.
@@ -38,6 +40,8 @@ pnpm --filter @lean-academy/evidence test        # e.g. run just the evidence-re
 pnpm --filter @lean-academy/adaptive-engine test
 cd packages/evidence && pnpm exec vitest run src/index.test.ts   # a single test file
 ```
+
+**`tsc --noEmit` on `apps/web` needs Next's route types regenerated first** if you've added/removed a route since the last `next dev`/`next build` — otherwise the typed `PageProps<'/your-route'>`/`LayoutProps<...>` helpers fail with "does not satisfy the constraint 'AppRoutes'". Run `pnpm exec next typegen` (from `apps/web`) to regenerate them without a full build.
 
 **Build order matters for apps that aren't `apps/web`.** `apps/web` transpiles workspace packages' TS source directly (via `next.config.ts`'s `transpilePackages`), but `apps/api` resolves workspace packages through their `dist/` output (their `package.json` `main`/`types` point there). Run `pnpm build` (or at least build the packages `apps/api` depends on) before `apps/api` will typecheck or run — it doesn't watch/rebuild its deps for you.
 
@@ -62,6 +66,10 @@ Every training exercise is traceable through linked, must-stay-in-sync artifacts
 
 `packages/db/prisma/schema.prisma` uses Auth.js's (`next-auth`) standard adapter shape — `User`/`Account`/`Session`/`VerificationToken` — rather than a bespoke `Identity` table. `Account` (one row per `(provider, providerAccountId)`) already *is* the "Identity/AuthProvider" model `project_prompt.txt` asks for: it's how a user links Google and Facebook to one account without duplicates. Email+password does not create an `Account` row — Auth.js's Credentials provider isn't an OAuth "linked account," so it uses `User.hashedPassword` directly (the standard Auth.js pattern). Auth config lives in `apps/web/src/lib/auth.ts`. Don't reintroduce a separate custom Identity table; extend `Account`/`User` instead.
 
+### Email verification & password reset
+
+`VerificationToken` (Auth.js's standard table — see above) is reused for two purposes it wasn't originally built for: email verification and password reset. The `identifier` column is prefixed by purpose (`"verify:" + email` / `"reset:" + email`) so the two flows can't be confused; tokens are stored as a SHA-256 hash (`apps/web/src/lib/tokens.ts`), never plaintext, and deleted the moment they're looked up (valid or not) — single-use by construction, not by convention. `apps/web/src/lib/email.ts` sends real SMTP mail via `nodemailer`; locally it points at `maildev` (`pnpm dev:mail`), in production at a real provider's SMTP endpoint via the same `SMTP_*` env vars — the sending code itself never changes. `/api/auth/forgot-password` always returns the same generic message regardless of whether the account exists (prevents email enumeration) and is rate-limited by `apps/web/src/lib/rate-limit.ts` (in-memory, single-instance — fine for now, not for a multi-instance deployment). Known gap: password reset doesn't invalidate other sessions, since sessions use the JWT strategy (no server-side session store to revoke from).
+
 ### Documentation map
 
 - `README.md` — entry point and full doc index.
@@ -85,7 +93,7 @@ Every training exercise is traceable through linked, must-stay-in-sync artifacts
 
 ```text
 apps/
-  web/     Next.js 16 (App Router, Turbopack). Auth.js wired; /login + /signup built (see AuthForm below). Everything else still needs building against prototype/*.dc.html.
+  web/     Next.js 16 (App Router, Turbopack). Full auth flow built: /login, /signup, /verify-email, /forgot-password, /reset-password (see AuthForm and Email verification sections below). Everything else still needs building against prototype/*.dc.html.
   api/     Fastify. /health (includes a real DB connectivity check), /catalog (evidence-gated module list).
 
 packages/
