@@ -14,6 +14,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@lean-academy/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@lean-academy/evidence':
         specifier: workspace:*
         version: link:../../packages/evidence

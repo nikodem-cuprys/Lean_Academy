@@ -29,6 +29,8 @@ pnpm db:migrate           # run/create a Prisma migration (needs DATABASE_URL �
 pnpm --filter @lean-academy/db seed   # sync EvidenceRecord/ResearchCitation from data/evidence-registry.json
 ```
 
+**Local Postgres:** a PostgreSQL 17 server runs locally (Windows service `postgresql-x64-17`) with a dedicated `lean_academy` login role + database (not the `postgres` superuser — that stays a separate, unshared credential). `DATABASE_URL` needs to be in **two** places: `.env` at the repo root (read by `apps/web`/`apps/api` at runtime) *and* `packages/db/.env` (the Prisma CLI only reads `.env` from its own CWD/schema directory, not the monorepo root — copy it there too if you rotate the password). Both files are gitignored; see `.env.example` for the shape. The `lean_academy` role has `CREATEDB` so `prisma migrate dev` can create its shadow database — don't revoke that or migrations will fail with `P3014`.
+
 **Single-package commands** (run inside that package, or `pnpm --filter <name> <script>` from root):
 
 ```bash

@@ -22,9 +22,10 @@ _Companion to `docs/development-plan.md`. Columns: Backlog · Research · UX/Des
 - **[Infrastructure] Security plan v0** — Owner: Security Engineer. Output: `docs/security.md`.
 - **[Testing] Test strategy v0** — Owner: QA Engineer. Output: `docs/testing.md`.
 - **[Infrastructure] Repository & Monorepo Scaffold** — pnpm workspaces (`apps/{web,api}` + 8 `packages/*`). apps/web (Next.js 16, App Router) boots and renders real evidence-registry + auth-session data; apps/api (Fastify) serves `/health` and `/catalog`. `pnpm build`/`typecheck`/`test`/`lint` all pass at the repo root. Owner: Senior Full-Stack Engineer. See CLAUDE.md's Commands section for the real commands this unblocked.
-- **[Infrastructure] Database Schema v0** — Prisma schema in `packages/db/prisma/schema.prisma` covering every entity in `project_prompt.txt`'s DATABASE section. Two justified deviations: (1) `User`/`Account`/`Session`/`VerificationToken` follow Auth.js's standard adapter shape rather than a bespoke `Identity` table — `Account` already *is* the per-provider "Identity/AuthProvider" model the spec asked for, and reusing Auth.js's schema means the OAuth/PKCE code path is library-tested, not hand-rolled; (2) added `ChallengeProgress` as the join table normalization requires (not in the spec's literal entity list). Migrations not yet run against a live Postgres instance — do that (`pnpm db:migrate`) before this is truly done; schema is verified via `prisma generate`, not yet via a real migration. Owner: Data Engineer.
+- **[Infrastructure] Database Schema v0** — Prisma schema in `packages/db/prisma/schema.prisma` covering every entity in `project_prompt.txt`'s DATABASE section. Two justified deviations: (1) `User`/`Account`/`Session`/`VerificationToken` follow Auth.js's standard adapter shape rather than a bespoke `Identity` table — `Account` already *is* the per-provider "Identity/AuthProvider" model the spec asked for, and reusing Auth.js's schema means the OAuth/PKCE code path is library-tested, not hand-rolled; (2) added `ChallengeProgress` as the join table normalization requires (not in the spec's literal entity list). Owner: Data Engineer.
 - **[Science/Evidence] Evidence Registry Loader & Catalog Gate** — `packages/evidence` (Zod-validated, throws loudly on malformed/missing data). Split into `parseEvidenceRegistry` (pure, bundler-safe) and `loadEvidenceRegistry` (fs-based, Node-only) after discovering Next.js's server bundle virtualizes `__dirname`, which broke naive fs reads from bundled code — apps/web imports the JSON directly and parses it; apps/api reads it from disk. 9 tests, including one proving a non-approved module id is rejected. Owner: Data Engineer.
 - **[Adaptive Engine] Adaptive Engine Skeleton** — `packages/adaptive-engine`'s `RollingWindowAdaptiveEngine` implements the exact `AdaptiveTrainingTask` interface from `project_prompt.txt`. 10 tests, including ones proving no single-trial difficulty swings and correct min/max clamping. Not yet wired to a real exercise (that's `packages/cognitive-engine`'s job, still a placeholder). Owner: Senior Full-Stack Engineer / Psychometrics Specialist.
+- **[Infrastructure] Run the first real Prisma migration** — a local PostgreSQL 17 server (already installed, Windows service) now backs local dev: a dedicated `lean_academy` login role + database were created (not the `postgres` superuser), `pnpm db:migrate` applied migration `20260913190003_init` cleanly, and `pnpm --filter @lean-academy/db seed` synced all 10 evidence records. `apps/api`'s `/health` now does a real `SELECT 1` through Prisma and reports `{"status":"ok","db":"connected"}`. Credentials live in `.env` (repo root) and `packages/db/.env` (Prisma CLI doesn't read the root one — see CLAUDE.md) — both gitignored, neither committed. Owner: Data Engineer.
 
 ### In Progress
 
@@ -63,21 +64,6 @@ Status: In Progress — backend/config done, UI + email delivery remain (see Rea
 ## Ready — next executable batch
 
 ```text
-Title: Run the first real Prisma migration
-Epic: Infrastructure
-Priority: P0
-Description: Database Schema v0's schema.prisma is written and prisma generate succeeds, but no migration has run against a real Postgres instance yet (none was available in the scaffolding environment). Stand up a dev Postgres (local or hosted), set DATABASE_URL, and run the first migration.
-Acceptance criteria:
-- pnpm db:migrate runs cleanly from an empty database
-- pnpm --filter @lean-academy/db seed populates EvidenceRecord/ResearchCitation from data/evidence-registry.json without error
-- a basic smoke query (e.g. count Users) succeeds from apps/api
-Dependencies: Database Schema v0 (done)
-Complexity: S
-Owner: Data Engineer
-Status: Ready
-```
-
-```text
 Title: Auth: login/signup UI
 Epic: Authentication
 Priority: P0
@@ -86,7 +72,7 @@ Acceptance criteria:
 - visually matches prototype/Login.dc.html (tokens from packages/design-system)
 - all three sign-in paths (email, Google, Facebook) work end to end against a real DB
 - form validation errors are shown inline, not just thrown as raw API errors
-Dependencies: Run the first real Prisma migration
+Dependencies: Run the first real Prisma migration (done)
 Complexity: M
 Owner: Senior Full-Stack Engineer / Senior UI/UX Designer
 Status: Ready
@@ -101,7 +87,7 @@ Acceptance criteria:
 - signup sends a real verification email; clicking the link sets User.emailVerified
 - "forgot password" sends a reset link; using it updates hashedPassword and invalidates the token
 - tokens expire and are single-use
-Dependencies: Run the first real Prisma migration
+Dependencies: Run the first real Prisma migration (done)
 Complexity: M
 Owner: Senior Full-Stack Engineer / Security Engineer
 Status: Ready

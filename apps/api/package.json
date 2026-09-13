@@ -12,6 +12,7 @@
     "lint": "echo \"(no lint configured for apps/api yet)\""
   },
   "dependencies": {
+    "@lean-academy/db": "workspace:*",
     "@lean-academy/evidence": "workspace:*",
     "fastify": "^5.1.0"
   },
