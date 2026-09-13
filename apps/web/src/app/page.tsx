@@ -32,9 +32,14 @@ export default async function HomePage() {
         <dd>{session?.user ? session.user.email : "no"}</dd>
       </dl>
       {session?.user ? (
-        <Link href="/train/n-back" className="text-sm font-semibold text-accent underline">
-          Try the N-Back exercise →
-        </Link>
+        <div className="flex flex-col gap-2">
+          <Link href="/train/n-back" className="text-sm font-semibold text-accent underline">
+            Try the N-Back exercise →
+          </Link>
+          <Link href="/train/complex-span" className="text-sm font-semibold text-accent underline">
+            Try the Complex Span exercise →
+          </Link>
+        </div>
       ) : (
         <Link href="/login" className="text-sm font-semibold text-accent underline">
           Log in or sign up →
