@@ -21,7 +21,8 @@
     "@lean-academy/db": "workspace:*",
     "@lean-academy/evidence": "workspace:*",
     "@lean-academy/design-system": "workspace:*",
-    "@lean-academy/shared": "workspace:*"
+    "@lean-academy/shared": "workspace:*",
+    "@lean-academy/cognitive-engine": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

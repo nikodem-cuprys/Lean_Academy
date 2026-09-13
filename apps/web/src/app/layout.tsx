@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sora, Manrope } from "next/font/google";
+import { Sora, Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -15,6 +15,12 @@ const manrope = Manrope({
   weight: ["400", "500", "600", "700", "800"],
 });
 
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-num",
+  subsets: ["latin"],
+  weight: ["600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "LeanAcademy",
   description:
@@ -25,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${sora.variable} ${manrope.variable} h-full antialiased`}
+      className={`${sora.variable} ${manrope.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg text-text font-body">
         <Providers>{children}</Providers>

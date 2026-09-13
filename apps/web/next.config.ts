@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
     "@lean-academy/evidence",
     "@lean-academy/design-system",
     "@lean-academy/shared",
+    "@lean-academy/cognitive-engine",
+    "@lean-academy/adaptive-engine",
   ],
 };
 

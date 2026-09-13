@@ -31,7 +31,11 @@ export default async function HomePage() {
         <dt className="text-neutral-500">Signed in</dt>
         <dd>{session?.user ? session.user.email : "no"}</dd>
       </dl>
-      {!session?.user && (
+      {session?.user ? (
+        <Link href="/train/n-back" className="text-sm font-semibold text-accent underline">
+          Try the N-Back exercise →
+        </Link>
+      ) : (
         <Link href="/login" className="text-sm font-semibold text-accent underline">
           Log in or sign up →
         </Link>

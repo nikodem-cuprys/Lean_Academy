@@ -41,6 +41,7 @@ XS = hours, S = ~1 day, M = ~2-4 days, L = ~1-2 weeks, XL = ~3+ weeks, all assum
 **Exit criteria:** Matches the WEB SUCCESS CRITERIA in `project_prompt.txt` — account creation, all three auth methods, fast onboarding, intuitive level selection, evidence-supported WM exercises, reading-efficiency training with adaptive difficulty, daily training, understandable progress, science pages, multi-day return capability, legitimate achievements (if Phase 5 pulled forward for one), works on desktop and mobile browsers.
 **Dependencies:** Phase 2.
 **Size:** XL.
+**Status:** Started. First exercise (Adaptive N-Back) is implemented end to end — engine logic unit-tested, `/train/n-back` playable and auth-gated — but not yet click-verified in a live browser (see `docs/kanban.md`'s Backlog). Everything else in this phase's Deliverables list is still open; see `docs/kanban.md`'s Ready/Backlog sections for the sequenced remainder (Complex Span, Spatial Sequence Recall, Reading, baseline/calibration, session orchestration, Progress, Science).
 
 ## Phase 4 — UX Polish
 

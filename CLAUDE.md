@@ -47,6 +47,8 @@ cd packages/evidence && pnpm exec vitest run src/index.test.ts   # a single test
 
 The one generated artifact outside `apps/*`/`packages/*` is `prototype/lean-academy-prototype.html`. It's produced from `prototype/*.dc.html` + `prototype/canvas.json` via the Claude Code `design` skill's seed step — don't hand-edit it directly; edit the source `.dc.html`/`canvas.json` files and reseed/republish through the `design` skill.
 
+**Verifying interactive UI (timed exercises, forms with client-side state) needs a real browser** — build/typecheck/lint passing and server-rendered HTML looking right do not prove client-side interaction (timers, event listeners, animations) actually works. Check whether the Claude-in-Chrome extension is connected before claiming a screen like an exercise is verified; if it isn't, say so explicitly rather than inferring success from the build (see the N-Back exercise screen's kanban entry for what this looks like honestly reported).
+
 ## Architecture
 
 ### The evidence-gating chain (the project's central mechanic)
@@ -102,7 +104,7 @@ packages/
   adaptive-engine/     RollingWindowAdaptiveEngine implementing project_prompt.txt's AdaptiveTrainingTask interface; gradual, window-based difficulty changes only.
   design-system/       Color/type/spacing tokens transcribed from prototype/Styleguide.dc.html — keep both in sync.
   shared/              Cross-cutting plain-language labels (difficulty levels, training domains).
-  cognitive-engine/    Placeholder — will hold the WM exercise implementations (n-back, complex span, etc.), wrapping adaptive-engine.
+  cognitive-engine/    NBackTask done (wraps adaptive-engine; difficulty *is* N for this task). Complex span, spatial sequence recall, verbal sequencing, method of loci still placeholders — follow NBackTask's pattern: task-specific stimulus/scoring logic here, difficulty adaptation delegated to adaptive-engine, never reimplemented.
   reading-engine/      Placeholder — paced/adaptive reading + Reading Efficiency Score.
   trial-engine/        Placeholder — shared stimulus/timing runtime (performance.now(), focus-loss detection).
   psychometrics/       Placeholder — accepted psychometric calculations (d-prime, span scoring, etc.).
