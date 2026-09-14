@@ -71,6 +71,7 @@ XS = hours, S = ~1 day, M = ~2-4 days, L = ~1-2 weeks, XL = ~3+ weeks, all assum
 **Exit criteria:** The Progress page's "Similar Cognitive Tasks" and "Broader Transfer" sections have real assessment data behind them, not placeholders.
 **Dependencies:** Phase 3 (need weeks of trained-task data first).
 **Size:** L.
+**Status:** Planned, not started — see `docs/kanban.md`'s Phase 6 breakdown (Backlog, sequenced after Phase 5) for six concrete cards: a real psychometric scoring library (d-prime, confidence intervals — foundational for the rest), two genuine near-transfer assessments (Backward Digit Span for Working Memory, an alternate spatial-span variant for Spatial), an expanded/rotating reading-passage bank (alternate forms), wiring the Progress page's "Similar Cognitive Tasks" tab to the real assessment data once it exists, and a longitudinal trend view (sequenced last since it needs the most real elapsed usage time). No far-transfer assessment card exists — `docs/evidence-review.md` doesn't support a far-transfer claim for any current module, and the Progress page's "Broader Transfer" tab already handles that honestly as a static disclaimer needing no new data.
 
 ## Phase 7 — Monetization
 
