@@ -54,6 +54,7 @@ model User {
   challengeProgress       ChallengeProgress[]
   dailyGoal               DailyGoal?
   streak                  Streak?
+  xpEntries               XpEntry[]
   devices                 Device[]
   notificationPreference  NotificationPreference?
 }
@@ -170,6 +171,7 @@ model TrainingSession {
 
   trials         Trial[]
   readingResults ReadingResult[]
+  xpEntries      XpEntry[]
 
   @@index([userId, startedAt])
 }
@@ -373,6 +375,31 @@ model UserAchievement {
   metadata      Json?
 
   @@unique([userId, achievementId])
+}
+
+enum XpReason {
+  SESSION_COMPLETION
+  CONSISTENCY_BONUS
+  NEW_DOMAIN_BONUS
+  ACHIEVEMENT_BONUS
+}
+
+/// One row per XP award (see apps/web/src/lib/xp.ts) rather than a
+/// single mutable running total — lets the daily anti-grind cap be
+/// computed honestly from real award history instead of a counter that
+/// could drift, and keeps a real audit trail of how a user's Training
+/// Level was reached.
+model XpEntry {
+  id                 String          @id @default(cuid())
+  userId             String
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount             Int
+  reason             XpReason
+  trainingSessionId  String?
+  trainingSession    TrainingSession? @relation(fields: [trainingSessionId], references: [id])
+  createdAt          DateTime        @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model DailyGoal {

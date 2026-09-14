@@ -1,5 +1,6 @@
 import { prisma, Prisma } from "@lean-academy/db";
 import { READING_DEFAULT_INITIAL_DIFFICULTY } from "@lean-academy/reading-engine";
+import { awardXp, XP_AMOUNTS } from "@/lib/xp";
 
 // Achievements epic (Phase 5 — see docs/kanban.md). The catalog itself
 // (11 real, checkable milestones) lives in
@@ -11,10 +12,12 @@ import { READING_DEFAULT_INITIAL_DIFFICULTY } from "@lean-academy/reading-engine
 // difficulty/comprehension milestones), and the onboarding completion
 // route (the first-assessment milestone).
 //
-// awardAchievementOnce is a Prisma upsert against
-// UserAchievement's @@unique([userId, achievementId]) constraint, so
-// calling it for an already-earned achievement is a safe no-op rather
-// than something callers need to guard against themselves.
+// awardAchievementOnce finds-then-creates against UserAchievement's
+// @@unique([userId, achievementId]) constraint (rather than upserting)
+// specifically so it knows whether this call is a genuine new award —
+// that's what "achieving genuine task milestones" XP (see
+// apps/web/src/lib/xp.ts) is keyed off of, not every achievement check.
+// Calling it for an already-earned achievement is still a safe no-op.
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -22,11 +25,13 @@ async function awardAchievementOnce(userId: string, key: string, metadata?: Pris
   const achievement = await prisma.achievement.findUnique({ where: { key } });
   if (!achievement) return; // seed hasn't run for this key — don't fail the caller's real work over it
 
-  await prisma.userAchievement.upsert({
+  const existing = await prisma.userAchievement.findUnique({
     where: { userId_achievementId: { userId, achievementId: achievement.id } },
-    create: { userId, achievementId: achievement.id, metadata },
-    update: {},
   });
+  if (existing) return;
+
+  await prisma.userAchievement.create({ data: { userId, achievementId: achievement.id, metadata } });
+  await awardXp(userId, XP_AMOUNTS.ACHIEVEMENT_BONUS, "ACHIEVEMENT_BONUS");
 }
 
 export function startOfUtcWeek(now: Date): Date {

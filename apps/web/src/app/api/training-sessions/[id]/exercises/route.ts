@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma, Prisma } from "@lean-academy/db";
 import { auth } from "@/lib/auth";
 import { checkExerciseAchievements } from "@/lib/achievements";
+import { recordNewDomainXpIfFirstTime } from "@/lib/xp";
 
 // Called once per exercise completion during a training session (see
 // TrainingSessionRunner) — persists that exercise's real Trial rows and
@@ -87,6 +88,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     sessionCorrect: trials.filter((t) => t.correct).length,
     sessionTotal: trials.length,
   });
+  await recordNewDomainXpIfFirstTime(session.user.id, taskVersion.id, id);
 
   return NextResponse.json({ success: true });
 }
