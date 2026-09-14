@@ -42,6 +42,9 @@ export default async function HomePage() {
           <Link href="/train/spatial-sequence" className="text-sm font-semibold text-accent underline">
             Try the Spatial Sequence exercise →
           </Link>
+          <Link href="/train/reading" className="text-sm font-semibold text-accent underline">
+            Try the Paced Reading exercise →
+          </Link>
         </div>
       ) : (
         <Link href="/login" className="text-sm font-semibold text-accent underline">

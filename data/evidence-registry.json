@@ -182,11 +182,13 @@
       ],
       "limitations": [
         "2023 RCT found training-group gains of roughly +35 WPM without comprehension loss — a modest, realistic effect size, not a dramatic one",
-        "Perceptual span (the region of text usable per fixation) is a hard physiological constraint (~3-4 letters left, ~14-15 letters right of fixation) that bounds how much speed gain is plausible without comprehension cost"
+        "Perceptual span (the region of text usable per fixation) is a hard physiological constraint (~3-4 letters left, ~14-15 letters right of fixation) that bounds how much speed gain is plausible without comprehension cost",
+        "The Reading Efficiency Score's comprehension floor (0.70) is sourced from Betts' (1946) Informal Reading Inventory instructional-level convention, a separate and older source than the Klimovich RCT above — that RCT establishes realistic WPM-gain size, not a pass/fail comprehension threshold"
       ],
       "citations": [
         {"authors": "Klimovich et al.", "year": 2023, "title": "Does speed-reading training work, and if so, why? Effects of speed-reading training and metacognitive training on reading speed, comprehension and eye movements", "venue": "Journal of Research in Reading", "url": "https://onlinelibrary.wiley.com/doi/full/10.1111/1467-9817.12417"},
-        {"authors": "Rayner, Slattery & Bélanger", "year": 2011, "title": "Eye movements, the perceptual span, and reading speed", "venue": "Psychonomic Bulletin & Review (PMC)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3075059/"}
+        {"authors": "Rayner, Slattery & Bélanger", "year": 2011, "title": "Eye movements, the perceptual span, and reading speed", "venue": "Psychonomic Bulletin & Review (PMC)", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3075059/"},
+        {"authors": "Betts, E. A.", "year": 1946, "title": "Foundations of Reading Instruction", "venue": "American Book Company (Informal Reading Inventory instructional/frustration-level criteria)", "url": "https://study.com/learn/lesson/informal-reading-inventory-test-uses.html"}
       ]
     },
     {

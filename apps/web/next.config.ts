@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
     "@lean-academy/shared",
     "@lean-academy/cognitive-engine",
     "@lean-academy/adaptive-engine",
+    "@lean-academy/reading-engine",
   ],
 };
 

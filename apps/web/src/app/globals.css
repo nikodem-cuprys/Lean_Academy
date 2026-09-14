@@ -23,6 +23,8 @@
   --color-wm-soft: oklch(94% 0.03 276);
   --color-spatial: oklch(58% 0.10 195);
   --color-spatial-soft: oklch(94% 0.025 195);
+  --color-reading: oklch(62% 0.16 75);
+  --color-reading-soft: oklch(95% 0.04 75);
   --color-success: oklch(62% 0.14 150);
   --color-success-soft: oklch(95% 0.03 150);
 
@@ -51,6 +53,8 @@
     --color-wm-soft: oklch(30% 0.05 276);
     --color-spatial: oklch(72% 0.09 195);
     --color-spatial-soft: oklch(30% 0.04 195);
+    --color-reading: oklch(78% 0.13 75);
+    --color-reading-soft: oklch(33% 0.06 75);
     --color-success: oklch(72% 0.13 150);
     --color-success-soft: oklch(30% 0.05 150);
   }
@@ -74,6 +78,8 @@
   --color-wm-soft: var(--color-wm-soft);
   --color-spatial: var(--color-spatial);
   --color-spatial-soft: var(--color-spatial-soft);
+  --color-reading: var(--color-reading);
+  --color-reading-soft: var(--color-reading-soft);
   --color-success: var(--color-success);
   --color-success-soft: var(--color-success-soft);
 

@@ -23,7 +23,8 @@
     "@lean-academy/evidence": "workspace:*",
     "@lean-academy/design-system": "workspace:*",
     "@lean-academy/shared": "workspace:*",
-    "@lean-academy/cognitive-engine": "workspace:*"
+    "@lean-academy/cognitive-engine": "workspace:*",
+    "@lean-academy/reading-engine": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

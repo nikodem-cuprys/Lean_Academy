@@ -54,6 +54,9 @@ importers:
       '@lean-academy/evidence':
         specifier: workspace:*
         version: link:../../packages/evidence
+      '@lean-academy/reading-engine':
+        specifier: workspace:*
+        version: link:../../packages/reading-engine
       '@lean-academy/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -201,6 +204,10 @@ importers:
         version: 2.1.9(@types/node@20.19.43)(jsdom@24.1.3(supports-color@7.2.0))(lightningcss@1.32.0)(supports-color@7.2.0)
 
   packages/reading-engine:
+    dependencies:
+      '@lean-academy/adaptive-engine':
+        specifier: workspace:*
+        version: link:../adaptive-engine
     devDependencies:
       '@types/node':
         specifier: ^20.19.43
