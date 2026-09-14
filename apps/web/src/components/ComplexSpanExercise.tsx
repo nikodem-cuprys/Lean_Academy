@@ -6,6 +6,12 @@ import {
   ComplexSpanTask,
   type ProcessingItem,
 } from "@lean-academy/cognitive-engine";
+import {
+  epochOffsetMs,
+  perfToEpochMs,
+  type SessionModeProps,
+  type TrialInput,
+} from "@/lib/session-types";
 
 // Adapted from prototype/ExerciseComplexSpan.dc.html, which only shows
 // one representative moment (the processing step) — the recall UI is
@@ -48,7 +54,7 @@ interface Results {
   processingAccuracy: { correct: number; total: number };
 }
 
-export function ComplexSpanExercise() {
+export function ComplexSpanExercise({ initialDifficulty, onComplete }: SessionModeProps = {}) {
   const [phase, setPhase] = useState<Phase>("processing");
   const [setNumber, setSetNumber] = useState(0);
   const [setSize, setSetSize] = useState<number | null>(null);
@@ -74,9 +80,11 @@ export function ComplexSpanExercise() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const task = new ComplexSpanTask();
+    const task = new ComplexSpanTask(initialDifficulty !== undefined ? { initialDifficulty } : {});
     const startDifficulty = task.getCurrentDifficulty();
     const sets: SetSummary[] = [];
+    const offsetMs = epochOffsetMs();
+    const trials: TrialInput[] = [];
 
     async function waitForTrueFalse(): Promise<{ said: boolean; interrupted: boolean }> {
       let interrupted = !visibleRef.current;
@@ -112,6 +120,7 @@ export function ComplexSpanExercise() {
       for (let s = 0; s < TOTAL_SETS; s++) {
         if (controller.signal.aborted) return;
 
+        const setStartedAt = performance.now();
         task.startSet();
         const size = task.getCurrentSetSize();
         setSetNumber(s + 1);
@@ -142,8 +151,9 @@ export function ComplexSpanExercise() {
         await waitForRecallSubmit();
         if (controller.signal.aborted) return;
 
+        const respondedAt = performance.now();
         const outcome = task.submitRecall(recalledRef.current, {
-          timestamp: performance.now(),
+          timestamp: respondedAt,
         });
         const summary: SetSummary = {
           setSize: outcome.setSize,
@@ -151,15 +161,34 @@ export function ComplexSpanExercise() {
           fullyCorrect: outcome.fullyCorrect,
         };
         sets.push(summary);
+        trials.push({
+          correct: outcome.fullyCorrect,
+          stimulusStartedAtMs: perfToEpochMs(setStartedAt, offsetMs),
+          respondedAtMs: perfToEpochMs(respondedAt, offsetMs),
+          wasInterrupted: false,
+          difficultyAtTrial: outcome.setSize,
+          metadata: { correctPositions: outcome.correctPositions },
+        });
         setSetFeedback(summary);
         setPhase("feedback");
         await sleep(FEEDBACK_MS, controller.signal);
         if (controller.signal.aborted) return;
       }
 
+      const endDifficulty = task.getCurrentDifficulty();
+      if (onComplete) {
+        onComplete({
+          method: "complex-span-v0",
+          startDifficulty,
+          endDifficulty,
+          trials,
+          summaryLabel: `Span ${startDifficulty} → ${endDifficulty}`,
+        });
+        return;
+      }
       setResults({
         startDifficulty,
-        endDifficulty: task.getCurrentDifficulty(),
+        endDifficulty,
         sets,
         processingAccuracy: task.getProcessingAccuracy(),
       });
@@ -167,6 +196,7 @@ export function ComplexSpanExercise() {
 
     run();
     return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleTrueFalse(said: boolean) {

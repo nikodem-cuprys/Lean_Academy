@@ -3,6 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { NBackTask, type NBackStimulus } from "@lean-academy/cognitive-engine";
+import {
+  epochOffsetMs,
+  perfToEpochMs,
+  type SessionModeProps,
+  type TrialInput,
+} from "@/lib/session-types";
 
 // Adapted from prototype/Exercise.dc.html + prototype/ExerciseResults.dc.html.
 // One real, honest deviation from the mockup: the prototype's "Exercise 1
@@ -31,7 +37,7 @@ interface Results {
   scoredTrials: number;
 }
 
-export function NBackExercise() {
+export function NBackExercise({ initialDifficulty, onComplete }: SessionModeProps = {}) {
   const [phase, setPhase] = useState<"stimulus" | "feedback" | "done">("stimulus");
   const [stimulus, setStimulus] = useState<NBackStimulus | null>(null);
   const [currentN, setCurrentN] = useState<number | null>(null);
@@ -52,8 +58,10 @@ export function NBackExercise() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const task = new NBackTask();
+    const task = new NBackTask(initialDifficulty !== undefined ? { initialDifficulty } : {});
     const startDifficulty = task.getCurrentDifficulty();
+    const offsetMs = epochOffsetMs();
+    const trials: TrialInput[] = [];
 
     async function run() {
       setCurrentN(task.getCurrentN());
@@ -61,6 +69,7 @@ export function NBackExercise() {
         if (controller.signal.aborted) return;
 
         const stim = task.nextStimulus();
+        const difficultyAtTrial = task.getCurrentN();
         setStimulus(stim);
         setTrialNumber(i + 1);
         setFeedback(null);
@@ -101,10 +110,28 @@ export function NBackExercise() {
           if (outcome.scored) {
             setFeedback({ correct: outcome.correct });
             setCurrentN(task.getCurrentN());
+            trials.push({
+              correct: outcome.correct,
+              reactionTimeMs,
+              stimulusStartedAtMs: perfToEpochMs(stimulusStartedAt, offsetMs),
+              respondedAtMs: perfToEpochMs(performance.now(), offsetMs),
+              wasInterrupted: false,
+              difficultyAtTrial,
+              metadata: { position: stim.position, classification: outcome.classification },
+            });
           }
+        } else if (stim.isScoreable) {
+          // Interrupted trials are excluded from scoring but still
+          // recorded (flagged), per docs/product-requirements.md's
+          // timing-integrity requirement — visible, not deleted.
+          trials.push({
+            correct: false,
+            stimulusStartedAtMs: perfToEpochMs(stimulusStartedAt, offsetMs),
+            wasInterrupted: true,
+            difficultyAtTrial,
+            metadata: { position: stim.position, interrupted: true },
+          });
         }
-        // An interrupted trial is simply excluded from scoring — see
-        // docs/product-requirements.md's timing-integrity requirement.
 
         setPhase("feedback");
         await sleep(FEEDBACK_MS, controller.signal);
@@ -112,9 +139,20 @@ export function NBackExercise() {
       }
 
       const perf = task.calculatePerformance();
+      const endDifficulty = task.getCurrentDifficulty();
+      if (onComplete) {
+        onComplete({
+          method: "adaptive-nback-v0",
+          startDifficulty,
+          endDifficulty,
+          trials,
+          summaryLabel: `Level ${startDifficulty} → ${endDifficulty}`,
+        });
+        return;
+      }
       setResults({
         startDifficulty,
-        endDifficulty: task.getCurrentDifficulty(),
+        endDifficulty,
         accuracy: perf.accuracy,
         scoredTrials: perf.trialCount,
       });
@@ -123,6 +161,7 @@ export function NBackExercise() {
 
     run();
     return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleTap() {

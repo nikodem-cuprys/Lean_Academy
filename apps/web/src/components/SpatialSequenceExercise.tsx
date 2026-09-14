@@ -3,6 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SpatialSequenceTask } from "@lean-academy/cognitive-engine";
+import {
+  epochOffsetMs,
+  perfToEpochMs,
+  type SessionModeProps,
+  type TrialInput,
+} from "@/lib/session-types";
 
 // Adapted from prototype/ExerciseSpatial.dc.html (a 3x3 grid, cells light
 // up in sequence, then the player taps them back in the same order).
@@ -42,7 +48,7 @@ interface Results {
   sequences: SequenceSummary[];
 }
 
-export function SpatialSequenceExercise() {
+export function SpatialSequenceExercise({ initialDifficulty, onComplete }: SessionModeProps = {}) {
   const [phase, setPhase] = useState<Phase>("study");
   const [sequenceNumber, setSequenceNumber] = useState(0);
   const [sequenceLength, setSequenceLength] = useState<number | null>(null);
@@ -56,9 +62,11 @@ export function SpatialSequenceExercise() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const task = new SpatialSequenceTask();
+    const task = new SpatialSequenceTask(initialDifficulty !== undefined ? { initialDifficulty } : {});
     const startDifficulty = task.getCurrentDifficulty();
     const sequences: SequenceSummary[] = [];
+    const offsetMs = epochOffsetMs();
+    const trials: TrialInput[] = [];
 
     async function waitForRecallSubmit(): Promise<void> {
       await new Promise<void>((resolve) => {
@@ -70,6 +78,7 @@ export function SpatialSequenceExercise() {
       for (let s = 0; s < TOTAL_SEQUENCES; s++) {
         if (controller.signal.aborted) return;
 
+        const sequenceStartedAt = performance.now();
         task.startSequence();
         const length = task.getCurrentSequenceLength();
         setSequenceNumber(s + 1);
@@ -93,8 +102,9 @@ export function SpatialSequenceExercise() {
         await waitForRecallSubmit();
         if (controller.signal.aborted) return;
 
+        const respondedAt = performance.now();
         const outcome = task.submitRecall(tappedRef.current, {
-          timestamp: performance.now(),
+          timestamp: respondedAt,
         });
         const summary: SequenceSummary = {
           sequenceLength: outcome.sequenceLength,
@@ -102,21 +112,41 @@ export function SpatialSequenceExercise() {
           fullyCorrect: outcome.fullyCorrect,
         };
         sequences.push(summary);
+        trials.push({
+          correct: outcome.fullyCorrect,
+          stimulusStartedAtMs: perfToEpochMs(sequenceStartedAt, offsetMs),
+          respondedAtMs: perfToEpochMs(respondedAt, offsetMs),
+          wasInterrupted: false,
+          difficultyAtTrial: outcome.sequenceLength,
+          metadata: { correctPositions: outcome.correctPositions },
+        });
         setSequenceFeedback(summary);
         setPhase("feedback");
         await sleep(FEEDBACK_MS, controller.signal);
         if (controller.signal.aborted) return;
       }
 
+      const endDifficulty = task.getCurrentDifficulty();
+      if (onComplete) {
+        onComplete({
+          method: "visuospatial-sequence-recall-v0",
+          startDifficulty,
+          endDifficulty,
+          trials,
+          summaryLabel: `Level ${startDifficulty} → ${endDifficulty}`,
+        });
+        return;
+      }
       setResults({
         startDifficulty,
-        endDifficulty: task.getCurrentDifficulty(),
+        endDifficulty,
         sequences,
       });
     }
 
     run();
     return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleTap(position: number) {

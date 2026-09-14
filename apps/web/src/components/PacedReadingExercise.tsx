@@ -7,6 +7,12 @@ import {
   calculateReadingEfficiencyScore,
   type Passage,
 } from "@lean-academy/reading-engine";
+import {
+  epochOffsetMs,
+  perfToEpochMs,
+  type SessionModeProps,
+  type TrialInput,
+} from "@/lib/session-types";
 
 // Adapted from prototype/ExerciseReading.dc.html: a passage is shown
 // with a visual pace guide (a highlight that sweeps forward through
@@ -62,7 +68,7 @@ interface Results {
   comprehensionAccuracy: { correct: number; total: number };
 }
 
-export function PacedReadingExercise() {
+export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionModeProps = {}) {
   const [phase, setPhase] = useState<Phase>("reading");
   const [passageNumber, setPassageNumber] = useState(0);
   const [passage, setPassage] = useState<Passage | null>(null);
@@ -80,9 +86,12 @@ export function PacedReadingExercise() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const task = new PacedReadingTask();
+    const task = new PacedReadingTask(initialDifficulty !== undefined ? { initialDifficulty } : {});
+    const startDifficulty = task.getCurrentDifficulty();
     const startDifficultyWpm = task.getCurrentTargetWpm();
     const passages: PassageSummary[] = [];
+    const offsetMs = epochOffsetMs();
+    const trials: TrialInput[] = [];
 
     async function waitForFinishReading(): Promise<void> {
       await new Promise<void>((resolve) => {
@@ -111,6 +120,7 @@ export function PacedReadingExercise() {
 
         const nextPassage = task.nextPassage();
         const wpm = task.getCurrentTargetWpm();
+        const difficultyAtTrial = task.getCurrentDifficulty();
         setPassageNumber(p + 1);
         setPassage(nextPassage);
         setTargetWpm(wpm);
@@ -133,12 +143,21 @@ export function PacedReadingExercise() {
         if (controller.signal.aborted) return;
 
         const answeredCorrectly = chosenIndex === nextPassage.question.correctIndex;
+        const respondedAt = performance.now();
         const outcome = task.recordPassageResult({
           answeredCorrectly,
           elapsedMs,
-          timestamp: performance.now(),
+          timestamp: respondedAt,
         });
         passages.push({ correct: outcome.correct, actualWpm: outcome.actualWpm });
+        trials.push({
+          correct: outcome.correct,
+          stimulusStartedAtMs: perfToEpochMs(readingStartRef.current, offsetMs),
+          respondedAtMs: perfToEpochMs(respondedAt, offsetMs),
+          wasInterrupted: false,
+          difficultyAtTrial,
+          metadata: { actualWpm: outcome.actualWpm },
+        });
         setFeedback({
           correct: answeredCorrectly,
           correctText: nextPassage.question.choices[nextPassage.question.correctIndex],
@@ -148,9 +167,21 @@ export function PacedReadingExercise() {
         if (controller.signal.aborted) return;
       }
 
+      const endDifficulty = task.getCurrentDifficulty();
+      const endDifficultyWpm = task.getCurrentTargetWpm();
+      if (onComplete) {
+        onComplete({
+          method: "reading-paced-adaptive-v0",
+          startDifficulty,
+          endDifficulty,
+          trials,
+          summaryLabel: `${startDifficultyWpm} → ${endDifficultyWpm} WPM`,
+        });
+        return;
+      }
       setResults({
         startDifficultyWpm,
-        endDifficultyWpm: task.getCurrentTargetWpm(),
+        endDifficultyWpm,
         passages,
         averageWpm: task.getAverageWpm(),
         comprehensionAccuracy: task.getComprehensionAccuracy(),
@@ -159,6 +190,7 @@ export function PacedReadingExercise() {
 
     run();
     return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleFinishReading() {
