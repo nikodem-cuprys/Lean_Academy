@@ -33,6 +33,9 @@ export default async function HomePage() {
       </dl>
       {session?.user ? (
         <div className="flex flex-col gap-2">
+          <Link href="/onboarding" className="text-sm font-semibold text-accent underline">
+            Start onboarding →
+          </Link>
           <Link href="/train/n-back" className="text-sm font-semibold text-accent underline">
             Try the N-Back exercise →
           </Link>

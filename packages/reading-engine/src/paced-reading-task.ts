@@ -26,9 +26,9 @@ import { READING_PASSAGES, type Passage } from "./passages";
 
 const WPM_LADDER = [180, 200, 220, 240, 260, 280, 300, 320, 340];
 
-const DEFAULT_MIN_DIFFICULTY = 1;
-const DEFAULT_MAX_DIFFICULTY = WPM_LADDER.length;
-const DEFAULT_INITIAL_DIFFICULTY = 3; // 220 WPM
+export const READING_MIN_DIFFICULTY = 1;
+export const READING_MAX_DIFFICULTY = WPM_LADDER.length;
+export const READING_DEFAULT_INITIAL_DIFFICULTY = 3; // 220 WPM
 
 export interface ComprehensionAccuracy {
   correct: number;
@@ -68,9 +68,9 @@ export class PacedReadingTask {
   constructor(config: PacedReadingTaskConfig = {}) {
     this.random = config.random ?? Math.random;
     this.adaptiveEngine = new RollingWindowAdaptiveEngine({
-      initialDifficulty: config.initialDifficulty ?? DEFAULT_INITIAL_DIFFICULTY,
-      minDifficulty: config.minDifficulty ?? DEFAULT_MIN_DIFFICULTY,
-      maxDifficulty: config.maxDifficulty ?? DEFAULT_MAX_DIFFICULTY,
+      initialDifficulty: config.initialDifficulty ?? READING_DEFAULT_INITIAL_DIFFICULTY,
+      minDifficulty: config.minDifficulty ?? READING_MIN_DIFFICULTY,
+      maxDifficulty: config.maxDifficulty ?? READING_MAX_DIFFICULTY,
       ...DEFAULT_ROLLING_WINDOW_CONFIG,
     });
   }

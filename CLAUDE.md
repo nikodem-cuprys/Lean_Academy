@@ -105,7 +105,7 @@ Every training exercise is traceable through linked, must-stay-in-sync artifacts
 
 ```text
 apps/
-  web/     Next.js 16 (App Router, Turbopack). Full auth flow built: /login, /signup, /verify-email, /forgot-password, /reset-password. /train/n-back, /train/complex-span, /train/spatial-sequence, and /train/reading are the four real exercises so far. Playwright E2E tests live in apps/web/e2e/ (vitest is unit-only — see Commands). Everything else still needs building against prototype/*.dc.html.
+  web/     Next.js 16 (App Router, Turbopack). Full auth flow built: /login, /signup, /verify-email, /forgot-password, /reset-password. /train/n-back, /train/complex-span, /train/spatial-sequence, and /train/reading are the four real exercises so far. /onboarding (goals -> time -> experience -> calibration -> recommended level) is the first flow to actually write TrainingPlan/DailyGoal/DifficultyState/AssessmentResult rows to the DB — every exercise before it was client-side/in-memory only; it's an opt-in link on the home page, not a mandatory post-signup redirect yet. Playwright E2E tests live in apps/web/e2e/ (vitest is unit-only — see Commands). Everything else still needs building against prototype/*.dc.html.
   api/     Fastify. /health (includes a real DB connectivity check), /catalog (evidence-gated module list).
 
 packages/

@@ -53,9 +53,9 @@ export interface ComplexSpanTaskConfig {
   random?: () => number;
 }
 
-const DEFAULT_MIN_SET_SIZE = 3;
-const DEFAULT_MAX_SET_SIZE = 9;
-const DEFAULT_INITIAL_SET_SIZE = 4;
+export const COMPLEX_SPAN_MIN_SET_SIZE = 3;
+export const COMPLEX_SPAN_MAX_SET_SIZE = 9;
+export const COMPLEX_SPAN_DEFAULT_INITIAL_SET_SIZE = 4;
 
 export class ComplexSpanTask {
   private readonly adaptiveEngine: RollingWindowAdaptiveEngine;
@@ -69,9 +69,9 @@ export class ComplexSpanTask {
   constructor(config: ComplexSpanTaskConfig = {}) {
     this.random = config.random ?? Math.random;
     this.adaptiveEngine = new RollingWindowAdaptiveEngine({
-      initialDifficulty: config.initialDifficulty ?? DEFAULT_INITIAL_SET_SIZE,
-      minDifficulty: config.minDifficulty ?? DEFAULT_MIN_SET_SIZE,
-      maxDifficulty: config.maxDifficulty ?? DEFAULT_MAX_SET_SIZE,
+      initialDifficulty: config.initialDifficulty ?? COMPLEX_SPAN_DEFAULT_INITIAL_SET_SIZE,
+      minDifficulty: config.minDifficulty ?? COMPLEX_SPAN_MIN_SET_SIZE,
+      maxDifficulty: config.maxDifficulty ?? COMPLEX_SPAN_MAX_SET_SIZE,
       ...DEFAULT_ROLLING_WINDOW_CONFIG,
     });
   }

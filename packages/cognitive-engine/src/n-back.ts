@@ -65,9 +65,9 @@ export interface NBackTaskConfig {
   random?: () => number;
 }
 
-const DEFAULT_MIN_DIFFICULTY = 1;
-const DEFAULT_MAX_DIFFICULTY = 9;
-const DEFAULT_INITIAL_DIFFICULTY = 2;
+export const NBACK_MIN_DIFFICULTY = 1;
+export const NBACK_MAX_DIFFICULTY = 9;
+export const NBACK_DEFAULT_INITIAL_DIFFICULTY = 2;
 const DEFAULT_MATCH_PROBABILITY = 0.3;
 
 export class NBackTask {
@@ -91,9 +91,9 @@ export class NBackTask {
     this.random = config.random ?? Math.random;
 
     this.adaptiveEngine = new RollingWindowAdaptiveEngine({
-      initialDifficulty: config.initialDifficulty ?? DEFAULT_INITIAL_DIFFICULTY,
-      minDifficulty: config.minDifficulty ?? DEFAULT_MIN_DIFFICULTY,
-      maxDifficulty: config.maxDifficulty ?? DEFAULT_MAX_DIFFICULTY,
+      initialDifficulty: config.initialDifficulty ?? NBACK_DEFAULT_INITIAL_DIFFICULTY,
+      minDifficulty: config.minDifficulty ?? NBACK_MIN_DIFFICULTY,
+      maxDifficulty: config.maxDifficulty ?? NBACK_MAX_DIFFICULTY,
       ...DEFAULT_ROLLING_WINDOW_CONFIG,
     });
   }

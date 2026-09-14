@@ -36,9 +36,9 @@ export interface SpatialSequenceTaskConfig {
   random?: () => number;
 }
 
-const DEFAULT_MIN_SEQUENCE_LENGTH = 3;
-const DEFAULT_MAX_SEQUENCE_LENGTH = 9;
-const DEFAULT_INITIAL_SEQUENCE_LENGTH = 4;
+export const SPATIAL_SEQUENCE_MIN_LENGTH = 3;
+export const SPATIAL_SEQUENCE_MAX_LENGTH = 9;
+export const SPATIAL_SEQUENCE_DEFAULT_INITIAL_LENGTH = 4;
 
 export class SpatialSequenceTask {
   private readonly adaptiveEngine: RollingWindowAdaptiveEngine;
@@ -51,9 +51,9 @@ export class SpatialSequenceTask {
   constructor(config: SpatialSequenceTaskConfig = {}) {
     this.random = config.random ?? Math.random;
     this.adaptiveEngine = new RollingWindowAdaptiveEngine({
-      initialDifficulty: config.initialDifficulty ?? DEFAULT_INITIAL_SEQUENCE_LENGTH,
-      minDifficulty: config.minDifficulty ?? DEFAULT_MIN_SEQUENCE_LENGTH,
-      maxDifficulty: config.maxDifficulty ?? DEFAULT_MAX_SEQUENCE_LENGTH,
+      initialDifficulty: config.initialDifficulty ?? SPATIAL_SEQUENCE_DEFAULT_INITIAL_LENGTH,
+      minDifficulty: config.minDifficulty ?? SPATIAL_SEQUENCE_MIN_LENGTH,
+      maxDifficulty: config.maxDifficulty ?? SPATIAL_SEQUENCE_MAX_LENGTH,
       ...DEFAULT_ROLLING_WINDOW_CONFIG,
     });
   }
