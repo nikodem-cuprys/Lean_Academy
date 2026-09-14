@@ -2,6 +2,8 @@
 
 _Phase 7 planning, prepared early per spec instruction to research and design monetization before implementing any paywall. The overriding constraint: the monetization strategy must protect scientific credibility — never monetize fear, never hide basic scientific limitations behind a subscription, never imply training effectiveness itself is gated by payment._
 
+**Status:** Still accurate as a Phase 7 early-prepared plan — no implementation has started, nothing to reconcile yet.
+
 ## Guardrails (non-negotiable, from `project_prompt.txt`)
 
 - Never: "Your brain is declining — pay to fix it."

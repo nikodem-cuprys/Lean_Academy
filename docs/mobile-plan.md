@@ -2,6 +2,8 @@
 
 _Phase 8-9 planning, per `project_prompt.txt`. Mobile development begins only after the web MVP (Phase 3) demonstrates a successful core experience — this document is prepared early so the shared-architecture decisions in Phase 2 don't accidentally foreclose mobile options later._
 
+**Status:** Still accurate as a Phase 8-9 early-prepared plan — no implementation has started, nothing to reconcile yet. Re-confirm the ecosystem evaluation for real at the start of Phase 8 (already noted below).
+
 ## Cross-platform technology evaluation
 
 | Option | Fit for this product | Trade-off |

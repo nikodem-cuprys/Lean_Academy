@@ -29,7 +29,7 @@ Evidence review is never really "finished" — new modules in Phase 10 re-trigge
 - Once there's a real app, the **`run`** skill launches and drives it so you can see things actually working in a browser rather than trusting test output alone.
 - Before merging any auth/security-adjacent work, run the **`security-review`** skill — this project's threat model (`docs/security.md`) includes OAuth/PKCE correctness and cognitive-data privacy, both worth a dedicated pass beyond normal code review.
 
-### Phase 3+ — Implementation (Web MVP onward, current phase)
+### Phase 3+ — Implementation (Web MVP onward; Phases 3-4 done, Phase 5 current)
 
 - Run **`code-review`** (or **`simplify`** for pure cleanup passes) before considering a chunk of work done, especially anything touching the adaptive engine or scoring calculations — these are the places where a subtle bug becomes a scientific-integrity problem, not just a normal bug.
 - For UI/UX work specifically, remember the project's own priority order: UI/UX quality sits above technical architecture in the trade-off list in `project_prompt.txt`. When you're deciding where to spend review time, weight it accordingly.
@@ -86,12 +86,13 @@ Matched to when they'll actually matter, so you're not front-loading things you 
 - **Fork for research, don't fork for implementation you want to review closely.** Forking is great for "go read these five meta-analyses and summarize" (keeps noise out of your main context) but implementation work you'll want to review line-by-line is often better done directly in the main session where you're already tracking context.
 - **Re-run the "no prohibited claims" check whenever UI copy changes**, not just once at launch — it's cheap (a grep-style scan for IQ/smarter/cure/prevent-style language) and the cost of missing one in shipped copy is a credibility problem, not just a bug.
 - **When in doubt about scope, re-read the MVP Philosophy section of `docs/development-plan.md`** — 3-5 outstanding exercises plus reading training beats twenty mediocre ones; this is worth re-anchoring on any time a session starts drifting toward "let's also add..."
+- **The process this project actually follows (planning-as-cards, review-as-verification, retro-as-memory) is now written down in `docs/scrum.md`** — the habits above are the informal version; that file is the canonical, lightweight version.
 
 ## 4. Suggested learning order (matched to the roadmap, not front-loaded)
 
 1. TypeScript + Next.js basics (Phase 2, done — the auth flow and first two exercises are built on these)
 2. Postgres + Prisma, OAuth/PKCE concepts (also Phase 2, done — the schema and auth config are in `packages/db` and `apps/web/src/lib/auth.ts`; worth reading those alongside learning the concepts)
-3. Zod + Tailwind, enough Playwright/Vitest to read tests (Phase 3, now underway — see `docs/kanban.md`)
+3. Zod + Tailwind, enough Playwright/Vitest to read tests (Phase 3, done — worth having learned already if you haven't; see `docs/kanban.md`)
 4. Psychometrics vocabulary deepening (Phase 6)
 5. Stripe subscription model (Phase 7)
 6. Expo/React Native (Phase 8, and only after the framework re-evaluation confirms the choice)

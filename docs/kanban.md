@@ -1,6 +1,6 @@
 # Kanban — LeanAcademy
 
-_Companion to `docs/development-plan.md`. Columns: Backlog · Research · UX/Design · Ready · In Progress · Review · Testing · Done. This file is the live source of truth for "what's next" — keep it current rather than letting `docs/development-plan.md` (which is phase-level) go stale as a substitute._
+_Companion to `docs/development-plan.md` and `docs/scrum.md`. Columns: Backlog → Ready → Done. WIP limit: 1 card in Ready at a time. "Review/Testing" isn't a separate column — it's folded into the Definition of Done every card must satisfy before moving to Done (see below). This file is the live source of truth for "what's next" — keep it current rather than letting `docs/development-plan.md` (phase-level) or `docs/scrum.md` (process-level) go stale as a substitute._
 
 ## Epics
 
@@ -8,7 +8,21 @@ _Companion to `docs/development-plan.md`. Columns: Backlog · Research · UX/Des
 
 ## Board
 
+## Definition of Done
+
+Every card moves to Done only after all of the following are true (this is what "Review/Testing" collapses into — there is no separate column for it):
+
+1. **Real browser verification** — Claude-in-Chrome first; Playwright fallback in `apps/web/e2e/` against a production build if it won't connect (per CLAUDE.md's Commands section). State plainly what was and wasn't actually exercised.
+2. **Full existing e2e suite still green**, run alongside the new/changed spec, not just in isolation.
+3. **Evidence-gating chain updated together, in the same change**, if the card adds/changes a training method (`docs/evidence-review.md` + `data/evidence-registry.json` + re-seed) — see CLAUDE.md's Architecture section.
+4. **Non-negotiable content rules spot-checked** (no IQ/intelligence/dementia/ADHD claims, trained-task/near/far-transfer kept separate, WPM never without comprehension, difficulty always shown in plain language) — see CLAUDE.md.
+5. **This file updated with the Done entry**, in the same narrative style as the existing Done log.
+
+Cross-referenced from `docs/scrum.md`'s Definition of Done section, which does not repeat this list.
+
 ### Done
+
+_Entries below are narrative, not the Card template — that's intentional and has worked well; keep new entries in the same style rather than retrofitting the template onto prose. See Definition of Done above for what every entry here has already satisfied._
 
 - **[Research] Literature review pass 1** — WM updating, complex span, visuospatial WM, verbal WM, cognitive control, reading efficiency, memory strategies. Owner: Cognitive Scientist. Output: `docs/evidence-review.md`, `data/evidence-registry.json`.
 - **[Research] Evidence registry v0** — machine-readable registry gating the exercise catalog. Owner: Data Engineer / Psychometrics Specialist. Output: `data/evidence-registry.json`.
@@ -46,31 +60,23 @@ _Companion to `docs/development-plan.md`. Columns: Backlog · Research · UX/Des
 - **[Gamification] Achievements** — Phase 5's second card. Seeded the exact 11 real, checkable milestones `prototype/Achievements.dc.html` specifies via a new shared `packages/db/src/achievement-catalog.ts` (imported by both `prisma/seed.ts` and the trigger logic, so a typo'd key can't silently mean an achievement is never awarded or never seeded). Real trigger points, all at existing completion routes rather than a new polling job: `POST /api/training-sessions/:id/complete` (First Session, 10/30/100 Sessions via a real `TrainingSession` count, First Week via the real `Streak` reaching 7, and a fixed v0 weekly-session target of 5 — documented as a placeholder pending the real per-user target the Weekly Challenges backlog card will add), `POST /api/training-sessions/:id/exercises` (Working Memory Level 5, Personal Best, the Reading Efficiency Milestone, and "maintained 90% comprehension at a new pace"), and the onboarding-completion route (Completed first assessment). Three real design decisions the card's acceptance criteria flagged as open, now resolved and documented in `apps/web/src/lib/achievements.ts`: (1) **Working Memory Level 5** awards on *either* N-Back or Complex Span reaching the same raw difficulty number 5 — an explicit choice, not a hidden default, since the two tasks' ranges aren't otherwise comparable; (2) **Personal Best** is real, not vibes — it compares a task's new difficulty against the actual historical max from `Trial` rows (excluding the current session), so it only fires on a genuine improvement over real history, never on a first attempt with nothing to beat; a new `UserAchievement.metadata` JSON field (migration `20260914181756_add_user_achievement_metadata`) records which task earned it so the UI can show "Personal Best — Adaptive N-Back" the way the prototype shows "Personal Best — Spatial Sequence"; (3) **the two reading achievements are independently checkable**, not the same condition twice — the Milestone fires the first time pace exceeds the starting default ever, while the comprehension one requires a real pace increase *in that specific session* combined with that same session's own comprehension staying at/above 90%, computed straight from the `trials` already in the request body. Every title/description is spot-checked against `project_prompt.txt`'s SCIENTIFIC PROGRESS LANGUAGE section — none resembles its "10% smarter" anti-example. New real UI: `/achievements` (`AchievementsView`, linked from Home) shows a real "N of 11 earned" header and, matching the prototype exactly, progress bars only where one is meaningful (10/30/100 Sessions, the weekly target) — every other achievement is a plain earned/not-earned line, since the prototype itself never fakes a progress bar for something with no natural running count. `apps/web/e2e/achievements.spec.ts` verifies both a real browser flow (signup → real onboarding-completion and session-completion API calls → real `UserAchievement` rows → visible on `/achievements`) and, via direct calls to the same production `checkSessionCompletionAchievements`/`checkExerciseAchievements` functions against real Postgres, every milestone that would otherwise need dozens of real sessions or exercise runs driven through the UI. Full suite (31 tests, chromium project) passes. Owner: Senior Full-Stack Engineer.
 - **[Authentication] Fix: credentials sign-in failing right after registration under `next dev`** — root-caused, not just described, this time. Confirmed by network trace (`page.on("request"/"response")`) that `signIn()`'s own `getProviders()`→`getCsrfToken()` sequence can race a *separate* concurrent request to Auth.js's shared route handler that also touches the CSRF cookie — `SessionProvider`'s default `refetchOnWindowFocus` (a `visibilitychange` listener) is one real source of that extra request, confirmed by reading `next-auth`'s source directly rather than assuming. An initial attempt to fix this by pre-warming the CSRF cookie in `AuthForm` on mount made things *worse* (React Strict Mode double-invokes that effect too, adding yet another concurrent request) — reverted. The fix that actually works: `apps/web/src/app/providers.tsx` now sets `refetchOnWindowFocus={false}` (removes one real source of the race), and `AuthForm.tsx`'s `signInWithCsrfRaceRetry` retries the credentials sign-in once after a short delay if the first attempt errors — safe regardless of cause, since a genuine wrong password just fails the same way again on retry. Verified empirically, not just reasoned about: an 8-iteration stress test against a freshly cold-started dev server (cleared `.next/dev` cache each time, coldest and most race-prone condition) passed 8/8 — including one run where the underlying race still fired server-side (one `MissingCSRF` in the log) but the retry transparently recovered it. Owner: Senior Full-Stack Engineer.
 
-### Backlog (Phase 3+ and beyond — not yet Ready)
+---
 
-- **[Working Memory] Flanker/Go-No-Go cognitive-control module** — Blocked on stronger transfer evidence; see evidence review §6. Do not promote to Ready until evidence level improves or framing is re-scoped to strictly within-task.
-- **[Reading Training] Skimming training module** — Needs its own research pass (tracked in `docs/evidence-review.md` "Next research pass").
-- **[Reading Training] Reading flexibility training (pace-matches-purpose)** — Needs its own research pass.
-- **[Gamification] Full XP/achievements/weekly-challenges system** — Correctly sequenced after Phase 3/4 per development plan.
-- **[Payments] Stripe integration + entitlement system** — Correctly sequenced after Phase 3.
-- **[Mobile Foundation] React Native/Expo vs Flutter spike** — Correctly sequenced after Web MVP validation (Phase 8).
-- **[iOS] / [Android] app shells** — Blocked on Mobile Foundation.
-- **[Analytics] Full product + scientific analytics pipeline** — Needs schema design once real usage exists to instrument.
-- **[Authentication] Verify the real Google/Facebook OAuth redirect** — needs real OAuth app credentials (`GOOGLE_CLIENT_ID`/`FACEBOOK_CLIENT_ID` etc. in `.env`) registered with each provider; everything up to that point is implemented and code-reviewed but the actual redirect/callback round-trip has never been exercised.
-- **[Infrastructure] Broaden rate limiting beyond forgot-password/reset-password** — `docs/security.md` calls for rate limiting on login and register too; only the two newest endpoints have it (`apps/web/src/lib/rate-limit.ts`), and even that's in-memory/single-instance only — a real deployment needs a shared store (Redis, etc.).
-- **[Authentication] Invalidate other sessions on password reset** — sessions use the JWT strategy, so resetting a password doesn't revoke sessions already issued on other devices. Needs database sessions or a token-revocation list.
+## Ready
+
+**WIP limit: 1.** Exactly one card belongs here at a time — pull the next card from Backlog only when this section is empty (Definition of Ready lives in `docs/scrum.md`). When a card is pulled, move its full text here from Backlog rather than duplicating it.
+
+_Currently empty — the next card to pull is XP + Training Level (see Backlog → Phase 5 below)._
 
 ---
 
-## Ready — next executable batch (Phase 5 — Engagement)
+## Backlog
 
-Phase 4 (UX Polish) is functionally done — see the note further down. Phase 5's Deliverables per `docs/development-plan.md` are: daily activity system, streaks (with protection, non-manipulative copy), XP (with anti-grind caps), training levels (explicitly not a cognitive-ability claim), achievements, weekly challenges, personal bests. Broken down here for the first time, grounded directly in `project_prompt.txt`'s STREAKS / ACHIEVEMENTS / XP AND LEVELS / USER LEVEL / WEEKLY CHALLENGES / PERSONAL BESTS sections. Streaks and Achievements (this phase's first two cards) are both done — see the Done section above.
+Organized by phase, then blocked-vs-unblocked within a phase. Phases with nothing left aren't listed.
 
-Real data this phase can build on, already in place: `TrainingSession` (start/complete, real durations), `Trial` (per-response/set/sequence/passage records with `difficultyAtTrial`), `DifficultyState` (current level per task), `AssessmentResult` (from onboarding's `BASELINE` calibration), `Streak`, and now `Achievement`/`UserAchievement` (written by the two cards above). Schema already scaffolded but never written to: `DailyGoal` (written once, at onboarding), `Challenge`/`ChallengeProgress`. Not yet in the schema at all: XP and Training Level (no ledger/level field exists), Personal Bests (no dedicated table — see that card's note on why it may not need one).
+### Phase 5 — Engagement (not yet Ready)
 
-Nothing is in this Ready column right now — the remaining three Phase 5 cards are listed in the Backlog below in the order they're sequenced; XP + Training Level is next.
-
-## Backlog — rest of Phase 5 (not yet Ready)
+Real data this phase can build on, already in place: `TrainingSession` (start/complete, real durations), `Trial` (per-response/set/sequence/passage records with `difficultyAtTrial`), `DifficultyState` (current level per task), `AssessmentResult` (from onboarding's `BASELINE` calibration), `Streak`, and `Achievement`/`UserAchievement` (Streaks and Achievements, this phase's first two cards, are both done — see the Done section above). Schema already scaffolded but never written to: `DailyGoal` (written once, at onboarding), `Challenge`/`ChallengeProgress`. Not yet in the schema at all: XP and Training Level (no ledger/level field exists), Personal Bests (no dedicated table — see that card's note on why it may not need one).
 
 - **[Gamification] XP + Training Level** — no schema exists yet for either. `project_prompt.txt`'s XP AND LEVELS section requires XP for completing recommended training, consistency, trying new domains, and genuine milestones — and explicitly requires an anti-grind cap ("Avoid rewarding endless repetitive grinding. Cap or reduce XP from excessive training if needed"), which needs a real, testable design (e.g. a per-day cap), not an implicit one. USER LEVEL requires a separate "Training Level" derived from XP via a documented formula, displayed only as "Training Level N" — audited everywhere it appears so it never reads as a cognitive-ability claim (`project_prompt.txt`: "It must NOT be presented as cognitive ability... call it Training Level, not Intelligence Level"). A scientific-integrity test (matching `docs/testing.md`'s pattern) should assert directly that repeating one exercise many times in a day doesn't grant unlimited XP. Dependencies: `TrainingSession` data. Complexity: M.
 - **[Gamification] Personal bests** — `project_prompt.txt` names real, task-specific records (highest stable N-back level, longest spatial sequence, best reading efficiency at a given difficulty, etc.). The Achievements card above already computes essentially this same "new all-time high" check to award its own Personal Best achievement (`apps/web/src/lib/achievements.ts`'s `checkExerciseAchievements`) — this card is the fuller, dedicated feature: a real, browsable history of personal-best records per task (not just a single one-time badge), likely still without a new table, computed at query time from `Trial`/`DifficultyState` the same way the Progress page derives everything, rather than introducing a second, separately-maintained source of truth. Worth surfacing on the Session Complete screen using the celebration-pop animation the Animation/feedback pass already built specifically to gate on a real earned delta (`endDifficulty > startDifficulty`). Dependencies: `Trial` data (exists), the celebration-pop animation (exists), the Achievements card's existing personal-best check (exists — this card supersedes it with a real per-task view rather than just the one badge). Complexity: S/M.
@@ -78,17 +84,28 @@ Nothing is in this Ready column right now — the remaining three Phase 5 cards 
 
 `project_prompt.txt`'s LEAGUES / SOCIAL FEATURES section explicitly frames competitive/social features as "optional later-stage" — not part of Phase 5's Deliverables in `docs/development-plan.md` either, so it isn't a card here. Revisit only if a later phase explicitly calls for it.
 
-## Phase 4 loose ends (blocked, not just unscheduled)
+### Phase 4 — UX Polish (blocked, not just unscheduled)
 
-Two Phase 4 deliverables remain — they need inputs that don't exist yet, so don't promote them to Ready by picking a Backlog default instead of the real input:
+Both items below need inputs that don't exist yet — do not promote to Ready by substituting a Backlog default for the real input.
+
 - **[UX Polish] Onboarding refinement from real usage** — needs actual usage data from real users going through `/onboarding`; none exists yet (the app has no real users).
 - **[UX Polish] Second usability-testing round** — needs real test participants; `docs/development-plan.md`'s Phase 1 already did the first round against the prototype, but this one needs the *built* app and real users.
 
-## Backlog — rest of Phase 3 (not yet Ready)
+### Phase 3+ and beyond (not yet Ready)
 
-Empty — the phase itself is done.
+- **[Working Memory] Flanker/Go-No-Go cognitive-control module** — Blocked on stronger transfer evidence; see evidence review §6. Do not promote to Ready until evidence level improves or framing is re-scoped to strictly within-task.
+- **[Reading Training] Skimming training module** — Needs its own research pass (tracked in `docs/evidence-review.md` "Next research pass").
+- **[Reading Training] Reading flexibility training (pace-matches-purpose)** — Needs its own research pass.
+- **[Payments] Stripe integration + entitlement system** — Correctly sequenced after Phase 3.
+- **[Mobile Foundation] React Native/Expo vs Flutter spike** — Correctly sequenced after Web MVP validation (Phase 8).
+- **[iOS] / [Android] app shells** — Blocked on Mobile Foundation.
+- **[Analytics] Full product + scientific analytics pipeline** — Needs schema design once real usage exists to instrument.
 
-Three small Phase 2 loose ends (OAuth redirect unverified, rate limiting not broadened, no session invalidation on password reset) remain tracked further down and don't block Phase 5.
+### Phase 2 loose ends (not blocking Phase 5)
+
+- **[Authentication] Verify the real Google/Facebook OAuth redirect** — needs real OAuth app credentials (`GOOGLE_CLIENT_ID`/`FACEBOOK_CLIENT_ID` etc. in `.env`) registered with each provider; everything up to that point is implemented and code-reviewed but the actual redirect/callback round-trip has never been exercised.
+- **[Infrastructure] Broaden rate limiting beyond forgot-password/reset-password** — `docs/security.md` calls for rate limiting on login and register too; only the two newest endpoints have it (`apps/web/src/lib/rate-limit.ts`), and even that's in-memory/single-instance only — a real deployment needs a shared store (Redis, etc.).
+- **[Authentication] Invalidate other sessions on password reset** — sessions use the JWT strategy, so resetting a password doesn't revoke sessions already issued on other devices. Needs database sessions or a token-revocation list.
 
 ---
 
@@ -103,8 +120,7 @@ Acceptance criteria:
 - ...
 Dependencies:
 Complexity: XS | S | M | L | XL
-Owner:
-Status: Backlog | Research | UX/Design | Ready | In Progress | Review | Testing | Done
+Status: Backlog | Ready | Done
 ```
 
 Priority definitions: **P0** essential (blocks the current phase's exit criteria) · **P1** high value · **P2** valuable · **P3** later. Every P0/P1 card must name real acceptance criteria and real dependencies — no "Build frontend"-style cards.

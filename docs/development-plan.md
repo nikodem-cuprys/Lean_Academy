@@ -2,6 +2,8 @@
 
 _Phased roadmap per `project_prompt.txt`. Sizes use T-shirt estimates (XS/S/M/L/XL) since developer capacity is unknown — translate to a schedule once team size is known. Each phase lists Objective / Deliverables / Exit Criteria / Dependencies._
 
+_Process (roles, sprint/ceremony definitions, Definition of Ready/Done) lives in `docs/scrum.md`, not here — this file stays phase-level._
+
 ## Sizing legend
 
 XS = hours, S = ~1 day, M = ~2-4 days, L = ~1-2 weeks, XL = ~3+ weeks, all assuming one full-time senior generalist engineer; adjust down with more people, up with less focus time.

@@ -2,6 +2,8 @@
 
 _Companion to `docs/security.md` and `docs/ux-strategy.md`. Suggested stack per `project_prompt.txt`: Playwright (E2E) and Vitest (unit/integration)._
 
+**Status:** Drafted in Phase 0/2 as a strategy document; not yet revisited line-by-line against the real Phase 3-5 implementation. Substantial real Playwright coverage already exists (accessibility, responsive, performance, motion, streaks, achievements, onboarding, session, progress, science, and all four exercise specs in `apps/web/e2e/`) that this checklist doesn't yet reflect back — see `docs/kanban.md`'s Done section for what's actually covered and how.
+
 ## Test layers
 
 - **Unit tests:** pure logic — adaptive-engine difficulty curves, reading-efficiency-score formula (including the comprehension floor), psychometrics calculations (d-prime, span scoring, WPM/comprehension aggregation), evidence-registry schema validation.

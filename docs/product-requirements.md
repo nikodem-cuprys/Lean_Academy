@@ -1,6 +1,6 @@
 # Product Requirements Document — LeanAcademy
 
-_Written during Phase 0 (Research & Planning); the requirements below haven't changed since, so this stays the living reference through Phase 3 implementation — see `docs/kanban.md` for what's actually built against it so far. Source spec: [`project_prompt.txt`](../project_prompt.txt). Evidence backing: [`docs/evidence-review.md`](./evidence-review.md) / [`data/evidence-registry.json`](../data/evidence-registry.json)._
+_Written during Phase 0 (Research & Planning); the requirements below haven't changed since, so this stays the living reference through implementation (currently Phase 5) — see `docs/kanban.md` for what's actually built against it so far. Source spec: [`project_prompt.txt`](../project_prompt.txt). Evidence backing: [`docs/evidence-review.md`](./evidence-review.md) / [`data/evidence-registry.json`](../data/evidence-registry.json)._
 
 ## Vision
 

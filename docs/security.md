@@ -2,6 +2,8 @@
 
 _Phase 2 requirement, drafted early. Cognitive-performance data is sensitive: it can reveal information about a person's cognitive function over time, so this gets treated with the same care as health-adjacent data even though it isn't a clinical record._
 
+**Status:** Drafted in Phase 2 as a strategy document; not yet revisited line-by-line against the real implementation. Most of Authentication above is real and shipped (see `CLAUDE.md`'s Auth data model / Email verification sections and `docs/kanban.md`'s Done entries) — three items remain genuinely open and are tracked as Backlog cards in `docs/kanban.md`: OAuth redirect unverified, rate limiting not yet broadened past forgot-password/reset-password, no session invalidation on password reset.
+
 ## Authentication
 
 - Email + password: passwords hashed with a modern adaptive algorithm (bcrypt/argon2, never reversible encryption or fast general-purpose hashes), email verification required before full account trust, secure forgotten-password flow (time-limited, single-use tokens; never emailing the password itself).
