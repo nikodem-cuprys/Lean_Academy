@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@lean-academy/db";
 import { auth } from "@/lib/auth";
 import { TASK_BOUNDS, type TaskBounds } from "@/lib/task-bounds";
+import { checkFirstAssessmentAchievement } from "@/lib/achievements";
 
 // Implements project_prompt.txt's onboarding sequence: "goals ->
 // available time -> experience level -> short calibration -> recommended
@@ -130,6 +131,7 @@ export async function POST(request: Request) {
   await prisma.assessmentResult.create({
     data: { assessmentId: assessment.id, userId, scoreSummary: calibration },
   });
+  await checkFirstAssessmentAchievement(userId);
 
   return NextResponse.json({ success: true });
 }

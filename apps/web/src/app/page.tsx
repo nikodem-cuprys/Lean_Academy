@@ -99,6 +99,9 @@ export default async function HomePage() {
             <Link href="/science" className="font-semibold text-accent underline">
               See the science →
             </Link>
+            <Link href="/achievements" className="font-semibold text-accent underline">
+              View achievements →
+            </Link>
             <Link href="/train/n-back" className="font-semibold text-accent underline">
               Try the N-Back exercise →
             </Link>

@@ -8,6 +8,7 @@
  */
 import { loadEvidenceRegistry } from "@lean-academy/evidence";
 import { PrismaClient } from "@prisma/client";
+import { ACHIEVEMENT_CATALOG } from "../src/achievement-catalog";
 
 const prisma = new PrismaClient();
 
@@ -56,6 +57,7 @@ async function main() {
   console.log(`Synced ${registry.modules.length} evidence records.`);
 
   await seedImplementedTasks();
+  await seedAchievements();
 }
 
 /**
@@ -90,6 +92,24 @@ async function seedImplementedTasks() {
   }
 
   console.log(`Synced ${IMPLEMENTED_TASKS.length} task definitions/versions.`);
+}
+
+/**
+ * The Achievements catalog (see src/achievement-catalog.ts for the full
+ * list and the reasoning behind it) — upserted by `key` so re-running
+ * this after editing a title/description updates existing rows without
+ * touching any UserAchievement rows already earned against them.
+ */
+async function seedAchievements() {
+  for (const entry of ACHIEVEMENT_CATALOG) {
+    await prisma.achievement.upsert({
+      where: { key: entry.key },
+      create: entry,
+      update: { title: entry.title, description: entry.description, iconKey: entry.iconKey },
+    });
+  }
+
+  console.log(`Synced ${ACHIEVEMENT_CATALOG.length} achievements.`);
 }
 
 main()

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma, Prisma } from "@lean-academy/db";
 import { auth } from "@/lib/auth";
+import { checkExerciseAchievements } from "@/lib/achievements";
 
 // Called once per exercise completion during a training session (see
 // TrainingSessionRunner) — persists that exercise's real Trial rows and
@@ -42,7 +43,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
-  const { method, endDifficulty, trials } = parsed.data;
+  const { method, startDifficulty, endDifficulty, trials } = parsed.data;
 
   const definition = await prisma.taskDefinition.findUnique({
     where: { method },
@@ -73,6 +74,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     where: { userId_taskVersionId: { userId: session.user.id, taskVersionId: taskVersion.id } },
     create: { userId: session.user.id, taskVersionId: taskVersion.id, currentDifficulty: endDifficulty },
     update: { currentDifficulty: endDifficulty },
+  });
+
+  await checkExerciseAchievements({
+    userId: session.user.id,
+    method,
+    domain: definition!.domain,
+    taskVersionId: taskVersion.id,
+    trainingSessionId: id,
+    startDifficulty,
+    endDifficulty,
+    sessionCorrect: trials.filter((t) => t.correct).length,
+    sessionTotal: trials.length,
   });
 
   return NextResponse.json({ success: true });

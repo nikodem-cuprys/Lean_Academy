@@ -368,6 +368,9 @@ model UserAchievement {
   achievementId String
   achievement   Achievement @relation(fields: [achievementId], references: [id])
   earnedAt      DateTime    @default(now())
+  /// Contextual detail for achievements that vary by what triggered them
+  /// (e.g. Personal Best stores which task: { "method": "..." }).
+  metadata      Json?
 
   @@unique([userId, achievementId])
 }

@@ -41,7 +41,7 @@ test.describe("Accessibility (axe-core)", () => {
     expect(await scan(page)).toEqual([]);
   });
 
-  test("signed-in screens: home, onboarding, progress, science", async ({ page }) => {
+  test("signed-in screens: home, onboarding, progress, science, achievements", async ({ page }) => {
     await page.goto("/signup");
     await page.getByPlaceholder("Name").fill("E2E Bot");
     await page.getByPlaceholder("Email").fill(emails.signedIn);
@@ -59,6 +59,9 @@ test.describe("Accessibility (axe-core)", () => {
     expect(await scan(page)).toEqual([]);
 
     await page.goto("/science");
+    expect(await scan(page)).toEqual([]);
+
+    await page.goto("/achievements");
     expect(await scan(page)).toEqual([]);
   });
 
