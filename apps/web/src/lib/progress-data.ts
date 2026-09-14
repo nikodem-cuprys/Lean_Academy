@@ -1,6 +1,7 @@
 import { prisma } from "@lean-academy/db";
 import { parseEvidenceRegistry, findModule } from "@lean-academy/evidence";
 import { TASK_BOUNDS } from "./task-bounds";
+import { titleCase } from "./text";
 // Imported (not read via fs) — see the same comment on this import in
 // apps/web/src/app/page.tsx.
 import registryJson from "../../../../data/evidence-registry.json";
@@ -44,10 +45,6 @@ export interface ProgressData {
 
 const READING_METHOD = "reading-paced-adaptive-v0";
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-
-function titleCase(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-}
 
 function formatProgressLabel(method: string, startDifficulty: number, endDifficulty: number, sessionCount: number): string {
   if (method === "complex-span-v0") {
