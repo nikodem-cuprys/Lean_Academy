@@ -215,7 +215,7 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
         <button
           type="submit"
           disabled={submitting}
-          className="mt-2 w-full rounded-full bg-accent py-3.5 font-body text-[15px] font-bold text-on-accent disabled:opacity-60"
+          className="mt-2 w-full rounded-full bg-accent py-3.5 font-body text-[15px] font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-60 disabled:active:scale-100"
         >
           {submitting
             ? "Please wait…"

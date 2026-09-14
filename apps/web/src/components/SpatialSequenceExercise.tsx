@@ -225,7 +225,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete }: Sessi
                 aria-label={isHighlighted ? `Grid cell ${i + 1}, lit up` : `Grid cell ${i + 1}`}
                 onClick={() => handleTap(i)}
                 disabled={phase !== "recall"}
-                className="flex aspect-square items-center justify-center rounded-md border-[1.5px] font-num text-base font-bold"
+                className="flex aspect-square items-center justify-center rounded-md border-[1.5px] font-num text-base font-bold transition-transform duration-micro active:scale-90 disabled:active:scale-100"
                 style={{
                   background: isHighlighted || tapOrder >= 0 ? "var(--color-spatial)" : "var(--color-surface-2)",
                   borderColor: isHighlighted || tapOrder >= 0 ? "var(--color-spatial)" : "var(--color-border)",
@@ -244,7 +244,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete }: Sessi
               data-testid="recall-undo"
               onClick={handleUndo}
               disabled={tapped.length === 0}
-              className="flex-1 rounded-full border-[1.5px] border-border py-3 font-body text-sm font-bold text-text-2 disabled:opacity-40"
+              className="flex-1 rounded-full border-[1.5px] border-border py-3 font-body text-sm font-bold text-text-2 transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
             >
               Undo
             </button>
@@ -252,7 +252,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete }: Sessi
               data-testid="recall-submit"
               onClick={handleSubmit}
               disabled={tapped.length !== sequenceLength}
-              className="flex-1 rounded-full bg-accent py-3 font-body text-sm font-bold text-on-accent disabled:opacity-40"
+              className="flex-1 rounded-full bg-accent py-3 font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
             >
               Submit sequence
             </button>
@@ -276,8 +276,10 @@ function SpatialSequenceResults({ results }: { results: Results }) {
     note = `You held steady at this sequence length across ${sequences.length} rounds.`;
   }
 
+  const lengthIncreased = endDifficulty > startDifficulty;
+
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
+    <div data-testid="results-screen" className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7 animate-fade-in-up">
       <div className="mb-7 text-center">
         <div className="mx-auto mb-3.5 flex h-14 w-14 items-center justify-center rounded-full bg-success-soft">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
@@ -298,7 +300,7 @@ function SpatialSequenceResults({ results }: { results: Results }) {
         <div className="w-px bg-border" />
         <div className="text-center">
           <div className="mb-1 text-[11.5px] text-text-3">SEQUENCE LENGTH</div>
-          <div className="font-num text-2xl font-bold text-text">
+          <div className={`font-num text-2xl font-bold text-text ${lengthIncreased ? "animate-celebration-pop" : ""}`}>
             {startDifficulty} → {endDifficulty}
           </div>
         </div>

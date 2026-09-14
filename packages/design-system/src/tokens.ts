@@ -79,3 +79,16 @@ export const domainColorKey = {
   READING: "reading",
   SPATIAL: "spatial",
 } as const;
+
+/**
+ * Named durations/easings per docs/design-system.md's Motion section —
+ * micro for button/tap feedback, transition for screen/phase changes,
+ * celebration for level-up moments. Same values regardless of theme.
+ */
+export const motionTokens = {
+  durationMicro: "150ms",
+  durationTransition: "250ms",
+  durationCelebration: "500ms",
+  easeStandard: "cubic-bezier(0.4, 0, 0.2, 1)",
+  easeCelebration: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+} as const;

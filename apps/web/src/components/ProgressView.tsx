@@ -67,7 +67,7 @@ export function ProgressView({ data }: { data: ProgressData }) {
                 key={t}
                 data-testid={`progress-tab-${t}`}
                 onClick={() => setTab(t)}
-                className="flex-1 rounded-full py-2.5 text-center text-[12.5px] font-bold"
+                className="flex-1 rounded-full py-2.5 text-center text-[12.5px] font-bold transition-transform duration-micro active:scale-95"
                 style={
                   tab === t
                     ? { background: "var(--color-surface)", color: "var(--color-text)" }

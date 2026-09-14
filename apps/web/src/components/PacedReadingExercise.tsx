@@ -269,7 +269,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
           <button
             data-testid="finish-reading-button"
             onClick={handleFinishReading}
-            className="mt-4 w-full rounded-full bg-reading py-3.5 text-center font-body text-[14.5px] font-bold text-on-accent"
+            className="mt-4 w-full rounded-full bg-reading py-3.5 text-center font-body text-[14.5px] font-bold text-on-accent transition-transform duration-micro active:scale-95"
           >
             I&rsquo;ve finished reading
           </button>
@@ -294,7 +294,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
                       key={i}
                       data-testid={`answer-choice-${i}`}
                       onClick={() => handleSelectChoice(i)}
-                      className="flex w-full cursor-pointer items-center gap-2.5 rounded-md border-[1.5px] px-3.5 py-3 text-left text-[13.5px]"
+                      className="flex w-full cursor-pointer items-center gap-2.5 rounded-md border-[1.5px] px-3.5 py-3 text-left text-[13.5px] transition-transform duration-micro active:scale-[0.98]"
                       style={{
                         borderColor: isSelected ? "var(--color-reading)" : "var(--color-border)",
                         background: isSelected ? "var(--color-reading-soft)" : "var(--color-surface)",
@@ -314,7 +314,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
                 data-testid="submit-answer-button"
                 onClick={handleSubmitAnswer}
                 disabled={selectedChoice === null}
-                className="w-full rounded-full bg-reading py-3.5 text-center font-body text-[15px] font-bold text-on-accent disabled:opacity-40"
+                className="w-full rounded-full bg-reading py-3.5 text-center font-body text-[15px] font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
               >
                 Submit answer
               </button>
@@ -359,8 +359,10 @@ function PacedReadingResults({ results }: { results: Results }) {
     note = `You held steady at this pace across ${passages.length} passages.`;
   }
 
+  const paceIncreased = endDifficultyWpm > startDifficultyWpm;
+
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
+    <div data-testid="results-screen" className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7 animate-fade-in-up">
       <div className="mb-7 text-center">
         <div className="mx-auto mb-3.5 flex h-14 w-14 items-center justify-center rounded-full bg-success-soft">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
@@ -385,7 +387,7 @@ function PacedReadingResults({ results }: { results: Results }) {
 
       <div className="mb-4 rounded-lg border border-border bg-surface p-4.5">
         <div className="mb-1 text-[11.5px] text-text-3">TARGET PACE</div>
-        <div className="font-num text-xl font-bold text-text">
+        <div className={`font-num text-xl font-bold text-text ${paceIncreased ? "animate-celebration-pop" : ""}`}>
           {startDifficultyWpm} → {endDifficultyWpm} WPM
         </div>
       </div>

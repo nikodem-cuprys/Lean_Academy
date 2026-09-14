@@ -32,6 +32,20 @@
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-full: 999px;
+
+  /*
+   * Named motion tokens per docs/design-system.md's Motion section
+   * ("a small set of named durations/easings... rather than
+   * per-component timing values"): micro for button/tap feedback,
+   * transition for screen/phase changes, celebration for level-up
+   * moments. Same value regardless of theme, so these live outside
+   * the dark-mode block below.
+   */
+  --duration-micro: 150ms;
+  --duration-transition: 250ms;
+  --duration-celebration: 500ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-celebration: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -91,4 +105,71 @@
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-num: var(--font-num);
+
+  --duration-micro: var(--duration-micro);
+  --duration-transition: var(--duration-transition);
+  --duration-celebration: var(--duration-celebration);
+  --ease-standard: var(--ease-standard);
+  --ease-celebration: var(--ease-celebration);
+
+  /*
+   * animate-fade-in-up: the results-screen entrance, and any other
+   * "a new screen just appeared" moment — deliberately subtle
+   * (docs/design-system.md: "a correct-answer micro-animation is
+   * subtle"). animate-celebration-pop: reserved for a genuinely
+   * earned moment (e.g. the difficulty actually increased) — never
+   * applied unconditionally, since "do not exaggerate scientifically
+   * meaningless improvements with celebration-tier animation."
+   */
+  --animate-fade-in-up: fade-in-up var(--duration-transition) var(--ease-standard);
+  --animate-celebration-pop: celebration-pop var(--duration-celebration) var(--ease-celebration);
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes celebration-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/*
+ * Full prefers-reduced-motion support (docs/design-system.md's
+ * Animation rules): every decorative/celebratory CSS transition or
+ * animation collapses to effectively instant, while the information
+ * it was conveying (e.g. "Level 4 -> 5") still renders normally —
+ * only the motion is removed, nothing is hidden. This is pure CSS and
+ * only touches transition/animation properties, so it can't affect
+ * the JS-timed stimulus windows inside the training exercises
+ * (performance.now()/setTimeout-based task pacing, which is the
+ * measured task itself, not decoration, and must never be altered by
+ * a motion preference).
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

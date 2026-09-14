@@ -158,7 +158,7 @@ function SessionCompleteScreen({
   const displayNameByMethod = new Map(exercises.map((e) => [e.method, e]));
 
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
+    <div data-testid="results-screen" className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7 animate-fade-in-up">
       <div className="mb-6 text-center">
         <div className="mx-auto mb-4 flex h-[60px] w-[60px] items-center justify-center rounded-full bg-accent-soft">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">

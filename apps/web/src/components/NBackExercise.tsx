@@ -271,8 +271,10 @@ function NBackResults({ results }: { results: Results }) {
     note = `You held steady at this level across ${scoredTrials} scored trials.`;
   }
 
+  const levelIncreased = endDifficulty > startDifficulty;
+
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
+    <div data-testid="results-screen" className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7 animate-fade-in-up">
       <div className="mb-7 text-center">
         <div className="mx-auto mb-3.5 flex h-14 w-14 items-center justify-center rounded-full bg-success-soft">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
@@ -303,7 +305,7 @@ function NBackResults({ results }: { results: Results }) {
         <div className="w-px bg-border" />
         <div className="text-center">
           <div className="mb-1 text-[11.5px] text-text-3">LEVEL</div>
-          <div className="font-num text-2xl font-bold text-text">
+          <div className={`font-num text-2xl font-bold text-text ${levelIncreased ? "animate-celebration-pop" : ""}`}>
             {startDifficulty} → {endDifficulty}
           </div>
         </div>

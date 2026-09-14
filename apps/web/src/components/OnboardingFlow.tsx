@@ -317,7 +317,7 @@ function OptionRow({
       aria-checked={selected}
       data-testid={testId}
       onClick={onClick}
-      className="flex w-full cursor-pointer items-center justify-between rounded-md border-[1.5px] px-4 py-3.5 text-left"
+      className="flex w-full cursor-pointer items-center justify-between rounded-md border-[1.5px] px-4 py-3.5 text-left transition-transform duration-micro active:scale-[0.98]"
       style={{
         borderColor: selected ? "var(--color-accent)" : "var(--color-border)",
         background: selected ? "var(--color-accent-soft)" : "var(--color-surface)",
@@ -351,7 +351,7 @@ function ContinueButton({
       data-testid={testId}
       onClick={onClick}
       disabled={disabled}
-      className="mt-5 w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent disabled:opacity-40"
+      className="mt-5 w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent transition-transform duration-micro active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
     >
       {label}
     </button>
@@ -556,7 +556,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
               data-testid="calibration-spatial-submit"
               onClick={() => resolvePending(spatialTappedRef.current)}
               disabled={spatialTapped.length !== spatialTargetLength}
-              className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent disabled:opacity-40"
+              className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
             >
               Submit
             </button>
@@ -572,7 +572,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
               data-testid="calibration-nback-no"
               onClick={() => resolvePending(false)}
               disabled={!nbackScoreable}
-              className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-3 text-center font-body text-sm font-bold text-text disabled:opacity-40"
+              className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-3 text-center font-body text-sm font-bold text-text transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
             >
               Different
             </button>
@@ -580,7 +580,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
               data-testid="calibration-nback-yes"
               onClick={() => resolvePending(true)}
               disabled={!nbackScoreable}
-              className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-3 text-center font-body text-sm font-bold text-text disabled:opacity-40"
+              className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-3 text-center font-body text-sm font-bold text-text transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
             >
               Same
             </button>
@@ -611,7 +611,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
                     data-testid={`calibration-recall-key-${letter}`}
                     onClick={() => handleComplexSpanTap(letter)}
                     disabled={recalled.length >= 3}
-                    className="rounded-md border border-border bg-surface py-2 font-num text-sm font-bold text-text disabled:opacity-40"
+                    className="rounded-md border border-border bg-surface py-2 font-num text-sm font-bold text-text transition-transform duration-micro active:scale-90 disabled:opacity-40 disabled:active:scale-100"
                   >
                     {letter}
                   </button>
@@ -621,7 +621,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
                 data-testid="calibration-complexspan-submit"
                 onClick={() => resolvePending(recalledRef.current)}
                 disabled={recalled.length !== 3}
-                className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent disabled:opacity-40"
+                className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
               >
                 Submit
               </button>
@@ -638,7 +638,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
               <button
                 data-testid="calibration-finish-reading"
                 onClick={() => resolvePending(undefined)}
-                className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent"
+                className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95"
               >
                 I&rsquo;ve finished reading
               </button>
@@ -657,7 +657,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
                     key={i}
                     data-testid={`calibration-answer-choice-${i}`}
                     onClick={() => setSelectedChoice(i)}
-                    className="w-full cursor-pointer rounded-md border-[1.5px] px-3.5 py-3 text-left text-[13.5px]"
+                    className="w-full cursor-pointer rounded-md border-[1.5px] px-3.5 py-3 text-left text-[13.5px] transition-transform duration-micro active:scale-[0.98]"
                     style={{
                       borderColor: selectedChoice === i ? "var(--color-accent)" : "var(--color-border)",
                       background: selectedChoice === i ? "var(--color-accent-soft)" : "var(--color-surface)",
@@ -671,7 +671,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
                 data-testid="calibration-submit-answer"
                 onClick={() => selectedChoice !== null && resolvePending(selectedChoice)}
                 disabled={selectedChoice === null}
-                className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent disabled:opacity-40"
+                className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
               >
                 Submit
               </button>
@@ -709,7 +709,7 @@ function CalibrationGrid({ highlighted, tapped, onTap, disabled }: { highlighted
             data-testid={`calibration-grid-cell-${i}`}
             onClick={() => onTap(i)}
             disabled={disabled}
-            className="flex aspect-square items-center justify-center rounded-md border-[1.5px] font-num text-sm font-bold"
+            className="flex aspect-square items-center justify-center rounded-md border-[1.5px] font-num text-sm font-bold transition-transform duration-micro active:scale-90 disabled:active:scale-100"
             style={{
               background: isHighlighted || order >= 0 ? "var(--color-accent)" : "var(--color-surface)",
               borderColor: isHighlighted || order >= 0 ? "var(--color-accent)" : "var(--color-border)",

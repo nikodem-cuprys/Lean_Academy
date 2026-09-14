@@ -290,14 +290,14 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete }: SessionMo
               <button
                 data-testid="true-button"
                 onClick={() => handleTrueFalse(true)}
-                className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-4 text-center font-body text-[15px] font-bold text-text"
+                className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-4 text-center font-body text-[15px] font-bold text-text transition-transform duration-micro active:scale-95"
               >
                 True
               </button>
               <button
                 data-testid="false-button"
                 onClick={() => handleTrueFalse(false)}
-                className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-4 text-center font-body text-[15px] font-bold text-text"
+                className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-4 text-center font-body text-[15px] font-bold text-text transition-transform duration-micro active:scale-95"
               >
                 False
               </button>
@@ -347,7 +347,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete }: SessionMo
                       data-testid={`recall-key-${letter}`}
                       onClick={() => handleRecallTap(letter)}
                       disabled={recalled.length >= setSize}
-                      className="rounded-md border border-border bg-surface py-2 font-num text-sm font-bold text-text disabled:opacity-40"
+                      className="rounded-md border border-border bg-surface py-2 font-num text-sm font-bold text-text transition-transform duration-micro active:scale-90 disabled:opacity-40 disabled:active:scale-100"
                     >
                       {letter}
                     </button>
@@ -358,7 +358,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete }: SessionMo
                     data-testid="recall-undo"
                     onClick={handleRecallUndo}
                     disabled={recalled.length === 0}
-                    className="flex-1 rounded-full border-[1.5px] border-border py-3 font-body text-sm font-bold text-text-2 disabled:opacity-40"
+                    className="flex-1 rounded-full border-[1.5px] border-border py-3 font-body text-sm font-bold text-text-2 transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
                   >
                     Undo
                   </button>
@@ -366,7 +366,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete }: SessionMo
                     data-testid="recall-submit"
                     onClick={handleRecallSubmit}
                     disabled={recalled.length !== setSize}
-                    className="flex-1 rounded-full bg-accent py-3 font-body text-sm font-bold text-on-accent disabled:opacity-40"
+                    className="flex-1 rounded-full bg-accent py-3 font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
                   >
                     Submit
                   </button>
@@ -397,8 +397,10 @@ function ComplexSpanResults({ results }: { results: Results }) {
     note = `You held steady at this span length across ${sets.length} sets.`;
   }
 
+  const spanIncreased = endDifficulty > startDifficulty;
+
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
+    <div data-testid="results-screen" className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7 animate-fade-in-up">
       <div className="mb-7 text-center">
         <div className="mx-auto mb-3.5 flex h-14 w-14 items-center justify-center rounded-full bg-success-soft">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
@@ -419,7 +421,7 @@ function ComplexSpanResults({ results }: { results: Results }) {
         <div className="w-px bg-border" />
         <div className="text-center">
           <div className="mb-1 text-[11.5px] text-text-3">SPAN</div>
-          <div className="font-num text-2xl font-bold text-text">
+          <div className={`font-num text-2xl font-bold text-text ${spanIncreased ? "animate-celebration-pop" : ""}`}>
             {startDifficulty} → {endDifficulty}
           </div>
         </div>
