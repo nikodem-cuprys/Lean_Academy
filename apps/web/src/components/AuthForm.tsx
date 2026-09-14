@@ -117,9 +117,9 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
         </button>
       </div>
 
-      <div className="mb-1.5 font-display text-[23px] font-bold text-text">
+      <h1 className="mb-1.5 font-display text-[23px] font-bold text-text">
         {signup ? "Create your account" : "Welcome back"}
-      </div>
+      </h1>
       <div className="mb-7 text-[13.5px] text-text-2">
         {signup
           ? "Start with a free 6-minute session."

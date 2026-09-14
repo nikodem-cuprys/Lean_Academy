@@ -24,7 +24,7 @@ export function ProgressView({ data }: { data: ProgressData }) {
 
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
-      <div className="mb-5 font-display text-[22px] font-bold text-text">Progress</div>
+      <h1 className="mb-5 font-display text-[22px] font-bold text-text">Progress</h1>
 
       {!data.hasAnyData ? (
         <div className="rounded-lg border border-border bg-surface p-6 text-center shadow-sm">

@@ -233,6 +233,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
         Passage {passageNumber} of {TOTAL_PASSAGES}
       </div>
 
+      <h1 className="sr-only">Paced Reading exercise</h1>
       <div className="mb-4 flex items-center justify-center gap-1.5">
         <div className="h-[7px] w-[7px] rounded-full bg-reading" />
         <div className="text-[12.5px] font-bold tracking-wide text-reading">
@@ -282,15 +283,18 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
               <div data-testid="question-prompt" className="mb-5 font-display text-lg font-bold leading-snug text-text">
                 {passage.question.prompt}
               </div>
-              <div className="flex flex-col gap-2.5">
+              <div role="radiogroup" aria-label={passage.question.prompt} className="flex flex-col gap-2.5">
                 {passage.question.choices.map((choice, i) => {
                   const isSelected = selectedChoice === i;
                   return (
-                    <div
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
                       key={i}
                       data-testid={`answer-choice-${i}`}
                       onClick={() => handleSelectChoice(i)}
-                      className="flex cursor-pointer items-center gap-2.5 rounded-md border-[1.5px] px-3.5 py-3 text-[13.5px]"
+                      className="flex w-full cursor-pointer items-center gap-2.5 rounded-md border-[1.5px] px-3.5 py-3 text-left text-[13.5px]"
                       style={{
                         borderColor: isSelected ? "var(--color-reading)" : "var(--color-border)",
                         background: isSelected ? "var(--color-reading-soft)" : "var(--color-surface)",
@@ -301,7 +305,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
                         style={{ borderColor: isSelected ? "var(--color-reading)" : "var(--color-border)" }}
                       />
                       {choice}
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -363,7 +367,7 @@ function PacedReadingResults({ results }: { results: Results }) {
             <path d="M5 13l4 4L19 7" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <div className="font-display text-[23px] font-bold text-text">Exercise complete</div>
+        <h1 className="font-display text-[23px] font-bold text-text">Exercise complete</h1>
         <div className="mt-1.5 text-[13.5px] text-text-2">Paced Reading</div>
       </div>
 

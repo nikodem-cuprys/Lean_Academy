@@ -159,7 +159,7 @@ export function OnboardingFlow() {
   if (phase === "goals") {
     return (
       <OnboardingStep step={1} title="What would you like to focus on?" subtitle="Pick what matters most. We'll build your plan around it — you can always train everything either way.">
-        <div className="flex flex-col gap-2.5">
+        <div role="radiogroup" aria-label="What would you like to focus on?" className="flex flex-col gap-2.5">
           {GOAL_OPTIONS.map((opt) => (
             <OptionRow key={opt.id} testId={`goal-${opt.id}`} selected={goal === opt.id} label={opt.label} onClick={() => setGoal(opt.id)} />
           ))}
@@ -172,7 +172,7 @@ export function OnboardingFlow() {
   if (phase === "time") {
     return (
       <OnboardingStep step={2} title="How much time can you give each day?" subtitle="We'll build sessions to fit. You can change this anytime.">
-        <div className="flex flex-col gap-3">
+        <div role="radiogroup" aria-label="How much time can you give each day?" className="flex flex-col gap-3">
           {TIME_OPTIONS.map((opt) => (
             <OptionRow
               key={opt.minutes}
@@ -218,7 +218,7 @@ export function OnboardingFlow() {
         title="Have you done anything like this before?"
         subtitle="No wrong answer — this just helps your first sessions feel right. A short calibration next will fine-tune it further."
       >
-        <div className="flex flex-col gap-3">
+        <div role="radiogroup" aria-label="Have you done anything like this before?" className="flex flex-col gap-3">
           {EXPERIENCE_OPTIONS.map((opt) => (
             <OptionRow
               key={opt.id}
@@ -245,7 +245,7 @@ export function OnboardingFlow() {
         <div className="mb-6 text-center">
           <div className="font-display text-[22px] font-bold text-text">We recommend starting at:</div>
         </div>
-        <div className="flex flex-col gap-2.5">
+        <div role="radiogroup" aria-label="Recommended difficulty level" className="flex flex-col gap-2.5">
           {DIFFICULTY_OPTIONS.map((opt) => (
             <OptionRow
               key={opt.id}
@@ -290,7 +290,7 @@ function OnboardingStep({
         ))}
       </div>
       <div className="mb-2.5 text-[12.5px] font-bold tracking-wide text-text-3">STEP {step} OF 3</div>
-      <div className="mb-2 font-display text-[25px] font-bold leading-tight text-text">{title}</div>
+      <h1 className="mb-2 font-display text-[25px] font-bold leading-tight text-text">{title}</h1>
       <div className="mb-6 text-sm leading-relaxed text-text-2">{subtitle}</div>
       <div className="flex-1">{children}</div>
     </div>
@@ -311,10 +311,13 @@ function OptionRow({
   onClick: () => void;
 }) {
   return (
-    <div
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
       data-testid={testId}
       onClick={onClick}
-      className="flex w-full cursor-pointer items-center justify-between rounded-md border-[1.5px] px-4 py-3.5"
+      className="flex w-full cursor-pointer items-center justify-between rounded-md border-[1.5px] px-4 py-3.5 text-left"
       style={{
         borderColor: selected ? "var(--color-accent)" : "var(--color-border)",
         background: selected ? "var(--color-accent-soft)" : "var(--color-surface)",
@@ -328,7 +331,7 @@ function OptionRow({
         className="h-5 w-5 flex-shrink-0 rounded-full border-2"
         style={{ borderColor: selected ? "var(--color-accent)" : "var(--color-border)" }}
       />
-    </div>
+    </button>
   );
 }
 
@@ -645,20 +648,23 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
               <div data-testid="calibration-question-prompt" className="mb-4 font-display text-base font-bold text-text">
                 {passage.question.prompt}
               </div>
-              <div className="mb-4 flex flex-col gap-2">
+              <div role="radiogroup" aria-label={passage.question.prompt} className="mb-4 flex flex-col gap-2">
                 {passage.question.choices.map((choice, i) => (
-                  <div
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={selectedChoice === i}
                     key={i}
                     data-testid={`calibration-answer-choice-${i}`}
                     onClick={() => setSelectedChoice(i)}
-                    className="cursor-pointer rounded-md border-[1.5px] px-3.5 py-3 text-[13.5px]"
+                    className="w-full cursor-pointer rounded-md border-[1.5px] px-3.5 py-3 text-left text-[13.5px]"
                     style={{
                       borderColor: selectedChoice === i ? "var(--color-accent)" : "var(--color-border)",
                       background: selectedChoice === i ? "var(--color-accent-soft)" : "var(--color-surface)",
                     }}
                   >
                     {choice}
-                  </div>
+                  </button>
                 ))}
               </div>
               <button

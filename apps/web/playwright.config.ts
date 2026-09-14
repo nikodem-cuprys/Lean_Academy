@@ -17,5 +17,9 @@ export default defineConfig({
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    // Only responsive.spec.ts runs here — every other spec already
+    // drives full exercises/sessions and would double the whole
+    // suite's runtime for no benefit if it ran under both viewports.
+    { name: "mobile", use: { ...devices["iPhone 13"] }, testMatch: /responsive\.spec\.ts/ },
   ],
 });

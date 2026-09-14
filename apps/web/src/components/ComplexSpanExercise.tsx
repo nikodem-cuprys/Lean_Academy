@@ -243,6 +243,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete }: SessionMo
         Set {setNumber} of {TOTAL_SETS}
       </div>
 
+      <h1 className="sr-only">Complex Span exercise</h1>
       <div className="mb-2 flex items-center justify-center gap-1.5">
         <div className="h-[7px] w-[7px] rounded-full bg-wm" />
         <div className="text-[12.5px] font-bold tracking-wide text-wm">
@@ -404,7 +405,7 @@ function ComplexSpanResults({ results }: { results: Results }) {
             <path d="M5 13l4 4L19 7" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <div className="font-display text-[23px] font-bold text-text">Exercise complete</div>
+        <h1 className="font-display text-[23px] font-bold text-text">Exercise complete</h1>
         <div className="mt-1.5 text-[13.5px] text-text-2">Complex Span</div>
       </div>
 

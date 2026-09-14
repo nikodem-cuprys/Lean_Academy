@@ -191,6 +191,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete }: Sessi
         Sequence {sequenceNumber} of {TOTAL_SEQUENCES}
       </div>
 
+      <h1 className="sr-only">Spatial Sequence Recall exercise</h1>
       <div className="mb-2 flex items-center justify-center gap-1.5">
         <div className="h-[7px] w-[7px] rounded-full bg-spatial" />
         <div className="text-[12.5px] font-bold tracking-wide text-spatial">
@@ -221,6 +222,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete }: Sessi
                 key={i}
                 type="button"
                 data-testid={`grid-cell-${i}`}
+                aria-label={isHighlighted ? `Grid cell ${i + 1}, lit up` : `Grid cell ${i + 1}`}
                 onClick={() => handleTap(i)}
                 disabled={phase !== "recall"}
                 className="flex aspect-square items-center justify-center rounded-md border-[1.5px] font-num text-base font-bold"
@@ -282,7 +284,7 @@ function SpatialSequenceResults({ results }: { results: Results }) {
             <path d="M5 13l4 4L19 7" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <div className="font-display text-[23px] font-bold text-text">Exercise complete</div>
+        <h1 className="font-display text-[23px] font-bold text-text">Exercise complete</h1>
         <div className="mt-1.5 text-[13.5px] text-text-2">Spatial Sequence Recall</div>
       </div>
 

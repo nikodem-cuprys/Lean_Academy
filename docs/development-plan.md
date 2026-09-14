@@ -51,6 +51,7 @@ XS = hours, S = ~1 day, M = ~2-4 days, L = ~1-2 weeks, XL = ~3+ weeks, all assum
 **Exit criteria:** New-user 3-second screen-comprehension bar met on every core screen; Core Web Vitals-equivalent performance targets met (see `docs/testing.md` for how these get verified).
 **Dependencies:** Phase 3.
 **Size:** L.
+**Status:** In progress. Accessibility audit done — see `docs/kanban.md`'s Done section for the real bugs it found and fixed (a design-token contrast failure, several keyboard-inaccessible controls, missing page headings). Mobile-responsive-web pass is Ready next; animation/feedback and performance optimization are in Backlog; onboarding refinement from real usage and the second usability-testing round are blocked on inputs that don't exist yet (real users) — see `docs/kanban.md` for details on all of these.
 
 ## Phase 5 — Engagement
 

@@ -43,15 +43,15 @@ test("Science page renders real evidence-registry data, not a hardcoded copy", a
   await expect(page.getByText("excluded", { exact: true })).toBeVisible();
 
   // Every approved module is listed, with its real evidence level.
-  for (const module of approved) {
-    const row = page.getByTestId(`science-module-${module.method}`);
+  for (const mod of approved) {
+    const row = page.getByTestId(`science-module-${mod.method}`);
     await expect(row).toBeVisible();
-    await expect(row.getByText(module.displayName, { exact: true })).toBeVisible();
+    await expect(row.getByText(mod.displayName, { exact: true })).toBeVisible();
   }
 
   // Excluded modules never appear as rows, but are named in the footer.
-  for (const module of excluded) {
-    await expect(page.getByTestId(`science-module-${module.method}`)).toHaveCount(0);
-    await expect(page.getByText(module.displayName, { exact: false })).toBeVisible();
+  for (const mod of excluded) {
+    await expect(page.getByTestId(`science-module-${mod.method}`)).toHaveCount(0);
+    await expect(page.getByText(mod.displayName, { exact: false })).toBeVisible();
   }
 });

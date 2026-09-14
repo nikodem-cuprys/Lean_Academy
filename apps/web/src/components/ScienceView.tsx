@@ -14,7 +14,7 @@ import type { ScienceData } from "@/lib/science-data";
 export function ScienceView({ data }: { data: ScienceData }) {
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
-      <div className="mb-1.5 font-display text-[23px] font-bold text-text">The Science</div>
+      <h1 className="mb-1.5 font-display text-[23px] font-bold text-text">The Science</h1>
       <div className="mb-4.5 text-[13px] leading-relaxed text-text-2">
         Every exercise here is backed by cited research — see what&rsquo;s proven, what&rsquo;s still limited, and
         what we chose not to include.

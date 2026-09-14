@@ -197,6 +197,7 @@ export function NBackExercise({ initialDifficulty, onComplete }: SessionModeProp
         Trial {trialNumber} of {TOTAL_TRIALS}
       </div>
 
+      <h1 className="sr-only">Adaptive N-Back exercise</h1>
       <div className="mb-2.5 flex items-center justify-center gap-1.5">
         <div className="h-[7px] w-[7px] rounded-full bg-wm" />
         <div className="text-[12.5px] font-bold tracking-wide text-wm">
@@ -284,9 +285,9 @@ function NBackResults({ results }: { results: Results }) {
             />
           </svg>
         </div>
-        <div className="font-display text-[23px] font-bold text-text">
+        <h1 className="font-display text-[23px] font-bold text-text">
           Exercise complete
-        </div>
+        </h1>
         <div className="mt-1.5 text-[13.5px] text-text-2">
           Adaptive N-Back
         </div>

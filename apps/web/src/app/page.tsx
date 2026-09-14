@@ -106,11 +106,11 @@ export default async function HomePage() {
       )}
 
       <dl className="text-sm text-left border rounded-lg p-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
-        <dt className="text-neutral-500">Evidence registry last reviewed</dt>
+        <dt className="text-text-3">Evidence registry last reviewed</dt>
         <dd>{registry.lastReviewed}</dd>
-        <dt className="text-neutral-500">Approved training modules</dt>
+        <dt className="text-text-3">Approved training modules</dt>
         <dd>{approved.length}</dd>
-        <dt className="text-neutral-500">Signed in</dt>
+        <dt className="text-text-3">Signed in</dt>
         <dd>{session?.user ? session.user.email : "no"}</dd>
       </dl>
     </main>
