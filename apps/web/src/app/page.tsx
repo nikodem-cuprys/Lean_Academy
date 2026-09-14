@@ -79,6 +79,9 @@ export default async function HomePage() {
           )}
 
           <div className="flex flex-col gap-2 text-center text-sm">
+            <Link href="/progress" className="font-semibold text-accent underline">
+              View progress →
+            </Link>
             <Link href="/train/n-back" className="font-semibold text-accent underline">
               Try the N-Back exercise →
             </Link>
