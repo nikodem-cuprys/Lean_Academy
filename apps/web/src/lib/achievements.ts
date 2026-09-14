@@ -1,6 +1,7 @@
 import { prisma, Prisma } from "@lean-academy/db";
 import { READING_DEFAULT_INITIAL_DIFFICULTY } from "@lean-academy/reading-engine";
 import { awardXp, XP_AMOUNTS } from "@/lib/xp";
+import { checkNewPersonalBest } from "@/lib/personal-bests";
 
 // Achievements epic (Phase 5 — see docs/kanban.md). The catalog itself
 // (11 real, checkable milestones) lives in
@@ -98,26 +99,23 @@ export interface ExerciseAchievementInput {
  * WORKING_MEMORY task reaching the same numeric threshold — an explicit
  * design decision, since N-Back's 1-9 range and Complex Span's 3-9
  * range aren't otherwise comparable, see docs/kanban.md's Achievements
- * card), Personal Best (this task's difficulty exceeding the highest
- * it had ever reached before this session, across any task), the
- * Reading Efficiency Milestone (pace increased beyond the starting
- * default), and "maintained 90% comprehension at a new pace" (pace
- * increased *this session* while this session's own comprehension
- * stayed at or above 90%).
+ * card), Personal Best (a real per-task check shared with the fuller
+ * Personal Bests card — see apps/web/src/lib/personal-bests.ts — so
+ * reading uses the real Reading Efficiency Score, not a raw
+ * target-WPM-ladder comparison), the Reading Efficiency Milestone
+ * (pace increased beyond the starting default), and "maintained 90%
+ * comprehension at a new pace" (pace increased *this session* while
+ * this session's own comprehension stayed at or above 90%).
  */
-export async function checkExerciseAchievements(input: ExerciseAchievementInput) {
+export async function checkExerciseAchievements(input: ExerciseAchievementInput): Promise<{ newPersonalBest: boolean }> {
   const { userId, method, domain, taskVersionId, trainingSessionId, startDifficulty, endDifficulty, sessionCorrect, sessionTotal } = input;
 
   if (domain === "WORKING_MEMORY" && endDifficulty >= 5) {
     await awardAchievementOnce(userId, "working-memory-level-5", { method });
   }
 
-  const priorBest = await prisma.trial.aggregate({
-    where: { taskVersionId, trainingSession: { userId }, trainingSessionId: { not: trainingSessionId } },
-    _max: { difficultyAtTrial: true },
-  });
-  const priorMax = priorBest._max.difficultyAtTrial;
-  if (priorMax !== null && endDifficulty > priorMax) {
+  const newPersonalBest = await checkNewPersonalBest(userId, method, taskVersionId, trainingSessionId, endDifficulty);
+  if (newPersonalBest) {
     await awardAchievementOnce(userId, "personal-best", { method });
   }
 
@@ -129,6 +127,8 @@ export async function checkExerciseAchievements(input: ExerciseAchievementInput)
       await awardAchievementOnce(userId, "reading-comprehension-at-new-pace");
     }
   }
+
+  return { newPersonalBest };
 }
 
 /** Called after a user's first-ever AssessmentResult is created. */

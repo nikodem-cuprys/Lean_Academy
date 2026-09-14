@@ -225,7 +225,12 @@ test("Progress page shows an honest empty state after calibration, then real dat
   await expect(page.getByText("READING — LAST 30 DAYS")).toBeVisible();
   await expect(page.getByText("PACE", { exact: true })).toBeVisible();
   await expect(page.getByText("COMPREHENSION", { exact: true })).toBeVisible();
-  await expect(page.getByText(/WPM/)).toBeVisible();
+  await expect(page.getByText("WPM", { exact: true })).toBeVisible();
+  // The Personal Bests card's real all-time reading best (Reading
+  // Efficiency Score-based, see apps/web/src/lib/personal-bests.ts),
+  // shown in the same card, separate from the 30-day trend above it.
+  await expect(page.getByTestId("reading-personal-best")).toBeVisible();
+  await expect(page.getByTestId("reading-personal-best").getByText(/comprehension/)).toBeVisible();
 
   await page.getByTestId("progress-tab-trained").click();
   // At least one non-reading trained task (spatial sequence is in every
@@ -235,6 +240,9 @@ test("Progress page shows an honest empty state after calibration, then real dat
   await expect(
     page.getByText(/Level \d+ → Level \d+ over \d+ session/).or(page.getByText(/-item → \d+-item best span/)).first()
   ).toBeVisible();
+  // Every trained task's real Personal Best line (from the same card,
+  // computed from real Trial history) should also be showing by now.
+  await expect(page.getByText(/🏆 Personal best:/).first()).toBeVisible();
 
   // Verify against the real DB directly too.
   const user = await prisma.user.findUnique({ where: { email } });

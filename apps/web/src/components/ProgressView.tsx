@@ -40,24 +40,39 @@ export function ProgressView({ data }: { data: ProgressData }) {
         </div>
       ) : (
         <>
-          {data.reading?.hasComparison && (
+          {data.reading && (data.reading.hasComparison || data.reading.bestWpm != null) && (
             <div className="mb-4 rounded-lg border border-border bg-surface p-5 shadow-sm">
-              <div className="mb-3.5 text-[12px] font-bold tracking-wide text-text-3">READING — LAST 30 DAYS</div>
-              <div className="flex gap-7">
-                <div>
-                  <div className="mb-0.5 text-[11px] text-text-3">PACE</div>
-                  <div className="font-num text-2xl font-bold text-text">
-                    {data.reading.startWpm} → {data.reading.endWpm}{" "}
-                    <span className="font-body text-xs font-normal text-text-2">WPM</span>
+              {data.reading.hasComparison && (
+                <>
+                  <div className="mb-3.5 text-[12px] font-bold tracking-wide text-text-3">READING — LAST 30 DAYS</div>
+                  <div className="flex gap-7">
+                    <div>
+                      <div className="mb-0.5 text-[11px] text-text-3">PACE</div>
+                      <div className="font-num text-2xl font-bold text-text">
+                        {data.reading.startWpm} → {data.reading.endWpm}{" "}
+                        <span className="font-body text-xs font-normal text-text-2">WPM</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="mb-0.5 text-[11px] text-text-3">COMPREHENSION</div>
+                      <div className="font-num text-2xl font-bold text-success">
+                        {data.reading.startComprehensionPct}% → {data.reading.endComprehensionPct}%
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+              {data.reading.bestWpm != null && data.reading.bestComprehensionPct != null && (
+                <div className={data.reading.hasComparison ? "mt-4 border-t border-border pt-3.5" : ""} data-testid="reading-personal-best">
+                  <div className="mb-0.5 text-[11px] text-text-3">PERSONAL BEST</div>
+                  <div className="font-num text-base font-bold text-text">
+                    {data.reading.bestWpm} WPM{" "}
+                    <span className="font-body text-xs font-normal text-text-2">
+                      at {data.reading.bestComprehensionPct}% comprehension
+                    </span>
                   </div>
                 </div>
-                <div>
-                  <div className="mb-0.5 text-[11px] text-text-3">COMPREHENSION</div>
-                  <div className="font-num text-2xl font-bold text-success">
-                    {data.reading.startComprehensionPct}% → {data.reading.endComprehensionPct}%
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           )}
 
@@ -142,6 +157,11 @@ function TrainedTaskCard({ task }: { task: TrainedTaskProgress }) {
       <div className="h-2 overflow-hidden rounded-full bg-surface-2">
         <div className="h-full rounded-full bg-accent" style={{ width: `${Math.round(task.progressFraction * 100)}%` }} />
       </div>
+      {task.personalBestLabel ? (
+        <div className="mt-2.5 text-[11px] font-semibold text-text-3" data-testid={`personal-best-${task.method}`}>
+          🏆 Personal best: {task.personalBestLabel}
+        </div>
+      ) : null}
     </div>
   );
 }

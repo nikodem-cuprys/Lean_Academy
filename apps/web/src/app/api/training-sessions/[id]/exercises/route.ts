@@ -77,7 +77,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     update: { currentDifficulty: endDifficulty },
   });
 
-  await checkExerciseAchievements({
+  const { newPersonalBest } = await checkExerciseAchievements({
     userId: session.user.id,
     method,
     domain: definition!.domain,
@@ -90,5 +90,5 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   });
   await recordNewDomainXpIfFirstTime(session.user.id, taskVersion.id, id);
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, newPersonalBest });
 }

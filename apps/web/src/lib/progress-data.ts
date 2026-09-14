@@ -2,6 +2,7 @@ import { prisma } from "@lean-academy/db";
 import { parseEvidenceRegistry, findModule } from "@lean-academy/evidence";
 import { TASK_BOUNDS } from "./task-bounds";
 import { titleCase } from "./text";
+import { getPersonalBestsStatus } from "./personal-bests";
 // Imported (not read via fs) — see the same comment on this import in
 // apps/web/src/app/page.tsx.
 import registryJson from "../../../../data/evidence-registry.json";
@@ -27,14 +28,20 @@ export interface TrainedTaskProgress {
   progressLabel: string;
   /** 0-1, current difficulty's position on this task's own min-max range. */
   progressFraction: number;
+  /** The Personal Bests card's real, all-time best on this task — see apps/web/src/lib/personal-bests.ts. Null if no Trial rows exist yet. */
+  personalBestLabel: string | null;
 }
 
 export interface ReadingProgress {
+  /** Whether a real 30-day WPM/comprehension trend exists (needs 2+ sessions in the window) — independent of the all-time personal best below, which can exist from a single session. */
   hasComparison: boolean;
   startWpm: number;
   endWpm: number;
   startComprehensionPct: number;
   endComprehensionPct: number;
+  /** All-time best reading session by Reading Efficiency Score (see personal-bests.ts) — the real WPM/comprehension pair from that session, never a bare composite number. Null if no reading sessions yet. */
+  bestWpm: number | null;
+  bestComprehensionPct: number | null;
 }
 
 export interface ProgressData {
@@ -53,7 +60,7 @@ function formatProgressLabel(method: string, startDifficulty: number, endDifficu
   return `Level ${startDifficulty} → Level ${endDifficulty} over ${sessionCount} session${sessionCount === 1 ? "" : "s"}`;
 }
 
-function actualWpmFromMetadata(metadata: unknown): number | null {
+export function actualWpmFromMetadata(metadata: unknown): number | null {
   if (metadata && typeof metadata === "object" && "actualWpm" in metadata) {
     const value = (metadata as { actualWpm?: unknown }).actualWpm;
     return typeof value === "number" ? value : null;
@@ -68,6 +75,8 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
     where: { userId },
     include: { taskVersion: { include: { taskDefinition: true } } },
   });
+  const personalBests = await getPersonalBestsStatus(userId);
+  const personalBestByMethod = new Map(personalBests.map((pb) => [pb.method, pb]));
 
   const trainedTasks: TrainedTaskProgress[] = [];
   for (const ds of difficultyStates) {
@@ -85,6 +94,7 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
     const progressFraction = bounds ? Math.max(0, Math.min(1, (currentDifficulty - bounds.min) / (bounds.max - bounds.min))) : 0;
     const evidenceModule = findModule(registry, method);
     const evidenceBadge = evidenceModule ? titleCase(evidenceModule.evidenceLevel) : "—";
+    const personalBestLabel = personalBestByMethod.get(method)?.label ?? null;
 
     if (trials.length === 0) {
       trainedTasks.push({
@@ -93,6 +103,7 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
         evidenceBadge,
         progressLabel: `Calibrated at Level ${currentDifficulty} — no training sessions yet`,
         progressFraction,
+        personalBestLabel,
       });
       continue;
     }
@@ -105,12 +116,15 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
       evidenceBadge,
       progressLabel: formatProgressLabel(method, startDifficulty, currentDifficulty, sessionCount),
       progressFraction,
+      personalBestLabel,
     });
   }
 
   const readingDifficultyState = difficultyStates.find((ds) => ds.taskVersion.taskDefinition.method === READING_METHOD);
   let reading: ReadingProgress | null = null;
   if (readingDifficultyState) {
+    const readingBest = personalBestByMethod.get(READING_METHOD);
+
     const since = new Date(Date.now() - THIRTY_DAYS_MS);
     const readingTrials = await prisma.trial.findMany({
       where: {
@@ -122,6 +136,11 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
     });
 
     const sessionIds = Array.from(new Set(readingTrials.map((t) => t.trainingSessionId)));
+    let hasComparison = false;
+    let startWpm = 0;
+    let endWpm = 0;
+    let startComprehensionPct = 0;
+    let endComprehensionPct = 0;
     if (sessionIds.length >= 2) {
       const firstSessionId = sessionIds[0];
       const lastSessionId = sessionIds[sessionIds.length - 1];
@@ -135,12 +154,25 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
       const avgComprehension = (trials: typeof readingTrials) =>
         trials.length > 0 ? (trials.filter((t) => t.correct).length / trials.length) * 100 : 0;
 
+      hasComparison = true;
+      startWpm = Math.round(avgWpm(firstTrials));
+      endWpm = Math.round(avgWpm(lastTrials));
+      startComprehensionPct = Math.round(avgComprehension(firstTrials));
+      endComprehensionPct = Math.round(avgComprehension(lastTrials));
+    }
+
+    // The all-time personal best is shown regardless of the 30-day
+    // comparison above — even a single real session has a genuine best
+    // (just not yet a trend), so it isn't gated behind hasComparison.
+    if (hasComparison || readingBest?.wpm != null) {
       reading = {
-        hasComparison: true,
-        startWpm: Math.round(avgWpm(firstTrials)),
-        endWpm: Math.round(avgWpm(lastTrials)),
-        startComprehensionPct: Math.round(avgComprehension(firstTrials)),
-        endComprehensionPct: Math.round(avgComprehension(lastTrials)),
+        hasComparison,
+        startWpm,
+        endWpm,
+        startComprehensionPct,
+        endComprehensionPct,
+        bestWpm: readingBest?.wpm ?? null,
+        bestComprehensionPct: readingBest?.comprehensionPct ?? null,
       };
     }
   }

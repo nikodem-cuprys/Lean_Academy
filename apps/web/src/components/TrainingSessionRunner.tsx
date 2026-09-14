@@ -52,6 +52,7 @@ export function TrainingSessionRunner({ exercises }: { exercises: TodaysExercise
   const [totalDurationSeconds, setTotalDurationSeconds] = useState(0);
   const [streakResult, setStreakResult] = useState<StreakOutcome | null>(null);
   const [xpResult, setXpResult] = useState<SessionCompletionXpResult | null>(null);
+  const [personalBests, setPersonalBests] = useState<Record<string, boolean>>({});
 
   const sessionIdRef = useRef<string | null>(null);
   const startedAtRef = useRef(0);
@@ -82,7 +83,12 @@ export function TrainingSessionRunner({ exercises }: { exercises: TodaysExercise
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(outcome),
-    }).catch((err) => console.error("Failed to persist exercise trials:", err));
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.newPersonalBest) setPersonalBests((prev) => ({ ...prev, [outcome.method]: true }));
+      })
+      .catch((err) => console.error("Failed to persist exercise trials:", err));
   }
 
   function persistCompletion(durationSeconds: number) {
@@ -122,6 +128,7 @@ export function TrainingSessionRunner({ exercises }: { exercises: TodaysExercise
         totalMinutes={Math.max(1, Math.round(totalDurationSeconds / 60))}
         streak={streakResult}
         xp={xpResult}
+        personalBests={personalBests}
       />
     );
   }
@@ -164,12 +171,14 @@ function SessionCompleteScreen({
   totalMinutes,
   streak,
   xp,
+  personalBests,
 }: {
   summaries: ExerciseSessionOutcome[];
   exercises: TodaysExercise[];
   totalMinutes: number;
   streak: StreakOutcome | null;
   xp: SessionCompletionXpResult | null;
+  personalBests: Record<string, boolean>;
 }) {
   const displayNameByMethod = new Map(exercises.map((e) => [e.method, e]));
 
@@ -197,17 +206,24 @@ function SessionCompleteScreen({
         {summaries.map((s, i) => {
           const exercise = displayNameByMethod.get(s.method);
           const colorKey = exercise ? DOMAIN_COLOR_CLASS[exercise.domain] : "accent";
+          const isNewPersonalBest = !!personalBests[s.method];
           return (
             <div
               key={s.method}
-              className={`flex items-center gap-3 py-3 ${i < summaries.length - 1 ? "border-b border-border" : ""}`}
+              data-testid={`session-complete-exercise-${s.method}`}
+              className={`flex items-center gap-3 py-3 ${i < summaries.length - 1 ? "border-b border-border" : ""} ${isNewPersonalBest ? "animate-celebration-pop" : ""}`}
             >
               <div
                 className="h-[26px] w-[26px] flex-shrink-0 rounded-md"
                 style={{ background: `var(--color-${colorKey}-soft)` }}
               />
-              <div className="flex-1 text-[13.5px] font-semibold text-text">
-                {exercise?.displayName ?? s.method}
+              <div className="flex-1">
+                <div className="text-[13.5px] font-semibold text-text">{exercise?.displayName ?? s.method}</div>
+                {isNewPersonalBest ? (
+                  <div className="text-[11px] font-bold text-accent" data-testid="new-personal-best-tag">
+                    🏆 New personal best
+                  </div>
+                ) : null}
               </div>
               <div className="font-num text-[13.5px] font-semibold text-text-2">{s.summaryLabel}</div>
             </div>
