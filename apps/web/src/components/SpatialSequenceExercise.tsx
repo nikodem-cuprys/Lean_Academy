@@ -1,0 +1,287 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { SpatialSequenceTask } from "@lean-academy/cognitive-engine";
+
+// Adapted from prototype/ExerciseSpatial.dc.html (a 3x3 grid, cells light
+// up in sequence, then the player taps them back in the same order).
+// The mockup is a static single moment — the study/recall/feedback phase
+// loop is new, following the same structure ComplexSpanExercise already
+// established for a multi-round exercise. Same honest-progress principle
+// as N-Back/Complex Span: "Sequence N of 5" is real within-exercise
+// progress. No visibility-interruption handling is needed here (unlike
+// N-Back's per-trial response window) — the study phase is a fixed timed
+// reveal with nothing to respond to, and the recall phase has no timeout
+// to race against, same as Complex Span's memory-display phase.
+
+const TOTAL_SEQUENCES = 5;
+const ITEM_DISPLAY_MS = 800;
+const ITEM_GAP_MS = 300;
+const FEEDBACK_MS = 900;
+const GRID_SIZE = 9;
+
+function sleep(ms: number, signal: AbortSignal): Promise<void> {
+  return new Promise((resolve) => {
+    const t = setTimeout(resolve, ms);
+    signal.addEventListener("abort", () => clearTimeout(t), { once: true });
+  });
+}
+
+type Phase = "study" | "recall" | "feedback";
+
+interface SequenceSummary {
+  sequenceLength: number;
+  correctPositions: number;
+  fullyCorrect: boolean;
+}
+
+interface Results {
+  startDifficulty: number;
+  endDifficulty: number;
+  sequences: SequenceSummary[];
+}
+
+export function SpatialSequenceExercise() {
+  const [phase, setPhase] = useState<Phase>("study");
+  const [sequenceNumber, setSequenceNumber] = useState(0);
+  const [sequenceLength, setSequenceLength] = useState<number | null>(null);
+  const [highlighted, setHighlighted] = useState<number | null>(null);
+  const [tapped, setTapped] = useState<number[]>([]);
+  const [sequenceFeedback, setSequenceFeedback] = useState<SequenceSummary | null>(null);
+  const [results, setResults] = useState<Results | null>(null);
+
+  const recallResolveRef = useRef<(() => void) | null>(null);
+  const tappedRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const task = new SpatialSequenceTask();
+    const startDifficulty = task.getCurrentDifficulty();
+    const sequences: SequenceSummary[] = [];
+
+    async function waitForRecallSubmit(): Promise<void> {
+      await new Promise<void>((resolve) => {
+        recallResolveRef.current = resolve;
+      });
+    }
+
+    async function run() {
+      for (let s = 0; s < TOTAL_SEQUENCES; s++) {
+        if (controller.signal.aborted) return;
+
+        task.startSequence();
+        const length = task.getCurrentSequenceLength();
+        setSequenceNumber(s + 1);
+        setSequenceLength(length);
+        setTapped([]);
+        tappedRef.current = [];
+
+        setPhase("study");
+        for (let i = 0; i < length; i++) {
+          if (controller.signal.aborted) return;
+          const position = task.nextSequenceItem();
+          setHighlighted(position);
+          await sleep(ITEM_DISPLAY_MS, controller.signal);
+          if (controller.signal.aborted) return;
+          setHighlighted(null);
+          await sleep(ITEM_GAP_MS, controller.signal);
+          if (controller.signal.aborted) return;
+        }
+
+        setPhase("recall");
+        await waitForRecallSubmit();
+        if (controller.signal.aborted) return;
+
+        const outcome = task.submitRecall(tappedRef.current, {
+          timestamp: performance.now(),
+        });
+        const summary: SequenceSummary = {
+          sequenceLength: outcome.sequenceLength,
+          correctPositions: outcome.correctPositions,
+          fullyCorrect: outcome.fullyCorrect,
+        };
+        sequences.push(summary);
+        setSequenceFeedback(summary);
+        setPhase("feedback");
+        await sleep(FEEDBACK_MS, controller.signal);
+        if (controller.signal.aborted) return;
+      }
+
+      setResults({
+        startDifficulty,
+        endDifficulty: task.getCurrentDifficulty(),
+        sequences,
+      });
+    }
+
+    run();
+    return () => controller.abort();
+  }, []);
+
+  function handleTap(position: number) {
+    if (phase !== "recall" || sequenceLength === null) return;
+    if (tappedRef.current.includes(position)) return;
+    if (tappedRef.current.length >= sequenceLength) return;
+    tappedRef.current = [...tappedRef.current, position];
+    setTapped(tappedRef.current);
+  }
+
+  function handleUndo() {
+    tappedRef.current = tappedRef.current.slice(0, -1);
+    setTapped(tappedRef.current);
+  }
+
+  function handleSubmit() {
+    recallResolveRef.current?.();
+    recallResolveRef.current = null;
+  }
+
+  if (results) {
+    return <SpatialSequenceResults results={results} />;
+  }
+
+  return (
+    <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5">
+      <div className="mb-2 flex items-center justify-between">
+        <Link href="/" aria-label="Exit exercise">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+        </Link>
+        <div className="mx-4 h-1 flex-1 rounded-full bg-surface-2">
+          <div
+            className="h-full rounded-full bg-spatial transition-all"
+            style={{ width: `${(sequenceNumber / TOTAL_SEQUENCES) * 100}%` }}
+          />
+        </div>
+        <div className="w-[18px]" />
+      </div>
+      <div className="mb-4 text-center text-xs text-text-3">
+        Sequence {sequenceNumber} of {TOTAL_SEQUENCES}
+      </div>
+
+      <div className="mb-2 flex items-center justify-center gap-1.5">
+        <div className="h-[7px] w-[7px] rounded-full bg-spatial" />
+        <div className="text-[12.5px] font-bold tracking-wide text-spatial">
+          SPATIAL MEMORY · SEQUENCE RECALL
+        </div>
+      </div>
+
+      <div className="mb-8 text-center font-display text-lg font-bold text-text">
+        {phase === "study"
+          ? "Watch the squares light up"
+          : phase === "feedback"
+            ? sequenceFeedback?.fullyCorrect
+              ? "Perfect recall"
+              : `${sequenceFeedback?.correctPositions ?? 0} of ${sequenceFeedback?.sequenceLength ?? sequenceLength} in the right order`
+            : "Tap the squares in the order they lit up"}
+      </div>
+
+      <div className="flex flex-1 flex-col items-center justify-center">
+        <div data-testid="highlighted-cell" className="hidden">
+          {highlighted !== null ? highlighted : ""}
+        </div>
+        <div className="mb-6 grid w-[250px] grid-cols-3 gap-3.5">
+          {Array.from({ length: GRID_SIZE }, (_, i) => {
+            const isHighlighted = phase === "study" && highlighted === i;
+            const tapOrder = tapped.indexOf(i);
+            return (
+              <button
+                key={i}
+                type="button"
+                data-testid={`grid-cell-${i}`}
+                onClick={() => handleTap(i)}
+                disabled={phase !== "recall"}
+                className="flex aspect-square items-center justify-center rounded-md border-[1.5px] font-num text-base font-bold"
+                style={{
+                  background: isHighlighted || tapOrder >= 0 ? "var(--color-spatial)" : "var(--color-surface-2)",
+                  borderColor: isHighlighted || tapOrder >= 0 ? "var(--color-spatial)" : "var(--color-border)",
+                  color: "var(--color-on-accent)",
+                }}
+              >
+                {tapOrder >= 0 ? tapOrder + 1 : ""}
+              </button>
+            );
+          })}
+        </div>
+
+        {phase === "recall" && sequenceLength !== null && (
+          <div className="flex w-full gap-3">
+            <button
+              data-testid="recall-undo"
+              onClick={handleUndo}
+              disabled={tapped.length === 0}
+              className="flex-1 rounded-full border-[1.5px] border-border py-3 font-body text-sm font-bold text-text-2 disabled:opacity-40"
+            >
+              Undo
+            </button>
+            <button
+              data-testid="recall-submit"
+              onClick={handleSubmit}
+              disabled={tapped.length !== sequenceLength}
+              className="flex-1 rounded-full bg-accent py-3 font-body text-sm font-bold text-on-accent disabled:opacity-40"
+            >
+              Submit sequence
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SpatialSequenceResults({ results }: { results: Results }) {
+  const { startDifficulty, endDifficulty, sequences } = results;
+  const perfectSequences = sequences.filter((s) => s.fullyCorrect).length;
+
+  let note: string;
+  if (endDifficulty > startDifficulty) {
+    note = `You recalled full sequences accurately enough that the sequence length increased — that's the sign to keep going.`;
+  } else if (endDifficulty < startDifficulty) {
+    note = `Sequence length eased back a notch to keep this challenging but doable. That's the adaptive engine working as intended, not a setback.`;
+  } else {
+    note = `You held steady at this sequence length across ${sequences.length} rounds.`;
+  }
+
+  return (
+    <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
+      <div className="mb-7 text-center">
+        <div className="mx-auto mb-3.5 flex h-14 w-14 items-center justify-center rounded-full bg-success-soft">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path d="M5 13l4 4L19 7" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <div className="font-display text-[23px] font-bold text-text">Exercise complete</div>
+        <div className="mt-1.5 text-[13.5px] text-text-2">Spatial Sequence Recall</div>
+      </div>
+
+      <div className="mb-4 flex justify-around rounded-lg border border-border bg-surface p-5 shadow-sm">
+        <div className="text-center">
+          <div className="mb-1 text-[11.5px] text-text-3">PERFECT SEQUENCES</div>
+          <div className="font-num text-2xl font-bold text-text">
+            {perfectSequences}/{sequences.length}
+          </div>
+        </div>
+        <div className="w-px bg-border" />
+        <div className="text-center">
+          <div className="mb-1 text-[11.5px] text-text-3">SEQUENCE LENGTH</div>
+          <div className="font-num text-2xl font-bold text-text">
+            {startDifficulty} → {endDifficulty}
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-auto rounded-lg border border-border bg-surface p-4.5">
+        <p className="text-[13.5px] leading-relaxed text-text-2">{note}</p>
+      </div>
+
+      <Link
+        href="/"
+        className="mt-6 block w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent"
+      >
+        Done
+      </Link>
+    </div>
+  );
+}

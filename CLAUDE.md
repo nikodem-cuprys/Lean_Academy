@@ -105,7 +105,7 @@ Every training exercise is traceable through linked, must-stay-in-sync artifacts
 
 ```text
 apps/
-  web/     Next.js 16 (App Router, Turbopack). Full auth flow built: /login, /signup, /verify-email, /forgot-password, /reset-password. /train/n-back is the first real exercise. Playwright E2E tests live in apps/web/e2e/ (vitest is unit-only — see Commands). Everything else still needs building against prototype/*.dc.html.
+  web/     Next.js 16 (App Router, Turbopack). Full auth flow built: /login, /signup, /verify-email, /forgot-password, /reset-password. /train/n-back, /train/complex-span, and /train/spatial-sequence are the three real exercises so far. Playwright E2E tests live in apps/web/e2e/ (vitest is unit-only — see Commands). Everything else still needs building against prototype/*.dc.html.
   api/     Fastify. /health (includes a real DB connectivity check), /catalog (evidence-gated module list).
 
 packages/
@@ -114,7 +114,7 @@ packages/
   adaptive-engine/     RollingWindowAdaptiveEngine implementing project_prompt.txt's AdaptiveTrainingTask interface; gradual, window-based difficulty changes only.
   design-system/       Color/type/spacing tokens transcribed from prototype/Styleguide.dc.html — keep both in sync.
   shared/              Cross-cutting plain-language labels (difficulty levels, training domains).
-  cognitive-engine/    NBackTask and ComplexSpanTask done (both wrap adaptive-engine; difficulty *is* N / set size respectively). Spatial sequence recall, verbal sequencing, method of loci still placeholders — follow NBackTask/ComplexSpanTask's pattern: task-specific stimulus/scoring logic here, difficulty adaptation delegated to adaptive-engine, never reimplemented.
+  cognitive-engine/    NBackTask, ComplexSpanTask, and SpatialSequenceTask done (all wrap adaptive-engine; difficulty *is* N / set size / sequence length respectively). Verbal sequencing, method of loci still placeholders — follow NBackTask/ComplexSpanTask/SpatialSequenceTask's pattern: task-specific stimulus/scoring logic here, difficulty adaptation delegated to adaptive-engine, never reimplemented.
   reading-engine/      Placeholder — paced/adaptive reading + Reading Efficiency Score.
   trial-engine/        Placeholder — shared stimulus/timing runtime (performance.now(), focus-loss detection).
   psychometrics/       Placeholder — accepted psychometric calculations (d-prime, span scoring, etc.).
