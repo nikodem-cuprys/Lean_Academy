@@ -381,13 +381,18 @@ model DailyGoal {
 }
 
 model Streak {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  currentStreakDays  Int      @default(0)
-  longestStreakDays  Int      @default(0)
-  lastActiveDate     DateTime?
-  updatedAt          DateTime @updatedAt
+  id                     String    @id @default(cuid())
+  userId                 String    @unique
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentStreakDays      Int       @default(0)
+  longestStreakDays      Int       @default(0)
+  lastActiveDate         DateTime?
+  // Streak protection (see apps/web/src/lib/streak.ts): one grace day is
+  // spendable to bridge exactly one missed day without breaking the
+  // streak. Starts at 1 so a brand-new streak already has protection,
+  // and is re-earned (capped at 2) every 7 consecutive active days.
+  streakFreezesAvailable Int       @default(1)
+  updatedAt              DateTime  @updatedAt
 }
 
 enum ChallengeType {

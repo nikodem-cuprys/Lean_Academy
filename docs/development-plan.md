@@ -60,6 +60,7 @@ XS = hours, S = ~1 day, M = ~2-4 days, L = ~1-2 weeks, XL = ~3+ weeks, all assum
 **Exit criteria:** Every gamification element maps to a real action or real performance; none implies a cognitive-ability claim (spot-checked against `SCIENTIFIC PROGRESS LANGUAGE` in `project_prompt.txt`).
 **Dependencies:** Phase 3/4 (needs real training data to gamify).
 **Size:** L.
+**Status:** Underway — see `docs/kanban.md`'s Phase 5 breakdown for the five concrete cards (Streaks, Achievements, XP + Training Level, Personal Bests, Weekly Challenges) with real acceptance criteria, dependencies, and sequencing. Streaks is done: a real `Streak` row now updates on every completed `TrainingSession`, with a genuine freeze-based protection mechanic and Home/Session-Complete UI, verified in `apps/web/e2e/streaks.spec.ts`. Achievements is Ready next (its data sources — `TrainingSession`, `Trial`, `DifficultyState`, `AssessmentResult` — already exist); the remaining three are sequenced after for reasons detailed in the kanban (new schema needed for XP/Level; Weekly Challenges' own example criteria reference the others). Leagues/social features are explicitly out of scope for this phase per `project_prompt.txt`'s "optional later-stage feature" framing.
 
 ## Phase 6 — Advanced Measurement
 

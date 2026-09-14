@@ -8,6 +8,7 @@ import { SpatialSequenceExercise } from "./SpatialSequenceExercise";
 import { PacedReadingExercise } from "./PacedReadingExercise";
 import type { ExerciseSessionOutcome, SessionModeProps } from "@/lib/session-types";
 import type { TodaysExercise } from "@/lib/todays-training";
+import type { StreakOutcome } from "@/lib/streak";
 
 // Implements docs/kanban.md's Session orchestration card: strings the
 // day's exercises together without returning to a menu between them
@@ -48,6 +49,7 @@ export function TrainingSessionRunner({ exercises }: { exercises: TodaysExercise
   const [phase, setPhase] = useState<Phase>("exercise");
   const [summaries, setSummaries] = useState<ExerciseSessionOutcome[]>([]);
   const [totalDurationSeconds, setTotalDurationSeconds] = useState(0);
+  const [streakResult, setStreakResult] = useState<StreakOutcome | null>(null);
 
   const sessionIdRef = useRef<string | null>(null);
   const startedAtRef = useRef(0);
@@ -88,7 +90,12 @@ export function TrainingSessionRunner({ exercises }: { exercises: TodaysExercise
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ totalDurationSeconds: durationSeconds }),
-    }).catch((err) => console.error("Failed to mark training session complete:", err));
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.streak) setStreakResult(data.streak);
+      })
+      .catch((err) => console.error("Failed to mark training session complete:", err));
   }
 
   function handleExerciseComplete(outcome: ExerciseSessionOutcome) {
@@ -110,6 +117,7 @@ export function TrainingSessionRunner({ exercises }: { exercises: TodaysExercise
         summaries={summaries}
         exercises={exercises}
         totalMinutes={Math.max(1, Math.round(totalDurationSeconds / 60))}
+        streak={streakResult}
       />
     );
   }
@@ -150,10 +158,12 @@ function SessionCompleteScreen({
   summaries,
   exercises,
   totalMinutes,
+  streak,
 }: {
   summaries: ExerciseSessionOutcome[];
   exercises: TodaysExercise[];
   totalMinutes: number;
+  streak: StreakOutcome | null;
 }) {
   const displayNameByMethod = new Map(exercises.map((e) => [e.method, e]));
 
@@ -198,6 +208,16 @@ function SessionCompleteScreen({
           );
         })}
       </div>
+
+      {streak ? (
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-3 text-[13.5px] font-semibold text-text-2" data-testid="streak-update">
+          <span aria-hidden="true">🔥</span>
+          <span>
+            {streak.currentStreakDays}-day streak
+            {streak.usedFreeze ? " — a streak freeze protected yesterday" : ""}
+          </span>
+        </div>
+      ) : null}
 
       <div className="mb-auto" />
 
