@@ -2,6 +2,10 @@ import { prisma, Prisma } from "@lean-academy/db";
 import { READING_DEFAULT_INITIAL_DIFFICULTY } from "@lean-academy/reading-engine";
 import { awardXp, XP_AMOUNTS } from "@/lib/xp";
 import { checkNewPersonalBest } from "@/lib/personal-bests";
+import { startOfUtcWeek } from "@/lib/date-utils";
+import { WEEKLY_SESSION_COUNT_TARGET } from "@/lib/weekly-challenges";
+
+export { startOfUtcWeek } from "@/lib/date-utils";
 
 // Achievements epic (Phase 5 — see docs/kanban.md). The catalog itself
 // (11 real, checkable milestones) lives in
@@ -20,8 +24,6 @@ import { checkNewPersonalBest } from "@/lib/personal-bests";
 // apps/web/src/lib/xp.ts) is keyed off of, not every achievement check.
 // Calling it for an already-earned achievement is still a safe no-op.
 
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
-
 async function awardAchievementOnce(userId: string, key: string, metadata?: Prisma.InputJsonValue) {
   const achievement = await prisma.achievement.findUnique({ where: { key } });
   if (!achievement) return; // seed hasn't run for this key — don't fail the caller's real work over it
@@ -35,19 +37,12 @@ async function awardAchievementOnce(userId: string, key: string, metadata?: Pris
   await awardXp(userId, XP_AMOUNTS.ACHIEVEMENT_BONUS, "ACHIEVEMENT_BONUS");
 }
 
-export function startOfUtcWeek(now: Date): Date {
-  // Monday 00:00 UTC of the week containing `now` — the same kind of
-  // UTC-calendar simplification apps/web/src/lib/streak.ts documents
-  // (no per-user timezone yet). getUTCDay(): 0=Sun..6=Sat.
-  const dayOfWeek = now.getUTCDay();
-  const daysSinceMonday = (dayOfWeek + 6) % 7;
-  const utcMidnightToday = Math.floor(now.getTime() / MS_PER_DAY) * MS_PER_DAY;
-  return new Date(utcMidnightToday - daysSinceMonday * MS_PER_DAY);
-}
-
-// Fixed v0 default until Weekly Challenges (docs/kanban.md's Phase 5
-// backlog) exists and can carry a real per-user weekly target instead.
-export const WEEKLY_SESSION_TARGET = 5;
+// Was a fixed v0 placeholder (5) until Weekly Challenges shipped a real
+// "complete N sessions" target of its own (project_prompt.txt's own
+// example: "Complete 4 sessions") — now this achievement and that
+// challenge share the exact same number instead of drifting
+// independently. See apps/web/src/lib/weekly-challenges.ts.
+export const WEEKLY_SESSION_TARGET = WEEKLY_SESSION_COUNT_TARGET;
 
 export const SESSION_COUNT_MILESTONES: { count: number; key: string }[] = [
   { count: 1, key: "first-session" },

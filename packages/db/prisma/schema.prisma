@@ -431,6 +431,11 @@ enum ChallengeType {
 
 model Challenge {
   id          String        @id @default(cuid())
+  /// Stable template identity (e.g. "complete-sessions") — lets weekly
+  /// generation (apps/web/src/lib/weekly-challenges.ts) upsert
+  /// idempotently against @@unique([slug, startsAt]) instead of guessing
+  /// from title text or reaching into the opaque `criteria` JSON.
+  slug        String
   title       String
   description String
   type        ChallengeType
@@ -442,6 +447,8 @@ model Challenge {
   /// Join table — not in the spec's literal entity list, but required to
   /// normalize many-users-to-many-challenges participation/progress.
   progress ChallengeProgress[]
+
+  @@unique([slug, startsAt])
 }
 
 model ChallengeProgress {

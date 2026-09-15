@@ -118,9 +118,10 @@ test.describe("Achievements — session-count and streak milestones (direct, rea
     earned = await earnedKeys();
     expect(earned).toContain("first-week");
 
-    // All these sessions land in the current UTC week, so the fixed
-    // v0 weekly target (5, see achievements.ts's WEEKLY_SESSION_TARGET)
-    // is real and legitimately met too.
+    // All these sessions land in the current UTC week, so the real
+    // weekly target (achievements.ts's WEEKLY_SESSION_TARGET, shared
+    // with Weekly Challenges' "complete N sessions" challenge — see
+    // weekly-challenges.ts) is legitimately met too.
     expect(earned).toContain("weekly-sessions-complete");
   });
 });

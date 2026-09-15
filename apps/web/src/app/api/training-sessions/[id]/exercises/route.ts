@@ -4,6 +4,7 @@ import { prisma, Prisma } from "@lean-academy/db";
 import { auth } from "@/lib/auth";
 import { checkExerciseAchievements } from "@/lib/achievements";
 import { recordNewDomainXpIfFirstTime } from "@/lib/xp";
+import { syncWeeklyChallengeProgress } from "@/lib/weekly-challenges";
 
 // Called once per exercise completion during a training session (see
 // TrainingSessionRunner) — persists that exercise's real Trial rows and
@@ -89,6 +90,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     sessionTotal: trials.length,
   });
   await recordNewDomainXpIfFirstTime(session.user.id, taskVersion.id, id);
+  await syncWeeklyChallengeProgress(session.user.id, new Date(), { newPersonalBestThisCall: newPersonalBest });
 
   return NextResponse.json({ success: true, newPersonalBest });
 }

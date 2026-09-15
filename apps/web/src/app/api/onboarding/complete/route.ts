@@ -4,6 +4,7 @@ import { prisma } from "@lean-academy/db";
 import { auth } from "@/lib/auth";
 import { TASK_BOUNDS, type TaskBounds } from "@/lib/task-bounds";
 import { checkFirstAssessmentAchievement } from "@/lib/achievements";
+import { syncWeeklyChallengeProgress } from "@/lib/weekly-challenges";
 
 // Implements project_prompt.txt's onboarding sequence: "goals ->
 // available time -> experience level -> short calibration -> recommended
@@ -132,6 +133,7 @@ export async function POST(request: Request) {
     data: { assessmentId: assessment.id, userId, scoreSummary: calibration },
   });
   await checkFirstAssessmentAchievement(userId);
+  await syncWeeklyChallengeProgress(userId);
 
   return NextResponse.json({ success: true });
 }
