@@ -54,6 +54,9 @@ importers:
       '@lean-academy/evidence':
         specifier: workspace:*
         version: link:../../packages/evidence
+      '@lean-academy/psychometrics':
+        specifier: workspace:*
+        version: link:../../packages/psychometrics
       '@lean-academy/reading-engine':
         specifier: workspace:*
         version: link:../../packages/reading-engine

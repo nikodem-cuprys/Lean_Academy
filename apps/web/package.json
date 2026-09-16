@@ -16,6 +16,7 @@
     "@lean-academy/db": "workspace:*",
     "@lean-academy/design-system": "workspace:*",
     "@lean-academy/evidence": "workspace:*",
+    "@lean-academy/psychometrics": "workspace:*",
     "@lean-academy/reading-engine": "workspace:*",
     "@lean-academy/shared": "workspace:*",
     "bcryptjs": "^2.4.3",

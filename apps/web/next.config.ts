@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
     "@lean-academy/cognitive-engine",
     "@lean-academy/adaptive-engine",
     "@lean-academy/reading-engine",
+    "@lean-academy/psychometrics",
   ],
 };
 

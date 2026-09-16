@@ -115,6 +115,12 @@ export function ProgressView({ data }: { data: ProgressData }) {
                   A short periodic assessment using a task you haven&rsquo;t practiced directly, sharing the same
                   underlying mechanism as one of your trained tasks, will appear here once you&rsquo;ve taken one.
                 </div>
+                <Link
+                  href="/assessments/backward-digit-span"
+                  className="mt-3.5 inline-block rounded-full bg-wm px-4.5 py-2.5 text-[12.5px] font-bold text-on-accent"
+                >
+                  Take the Backward Digit Span assessment
+                </Link>
               </div>
               <div className="px-1 text-xs leading-relaxed text-text-3">
                 Measured periodically, not every session, to avoid pure practice effects.

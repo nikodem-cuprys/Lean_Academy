@@ -140,6 +140,18 @@ The hard physiological constraint behind this: the **perceptual span** — the r
 
 **Production decision: Explicitly NOT approved.** Registry id `rsvp-single-word-v0`, `productionApproved: false`. This is precisely the "common speed-reading myth" the product brief instructs us not to implement just because it's popular.
 
+## 11. Near-transfer assessment — Backward Digit Span
+
+**What it is:** Phase 6's first near-transfer *assessment* (not a trainable exercise, and not gated through the production training catalog in `data/evidence-registry.json` — see `packages/evidence`'s catalog gate, which only governs trainable modules). A fixed ascending-span staircase: the user hears/sees a digit sequence and must report it in reverse order, with the sequence lengthening on success and the test stopping after two consecutive failures at one length — the standard psychometric span-testing method, not the rolling-window adaptive engine built for repeated practice (`project_prompt.txt`'s TRAINING VS ASSESSMENT distinction: assessment is "less frequent measurement," not adaptive training).
+
+**Why this counts as a genuine near-transfer measure, not a repeat of the trained task:** it is a different task and form than the trained N-Back and Complex Span exercises (a fixed-procedure assessment vs. adaptive practice tasks), while sharing the backward-span structure that §3's Melby-Lervåg & Hulme meta-analytic finding already establishes real near-transfer for: "substantial near transfer specifically when trained and untrained tasks share a serial-recall / complex-span / backward-span structure." No new citation search was needed for this decision — it's the direct, intended use of that already-reviewed finding, not a new evidence claim.
+
+**Explicitly not a reproduction of the WAIS/WISC Digit Span clinical subtest** — out of scope permanently per the excluded-domains list below. This is an original implementation of the general backward-span paradigm: sequences are freshly randomized on every run (`packages/cognitive-engine`'s `BackwardDigitSpanAssessment`) rather than drawn from a fixed, standardized item list, the same "original task, not the clinical instrument" framing already used for §4's `verbal-sequencing-v0`.
+
+**Claim limits:** results are reported as a near-transfer working-memory-span measure only — never as IQ, general intelligence, or an everyday-memory claim. A score from a handful of staircase trials at one span length carries real uncertainty, which is why it is always shown with a real confidence interval (`packages/psychometrics`'s `calculateProportionConfidenceInterval`, computed over the terminal span level's own trials) rather than a bare number.
+
+**Production decision:** Not a catalog module (no `data/evidence-registry.json` entry, no `productionApproved` flag) — it is an assessment surfaced from `/assessments/backward-digit-span` and linked from Progress's "Similar tasks" tab, not a trainable exercise in the catalog `packages/evidence` gates.
+
 ---
 
 ## Domains reviewed and deliberately excluded from this version
