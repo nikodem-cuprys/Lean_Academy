@@ -3,16 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { ProgressData, TrainedTaskProgress } from "@/lib/progress-data";
+import type { NearTransferAssessmentSummary } from "@/lib/near-transfer-assessment";
 
 // Built against prototype/Progress.dc.html. Two honest departures from
 // the mockup's specific example content:
 //
-// - "Similar tasks" (near transfer) shows a real "not measured yet"
-//   state instead of the mockup's fabricated result narrative — no
-//   near-transfer assessment mechanic exists yet (see docs/kanban.md;
-//   only the onboarding BASELINE calibration exists so far), so showing
-//   the mockup's specific "score improved" story would be inventing
-//   data no real user has.
+// - "Similar tasks" (near transfer) shows each real AssessmentResult
+//   the user has actually taken (docs/kanban.md's "Wire Similar
+//   Cognitive Tasks to real near-transfer data" card) instead of the
+//   mockup's fabricated result narrative — a user who hasn't taken
+//   either near-transfer assessment yet still sees the honest "not
+//   measured yet" placeholder, same real-data-or-honest-placeholder
+//   pattern the Trained tab already established.
 // - "Broader transfer" is copied close to verbatim from the mockup —
 //   it's already an honest static disclaimer, not a data display, so
 //   there was nothing to make more real.
@@ -109,27 +111,23 @@ export function ProgressView({ data }: { data: ProgressData }) {
 
           {tab === "similar" && (
             <>
-              <div className="mb-3 rounded-lg border border-border bg-surface p-5 shadow-sm">
-                <div className="mb-1.5 text-[13.5px] font-bold text-text">No near-transfer assessment yet</div>
-                <div className="text-[12.5px] leading-relaxed text-text-2">
-                  A short periodic assessment using a task you haven&rsquo;t practiced directly, sharing the same
-                  underlying mechanism as one of your trained tasks, will appear here once you&rsquo;ve taken one.
+              {data.nearTransferAssessments.length === 0 ? (
+                <div className="mb-3 rounded-lg border border-border bg-surface p-5 shadow-sm">
+                  <div className="mb-1.5 text-[13.5px] font-bold text-text">No near-transfer assessment yet</div>
+                  <div className="text-[12.5px] leading-relaxed text-text-2">
+                    A short periodic assessment using a task you haven&rsquo;t practiced directly, sharing the same
+                    underlying mechanism as one of your trained tasks, will appear here once you&rsquo;ve taken one.
+                  </div>
+                  <NearTransferCtaLinks taken={[]} />
                 </div>
-                <div className="mt-3.5 flex flex-wrap gap-2">
-                  <Link
-                    href="/assessments/backward-digit-span"
-                    className="inline-block rounded-full bg-wm px-4.5 py-2.5 text-[12.5px] font-bold text-on-accent"
-                  >
-                    Take the Backward Digit Span assessment
-                  </Link>
-                  <Link
-                    href="/assessments/backward-spatial-span"
-                    className="inline-block rounded-full bg-spatial px-4.5 py-2.5 text-[12.5px] font-bold text-on-accent"
-                  >
-                    Take the Backward Spatial Span assessment
-                  </Link>
+              ) : (
+                <div className="mb-3 flex flex-col gap-3">
+                  {data.nearTransferAssessments.map((assessment) => (
+                    <NearTransferCard key={assessment.assessmentName} assessment={assessment} />
+                  ))}
+                  <NearTransferCtaLinks taken={data.nearTransferAssessments.map((a) => a.assessmentName)} />
                 </div>
-              </div>
+              )}
               <div className="px-1 text-xs leading-relaxed text-text-3">
                 Measured periodically, not every session, to avoid pure practice effects.
               </div>
@@ -151,6 +149,66 @@ export function ProgressView({ data }: { data: ProgressData }) {
           )}
         </>
       )}
+    </div>
+  );
+}
+
+// Kept local rather than importing apps/web/src/lib/near-transfer-assessment.ts's
+// NEAR_TRANSFER_ASSESSMENTS here — that module also imports the Prisma
+// client (server-only) and this is a "use client" component, so pulling
+// it in would bundle server code into the client. Just display labels;
+// the real per-domain science lives in docs/evidence-review.md §11/§12.
+const ALL_NEAR_TRANSFER_ASSESSMENTS = [
+  { name: "Backward Digit Span", route: "/assessments/backward-digit-span", color: "var(--color-wm)" },
+  { name: "Backward Spatial Span", route: "/assessments/backward-spatial-span", color: "var(--color-spatial)" },
+] as const;
+
+function NearTransferCtaLinks({ taken }: { taken: string[] }) {
+  return (
+    <div className="mt-3.5 flex flex-wrap gap-2">
+      {ALL_NEAR_TRANSFER_ASSESSMENTS.map((a) => (
+        <Link
+          key={a.name}
+          href={a.route}
+          className="inline-block rounded-full px-4.5 py-2.5 text-[12.5px] font-bold text-on-accent"
+          style={{ background: a.color }}
+        >
+          {taken.includes(a.name) ? `Retake the ${a.name} assessment` : `Take the ${a.name} assessment`}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function NearTransferCard({ assessment }: { assessment: NearTransferAssessmentSummary }) {
+  const takenAt = new Date(assessment.takenAt);
+  return (
+    <div
+      className="rounded-lg border border-border bg-surface p-5 shadow-sm"
+      data-testid={`near-transfer-card-${assessment.route.split("/").pop()}`}
+    >
+      <div className="mb-1 flex items-center justify-between">
+        <div className="text-[13.5px] font-bold text-text">{assessment.assessmentName}</div>
+        <span className="text-[11px] text-text-3">{takenAt.toLocaleDateString()}</span>
+      </div>
+      <div className="mb-3 text-xs text-text-2">Near-transfer measure related to {assessment.trainedTaskLabel}</div>
+      <div className="flex gap-7">
+        <div>
+          <div className="mb-0.5 text-[11px] text-text-3">BACKWARD SPAN</div>
+          <div className="font-num text-xl font-bold text-text">{assessment.finalSpan}</div>
+        </div>
+        <div>
+          <div className="mb-0.5 text-[11px] text-text-3">AT THAT LENGTH</div>
+          <div className="font-num text-xl font-bold text-text">
+            {assessment.finalSpanCorrect}/{assessment.finalSpanTrials}
+          </div>
+        </div>
+      </div>
+      <div className="mt-2.5 text-[11px] leading-relaxed text-text-3">
+        {assessment.confidenceLevelPct}% confidence interval: {assessment.confidenceIntervalLowerPct}%–
+        {assessment.confidenceIntervalUpperPct}% accuracy at this length — a handful of trials carries real
+        uncertainty, which is why this isn&rsquo;t shown as a bare number.
+      </div>
     </div>
   );
 }

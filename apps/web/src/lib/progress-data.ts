@@ -3,6 +3,7 @@ import { parseEvidenceRegistry, findModule } from "@lean-academy/evidence";
 import { TASK_BOUNDS } from "./task-bounds";
 import { titleCase } from "./text";
 import { getPersonalBestsStatus } from "./personal-bests";
+import { getNearTransferAssessmentsSummary, type NearTransferAssessmentSummary } from "./near-transfer-assessment";
 // Imported (not read via fs) — see the same comment on this import in
 // apps/web/src/app/page.tsx.
 import registryJson from "../../../../data/evidence-registry.json";
@@ -48,6 +49,8 @@ export interface ProgressData {
   hasAnyData: boolean;
   trainedTasks: TrainedTaskProgress[];
   reading: ReadingProgress | null;
+  /** Real near-transfer AssessmentResult data — see apps/web/src/lib/near-transfer-assessment.ts. Empty until the user has taken at least one. */
+  nearTransferAssessments: NearTransferAssessmentSummary[];
 }
 
 const READING_METHOD = "reading-paced-adaptive-v0";
@@ -177,9 +180,16 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
     }
   }
 
+  const nearTransferAssessments = await getNearTransferAssessmentsSummary(userId);
+
   return {
-    hasAnyData: trainedTasks.length > 0 || reading !== null,
+    // Near-transfer assessments don't require prior training (they're
+    // reachable directly, not gated behind a training session), so a
+    // user who has only taken one shouldn't see the top-level "nothing
+    // trained yet" empty state hide their real result.
+    hasAnyData: trainedTasks.length > 0 || reading !== null || nearTransferAssessments.length > 0,
     trainedTasks,
     reading,
+    nearTransferAssessments,
   };
 }

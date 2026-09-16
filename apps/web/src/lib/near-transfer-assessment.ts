@@ -54,3 +54,98 @@ export async function getNearTransferAssessmentStatus(
   );
   return { lastTakenAt: lastResult.takenAt, isDue: now >= nextDueAt, nextDueAt };
 }
+
+/**
+ * The two near-transfer assessments this app has, each paired with the
+ * trained task(s) it's a genuine near-transfer measure *for* (see
+ * docs/evidence-review.md §11/§12) — used by the Progress page's
+ * "Similar tasks" tab (docs/kanban.md's "Wire Similar Cognitive Tasks
+ * to real near-transfer data" card) to know which assessments to look
+ * for and how to describe them, without hardcoding a second copy of
+ * this list there.
+ */
+export const NEAR_TRANSFER_ASSESSMENTS = [
+  {
+    assessmentName: BACKWARD_DIGIT_SPAN_ASSESSMENT_NAME,
+    route: "/assessments/backward-digit-span",
+    trainedTaskLabel: "your N-Back / Complex Span training",
+  },
+  {
+    assessmentName: BACKWARD_SPATIAL_SPAN_ASSESSMENT_NAME,
+    route: "/assessments/backward-spatial-span",
+    trainedTaskLabel: "your Spatial Sequence training",
+  },
+] as const;
+
+export interface NearTransferAssessmentSummary {
+  assessmentName: string;
+  route: string;
+  trainedTaskLabel: string;
+  finalSpan: number;
+  finalSpanCorrect: number;
+  finalSpanTrials: number;
+  /** Wilson-score confidence interval on accuracy at the terminal span level — see packages/psychometrics's calculateProportionConfidenceInterval. Not a confidence interval on the span number itself. */
+  confidenceIntervalLowerPct: number;
+  confidenceIntervalUpperPct: number;
+  confidenceLevelPct: number;
+  /** ISO string, not a Date — this crosses into a client component (ProgressView), and Date objects aren't safely serializable across the RSC boundary. */
+  takenAt: string;
+}
+
+function parseBackwardSpanScoreSummary(
+  value: unknown
+): { finalSpan: number; finalSpanCorrect: number; finalSpanTrials: number; confidenceInterval: { lower: number; upper: number; confidenceLevel: number } } | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as Record<string, unknown>;
+  if (typeof v.finalSpan !== "number" || typeof v.finalSpanCorrect !== "number" || typeof v.finalSpanTrials !== "number") {
+    return null;
+  }
+  const ci = v.confidenceInterval;
+  if (!ci || typeof ci !== "object") return null;
+  const c = ci as Record<string, unknown>;
+  if (typeof c.lower !== "number" || typeof c.upper !== "number" || typeof c.confidenceLevel !== "number") {
+    return null;
+  }
+  return {
+    finalSpan: v.finalSpan,
+    finalSpanCorrect: v.finalSpanCorrect,
+    finalSpanTrials: v.finalSpanTrials,
+    confidenceInterval: { lower: c.lower, upper: c.upper, confidenceLevel: c.confidenceLevel },
+  };
+}
+
+/** The user's most recent real result for each near-transfer assessment they've actually taken — never fabricated for one they haven't. */
+export async function getNearTransferAssessmentsSummary(userId: string): Promise<NearTransferAssessmentSummary[]> {
+  const summaries: NearTransferAssessmentSummary[] = [];
+
+  for (const config of NEAR_TRANSFER_ASSESSMENTS) {
+    const assessment = await prisma.assessment.findFirst({
+      where: { type: "NEAR_TRANSFER", name: config.assessmentName },
+    });
+    if (!assessment) continue;
+
+    const result = await prisma.assessmentResult.findFirst({
+      where: { userId, assessmentId: assessment.id },
+      orderBy: { takenAt: "desc" },
+    });
+    if (!result) continue;
+
+    const parsed = parseBackwardSpanScoreSummary(result.scoreSummary);
+    if (!parsed) continue; // malformed/unexpected shape — skip rather than show a broken card
+
+    summaries.push({
+      assessmentName: config.assessmentName,
+      route: config.route,
+      trainedTaskLabel: config.trainedTaskLabel,
+      finalSpan: parsed.finalSpan,
+      finalSpanCorrect: parsed.finalSpanCorrect,
+      finalSpanTrials: parsed.finalSpanTrials,
+      confidenceIntervalLowerPct: Math.round(parsed.confidenceInterval.lower * 100),
+      confidenceIntervalUpperPct: Math.round(parsed.confidenceInterval.upper * 100),
+      confidenceLevelPct: Math.round(parsed.confidenceInterval.confidenceLevel * 100),
+      takenAt: result.takenAt.toISOString(),
+    });
+  }
+
+  return summaries;
+}

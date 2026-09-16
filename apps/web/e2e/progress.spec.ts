@@ -249,3 +249,99 @@ test("Progress page shows an honest empty state after calibration, then real dat
   const trials = await prisma.trial.findMany({ where: { trainingSession: { userId: user!.id } } });
   expect(trials.length).toBeGreaterThan(0);
 });
+
+// docs/kanban.md's "Wire Similar Cognitive Tasks to real near-transfer
+// data" card — same digit-capture technique as
+// e2e/backward-digit-span.spec.ts (count() before textContent(), since
+// the study-digit element unmounts between phases and blocks otherwise).
+const nearTransferEmail = `e2e-progress-neartransfer-${Date.now()}@example.com`;
+
+test.afterAll(async () => {
+  const user = await prisma.user.findUnique({ where: { email: nearTransferEmail } });
+  if (user) {
+    await prisma.assessmentResult.deleteMany({ where: { userId: user.id } });
+    await prisma.difficultyState.deleteMany({ where: { userId: user.id } });
+    await prisma.dailyGoal.deleteMany({ where: { userId: user.id } });
+    await prisma.trainingPlan.deleteMany({ where: { userId: user.id } });
+  }
+  await prisma.user.deleteMany({ where: { email: nearTransferEmail } });
+});
+
+async function captureDigitSequence(page: Page): Promise<number[]> {
+  const seen: number[] = [];
+  let last: string | null = null;
+  const studyDigit = page.getByTestId("study-digit");
+  const submitButton = page.getByTestId("recall-submit");
+  for (let i = 0; i < 400; i++) {
+    if ((await submitButton.count()) > 0) break;
+    if ((await studyDigit.count()) > 0) {
+      const value = await studyDigit.textContent();
+      if (value && value !== last) {
+        seen.push(Number(value));
+        last = value;
+      }
+    }
+    await page.waitForTimeout(50);
+  }
+  return seen;
+}
+
+test("Progress's Similar tasks tab shows a real near-transfer result after taking an assessment, and still offers the untaken one", async ({
+  page,
+}) => {
+  await page.goto("/signup");
+  await page.getByPlaceholder("Name").fill("E2E Bot");
+  await page.getByPlaceholder("Email").fill(nearTransferEmail);
+  await page.getByPlaceholder("Password").fill(password);
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page).toHaveURL("/");
+
+  // Progress's top-level empty state ("Nothing trained yet") hides the
+  // whole tab bar for a genuinely untouched account, same gate the
+  // first test in this file already exercises — completing onboarding
+  // (real DifficultyState rows, no training session needed) is the
+  // realistic minimum to reach the tabs, matching how a real user
+  // would actually encounter this page.
+  await completeOnboarding(page);
+
+  await page.goto("/progress");
+  await page.getByTestId("progress-tab-similar").click();
+  await expect(page.getByText("No near-transfer assessment yet")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Take the Backward Digit Span assessment" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Take the Backward Spatial Span assessment" })).toBeVisible();
+
+  await page.goto("/assessments/backward-digit-span");
+  await page.getByTestId("start-assessment").click();
+  const submitButton = page.getByTestId("recall-submit");
+  const resultsScreen = page.getByTestId("results-screen");
+  while ((await resultsScreen.count()) === 0) {
+    const sequence = await captureDigitSequence(page);
+    if (sequence.length === 0) break;
+    await expect(submitButton).toBeVisible({ timeout: 10_000 });
+    for (const digit of [...sequence].reverse()) {
+      await page.getByTestId(`digit-key-${digit}`).click();
+    }
+    await expect(submitButton).toBeEnabled();
+    await submitButton.click();
+    await page.waitForTimeout(1300);
+  }
+  await expect(page.getByText("Assessment complete")).toBeVisible({ timeout: 15_000 });
+  await page.getByRole("link", { name: "Done" }).click();
+
+  await page.goto("/progress");
+  await page.getByTestId("progress-tab-similar").click();
+  await expect(page.getByTestId("near-transfer-card-backward-digit-span")).toBeVisible();
+  await expect(page.getByTestId("near-transfer-card-backward-digit-span")).toContainText("9"); // ran to the ceiling
+  await expect(page.getByTestId("near-transfer-card-backward-digit-span")).toContainText("confidence interval");
+  // The untaken assessment still offers a real "Take" CTA, and the taken one now offers "Retake" — neither is fabricated.
+  await expect(page.getByRole("link", { name: "Retake the Backward Digit Span assessment" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Take the Backward Spatial Span assessment" })).toBeVisible();
+
+  // Verify against the real DB directly too.
+  const user = await prisma.user.findUniqueOrThrow({ where: { email: nearTransferEmail } });
+  const result = await prisma.assessmentResult.findFirstOrThrow({
+    where: { userId: user.id, assessment: { name: "Backward Digit Span" } },
+  });
+  const scoreSummary = result.scoreSummary as { finalSpan: number };
+  expect(scoreSummary.finalSpan).toBe(9);
+});
