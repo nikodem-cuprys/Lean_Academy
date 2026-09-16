@@ -22,6 +22,16 @@ import { READING_PASSAGES, type Passage } from "./passages";
  * comfortable adult silent-reading pace) are product defaults, not a
  * literature-derived figure the way the comprehension floor is — see
  * reading-efficiency-score.ts for that one.
+ *
+ * Passage selection is order-driven, not random: nextPassage() always
+ * takes the front of `passagePool` (default READING_PASSAGES, in
+ * declared order), cycling with no repeats until the pool is exhausted,
+ * then resetting. This lets a caller with real per-user history (see
+ * apps/web/src/lib/reading-passage-rotation.ts) pass in the pool
+ * pre-sorted least-recently-seen-first, so a real cross-session
+ * rotation exists (docs/kanban.md's "Expand and rotate the
+ * reading-passage bank" card) — this class only owns *this run's*
+ * no-immediate-repeat cycling, not cross-session history.
  */
 
 const WPM_LADDER = [180, 200, 220, 240, 260, 280, 300, 320, 340];
@@ -52,13 +62,13 @@ export interface PacedReadingTaskConfig {
   initialDifficulty?: Difficulty;
   minDifficulty?: Difficulty;
   maxDifficulty?: Difficulty;
-  /** Injectable for deterministic tests; defaults to Math.random. */
-  random?: () => number;
+  /** Pre-ordered passage pool — nextPassage() cycles through it front-to-back. Defaults to READING_PASSAGES in declared order. */
+  passagePool?: Passage[];
 }
 
 export class PacedReadingTask {
   private readonly adaptiveEngine: RollingWindowAdaptiveEngine;
-  private readonly random: () => number;
+  private readonly passagePool: Passage[];
 
   private usedPassageIds: string[] = [];
   private currentPassage: Passage | null = null;
@@ -66,7 +76,7 @@ export class PacedReadingTask {
   private wpmSamples: number[] = [];
 
   constructor(config: PacedReadingTaskConfig = {}) {
-    this.random = config.random ?? Math.random;
+    this.passagePool = config.passagePool ?? READING_PASSAGES;
     this.adaptiveEngine = new RollingWindowAdaptiveEngine({
       initialDifficulty: config.initialDifficulty ?? READING_DEFAULT_INITIAL_DIFFICULTY,
       minDifficulty: config.minDifficulty ?? READING_MIN_DIFFICULTY,
@@ -99,18 +109,19 @@ export class PacedReadingTask {
   }
 
   /**
-   * Returns the next passage to read, cycling through the pool without
-   * repeats until every passage has been used once, then starting a
-   * fresh cycle — same no-immediate-repeat convention as
-   * ComplexSpanTask's letter pool.
+   * Returns the next passage to read: the front of `passagePool` among
+   * those not already used this run, cycling without repeats until
+   * every passage has been used once, then starting a fresh cycle —
+   * same no-immediate-repeat convention as ComplexSpanTask's letter
+   * pool, but order-driven (see this file's header) rather than random.
    */
   nextPassage(): Passage {
-    const unused = READING_PASSAGES.filter((p) => !this.usedPassageIds.includes(p.id));
+    let unused = this.passagePool.filter((p) => !this.usedPassageIds.includes(p.id));
     if (unused.length === 0) {
       this.usedPassageIds = [];
+      unused = this.passagePool;
     }
-    const pool = this.usedPassageIds.length === 0 ? READING_PASSAGES : unused;
-    const passage = pool[Math.floor(this.random() * pool.length)];
+    const passage = unused[0];
     this.usedPassageIds.push(passage.id);
     this.currentPassage = passage;
     return passage;

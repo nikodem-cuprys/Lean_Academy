@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   PacedReadingTask,
   calculateReadingEfficiencyScore,
+  READING_PASSAGES,
   type Passage,
 } from "@lean-academy/reading-engine";
 import {
@@ -32,6 +33,15 @@ import {
 // the reader clicking "I've finished reading," not from the guide's
 // speed — matching evidence-review.md §8's "the user reads normally
 // while pacing increases."
+//
+// Passage order is real, not fixed: on mount, this fetches the user's
+// real least-recently-seen passage order from
+// /api/reading-passage-order (this is a client component with no
+// direct DB access) and seeds PacedReadingTask's passagePool with it,
+// falling back to the engine's own declared order if the fetch fails
+// — never blocking the exercise on it. See docs/kanban.md's "Expand
+// and rotate the reading-passage bank" card and
+// apps/web/src/lib/reading-passage-rotation.ts.
 
 const TOTAL_PASSAGES = 5;
 const CHUNK_SIZE = 4; // words per pacer highlight step
@@ -86,12 +96,24 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
 
   useEffect(() => {
     const controller = new AbortController();
-    const task = new PacedReadingTask(initialDifficulty !== undefined ? { initialDifficulty } : {});
-    const startDifficulty = task.getCurrentDifficulty();
-    const startDifficultyWpm = task.getCurrentTargetWpm();
     const passages: PassageSummary[] = [];
     const offsetMs = epochOffsetMs();
     const trials: TrialInput[] = [];
+
+    async function fetchPassagePool(): Promise<Passage[]> {
+      try {
+        const res = await fetch("/api/reading-passage-order", { signal: controller.signal });
+        if (!res.ok) return READING_PASSAGES;
+        const data: { order?: unknown } = await res.json();
+        if (!Array.isArray(data.order)) return READING_PASSAGES;
+        const byId = new Map(READING_PASSAGES.map((p) => [p.id, p]));
+        const ordered = data.order.map((id) => (typeof id === "string" ? byId.get(id) : undefined));
+        if (ordered.length !== READING_PASSAGES.length || ordered.some((p) => !p)) return READING_PASSAGES;
+        return ordered as Passage[];
+      } catch {
+        return READING_PASSAGES; // never block the exercise on this
+      }
+    }
 
     async function waitForFinishReading(): Promise<void> {
       await new Promise<void>((resolve) => {
@@ -115,6 +137,15 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
     }
 
     async function run() {
+      const passagePool = await fetchPassagePool();
+      if (controller.signal.aborted) return;
+      const task = new PacedReadingTask({
+        passagePool,
+        ...(initialDifficulty !== undefined ? { initialDifficulty } : {}),
+      });
+      const startDifficulty = task.getCurrentDifficulty();
+      const startDifficultyWpm = task.getCurrentTargetWpm();
+
       for (let p = 0; p < TOTAL_PASSAGES; p++) {
         if (controller.signal.aborted) return;
 
@@ -156,7 +187,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
           respondedAtMs: perfToEpochMs(respondedAt, offsetMs),
           wasInterrupted: false,
           difficultyAtTrial,
-          metadata: { actualWpm: outcome.actualWpm },
+          metadata: { actualWpm: outcome.actualWpm, passageId: nextPassage.id },
         });
         setFeedback({
           correct: answeredCorrectly,

@@ -7,7 +7,7 @@ import {
   ComplexSpanTask,
   SpatialSequenceTask,
 } from "@lean-academy/cognitive-engine";
-import { PacedReadingTask, type Passage } from "@lean-academy/reading-engine";
+import { PacedReadingTask, READING_PASSAGES, type Passage } from "@lean-academy/reading-engine";
 
 // Implements project_prompt.txt's onboarding sequence: "goals ->
 // available time -> experience level -> short calibration -> recommended
@@ -74,6 +74,16 @@ const RECALL_LETTERS = ["B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** Fisher-Yates shuffle — doesn't mutate the input array. */
+function shuffleArray<T>(items: T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
 }
 
 interface CalibrationTally {
@@ -411,7 +421,14 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
     const spatialTask = new SpatialSequenceTask();
     const nbackTask = new NBackTask({ initialDifficulty: 1, minDifficulty: 1, maxDifficulty: 1 });
     const complexSpanTask = new ComplexSpanTask({ initialDifficulty: 3, minDifficulty: 3, maxDifficulty: 3 });
-    const readingTask = new PacedReadingTask();
+    // PacedReadingTask's passage order is deterministic (front of the
+    // pool first, not random — see paced-reading-task.ts), so a
+    // shuffled pool here is what keeps calibration showing a varied
+    // passage per user instead of literally the same one every time;
+    // the real per-user recency rotation itself is the trained
+    // exercise's concern (apps/web/src/lib/reading-passage-rotation.ts),
+    // not calibration's, since a user only calibrates once.
+    const readingTask = new PacedReadingTask({ passagePool: shuffleArray(READING_PASSAGES) });
 
     async function run() {
       const results: CalibrationTally[] = [];
