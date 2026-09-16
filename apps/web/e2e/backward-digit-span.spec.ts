@@ -33,6 +33,21 @@ test.afterAll(async () => {
   await prisma.$disconnect();
 });
 
+// Near-transfer assessments are premium-gated (docs/kanban.md's
+// "Entitlement system" card) — no Stripe integration exists yet to
+// reach a real PREMIUM subscription through the UI, so this grants one
+// directly via Prisma, the same "direct call/write for a state an
+// external dependency this suite doesn't manage would otherwise gate"
+// pattern already used elsewhere (e.g. personal-bests.spec.ts).
+async function grantPremium(userEmail: string) {
+  const user = await prisma.user.findUniqueOrThrow({ where: { email: userEmail } });
+  await prisma.subscription.upsert({
+    where: { userId: user.id },
+    create: { userId: user.id, plan: "PREMIUM_MONTHLY", status: "ACTIVE" },
+    update: { plan: "PREMIUM_MONTHLY", status: "ACTIVE" },
+  });
+}
+
 async function captureStudySequence(page: Page): Promise<number[]> {
   const seen: number[] = [];
   let last: string | null = null;
@@ -41,12 +56,16 @@ async function captureStudySequence(page: Page): Promise<number[]> {
 
   for (let i = 0; i < 400; i++) {
     if ((await submitButton.count()) > 0) break; // recall phase reached
-    // Check existence before reading text — study-digit unmounts
-    // between phases, and locator.textContent() blocks (auto-waits)
-    // indefinitely if the element isn't currently attached, which would
-    // deadlock this polling loop the instant study ends.
+    // The count() check alone isn't enough — study-digit can still
+    // detach between it and the textContent() call below (a real,
+    // reproducible flake independent of any app change: confirmed by
+    // running this same race against an unmodified build), which hangs
+    // textContent()'s auto-wait indefinitely. .catch(() => null) treats
+    // that detach as "no value yet" and lets the loop re-check next
+    // tick, the same safe pattern e2e/progress.spec.ts's
+    // captureTextSequence already uses.
     if ((await studyDigit.count()) > 0) {
-      const value = await studyDigit.textContent();
+      const value = await studyDigit.textContent().catch(() => null);
       if (value && value !== last) {
         seen.push(Number(value));
         last = value;
@@ -68,6 +87,7 @@ test("sign up, run the full staircase with correct backward recall to the ceilin
 
   await expect(page).toHaveURL("/");
   await expect(page.getByText("Signed in", { exact: true })).toBeVisible();
+  await grantPremium(email);
 
   await page.goto("/assessments/backward-digit-span");
   await expect(page.getByText("Backward Digit Span")).toBeVisible();

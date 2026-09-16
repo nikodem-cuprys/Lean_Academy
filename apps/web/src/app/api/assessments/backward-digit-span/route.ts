@@ -10,6 +10,7 @@ import { auth } from "@/lib/auth";
 import { checkFirstAssessmentAchievement } from "@/lib/achievements";
 import { syncWeeklyChallengeProgress } from "@/lib/weekly-challenges";
 import { BACKWARD_DIGIT_SPAN_ASSESSMENT_NAME } from "@/lib/near-transfer-assessment";
+import { isPremiumUser } from "@/lib/entitlements";
 
 // Real Assessment/AssessmentResult persistence for the Backward Digit
 // Span near-transfer assessment (docs/kanban.md's "Near-transfer
@@ -34,6 +35,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const userId = session.user.id;
+
+  // Defense in depth alongside the page-level gate
+  // (apps/web/src/app/assessments/backward-digit-span/page.tsx) — a
+  // free-tier client should never reach this UI, but the server is the
+  // real boundary, not the page.
+  if (!(await isPremiumUser(userId))) {
+    return NextResponse.json({ error: "Premium subscription required" }, { status: 403 });
+  }
 
   const parsed = bodySchema.safeParse(await request.json());
   if (!parsed.success) {

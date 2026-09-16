@@ -46,7 +46,9 @@ export function ProgressView({ data }: { data: ProgressData }) {
             <div className="mb-4 rounded-lg border border-border bg-surface p-5 shadow-sm">
               {data.reading.hasComparison && (
                 <>
-                  <div className="mb-3.5 text-[12px] font-bold tracking-wide text-text-3">READING — LAST 30 DAYS</div>
+                  <div className="mb-3.5 text-[12px] font-bold tracking-wide text-text-3">
+                    READING — {data.reading.isAllTimeTrend ? "ALL TIME" : "LAST 30 DAYS"}
+                  </div>
                   <div className="flex gap-7">
                     <div>
                       <div className="mb-0.5 text-[11px] text-text-3">PACE</div>
@@ -118,14 +120,22 @@ export function ProgressView({ data }: { data: ProgressData }) {
                     A short periodic assessment using a task you haven&rsquo;t practiced directly, sharing the same
                     underlying mechanism as one of your trained tasks, will appear here once you&rsquo;ve taken one.
                   </div>
-                  <NearTransferCtaLinks taken={[]} />
+                  <NearTransferCtaLinks taken={[]} isPremium={data.isPremium} />
                 </div>
               ) : (
                 <div className="mb-3 flex flex-col gap-3">
                   {data.nearTransferAssessments.map((assessment) => (
                     <NearTransferCard key={assessment.assessmentName} assessment={assessment} />
                   ))}
-                  <NearTransferCtaLinks taken={data.nearTransferAssessments.map((a) => a.assessmentName)} />
+                  <NearTransferCtaLinks
+                    taken={data.nearTransferAssessments.map((a) => a.assessmentName)}
+                    isPremium={data.isPremium}
+                  />
+                </div>
+              )}
+              {!data.isPremium && (
+                <div className="mb-3 px-1 text-xs leading-relaxed text-text-3" data-testid="near-transfer-premium-note">
+                  Near-transfer assessments are a premium feature.
                 </div>
               )}
               <div className="px-1 text-xs leading-relaxed text-text-3">
@@ -163,7 +173,7 @@ const ALL_NEAR_TRANSFER_ASSESSMENTS = [
   { name: "Backward Spatial Span", route: "/assessments/backward-spatial-span", color: "var(--color-spatial)" },
 ] as const;
 
-function NearTransferCtaLinks({ taken }: { taken: string[] }) {
+function NearTransferCtaLinks({ taken, isPremium }: { taken: string[]; isPremium: boolean }) {
   return (
     <div className="mt-3.5 flex flex-wrap gap-2">
       {ALL_NEAR_TRANSFER_ASSESSMENTS.map((a) => (
@@ -173,7 +183,11 @@ function NearTransferCtaLinks({ taken }: { taken: string[] }) {
           className="inline-block rounded-full px-4.5 py-2.5 text-[12.5px] font-bold text-on-accent"
           style={{ background: a.color }}
         >
-          {taken.includes(a.name) ? `Retake the ${a.name} assessment` : `Take the ${a.name} assessment`}
+          {isPremium
+            ? taken.includes(a.name)
+              ? `Retake the ${a.name} assessment`
+              : `Take the ${a.name} assessment`
+            : `🔒 ${a.name} (Premium)`}
         </Link>
       ))}
     </div>
@@ -232,6 +246,11 @@ function TrainedTaskCard({ task }: { task: TrainedTaskProgress }) {
       {task.personalBestLabel ? (
         <div className="mt-2.5 text-[11px] font-semibold text-text-3" data-testid={`personal-best-${task.method}`}>
           🏆 Personal best: {task.personalBestLabel}
+        </div>
+      ) : null}
+      {task.historyLimitedToLast30Days ? (
+        <div className="mt-2 text-[11px] text-text-3" data-testid={`history-limited-${task.method}`}>
+          Showing the last 30 days — Premium unlocks your full history.
         </div>
       ) : null}
     </div>

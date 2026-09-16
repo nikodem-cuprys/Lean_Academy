@@ -4,6 +4,7 @@ import { TASK_BOUNDS } from "./task-bounds";
 import { titleCase } from "./text";
 import { getPersonalBestsStatus } from "./personal-bests";
 import { getNearTransferAssessmentsSummary, type NearTransferAssessmentSummary } from "./near-transfer-assessment";
+import { isPremiumUser } from "./entitlements";
 // Imported (not read via fs) — see the same comment on this import in
 // apps/web/src/app/page.tsx.
 import registryJson from "../../../../data/evidence-registry.json";
@@ -29,8 +30,10 @@ export interface TrainedTaskProgress {
   progressLabel: string;
   /** 0-1, current difficulty's position on this task's own min-max range. */
   progressFraction: number;
-  /** The Personal Bests card's real, all-time best on this task — see apps/web/src/lib/personal-bests.ts. Null if no Trial rows exist yet. */
+  /** The Personal Bests card's real, all-time best on this task — see apps/web/src/lib/personal-bests.ts. Null if no Trial rows exist yet. Always all-time, regardless of tier — see entitlements.ts's comment on what "full history" means here. */
   personalBestLabel: string | null;
+  /** True only when this specific task has real trial history older than 30 days that a free account isn't shown — never true for a premium account, and never true just because the account is free with nothing older to hide. */
+  historyLimitedToLast30Days: boolean;
 }
 
 export interface ReadingProgress {
@@ -43,6 +46,8 @@ export interface ReadingProgress {
   /** All-time best reading session by Reading Efficiency Score (see personal-bests.ts) — the real WPM/comprehension pair from that session, never a bare composite number. Null if no reading sessions yet. */
   bestWpm: number | null;
   bestComprehensionPct: number | null;
+  /** False (the existing, unchanged behavior) for a free account — the trend window has always been 30 days. True for a premium account: the trend spans the user's full real history instead. */
+  isAllTimeTrend: boolean;
 }
 
 export interface ProgressData {
@@ -51,6 +56,8 @@ export interface ProgressData {
   reading: ReadingProgress | null;
   /** Real near-transfer AssessmentResult data — see apps/web/src/lib/near-transfer-assessment.ts. Empty until the user has taken at least one. */
   nearTransferAssessments: NearTransferAssessmentSummary[];
+  /** See apps/web/src/lib/entitlements.ts. Drives the free-tier 30-day history cap and the near-transfer assessment gate. */
+  isPremium: boolean;
 }
 
 const READING_METHOD = "reading-paced-adaptive-v0";
@@ -73,6 +80,7 @@ export function actualWpmFromMetadata(metadata: unknown): number | null {
 
 export async function getProgressData(userId: string): Promise<ProgressData> {
   const registry = parseEvidenceRegistry(registryJson, "data/evidence-registry.json");
+  const isPremium = await isPremiumUser(userId);
 
   const difficultyStates = await prisma.difficultyState.findMany({
     where: { userId },
@@ -81,16 +89,24 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
   const personalBests = await getPersonalBestsStatus(userId);
   const personalBestByMethod = new Map(personalBests.map((pb) => [pb.method, pb]));
 
+  const historyWindowStart = new Date(Date.now() - THIRTY_DAYS_MS);
+
   const trainedTasks: TrainedTaskProgress[] = [];
   for (const ds of difficultyStates) {
     const { method, displayName } = ds.taskVersion.taskDefinition;
     if (method === READING_METHOD) continue;
 
+    // Always fetch full history (cheap — these are small per-user rows)
+    // and apply the free-tier 30-day cap in memory, rather than a second
+    // query, so we can tell an honest "there IS more, it's just hidden"
+    // apart from "there just isn't more" — see historyLimitedToLast30Days.
     const trials = await prisma.trial.findMany({
       where: { taskVersionId: ds.taskVersionId, trainingSession: { userId } },
       orderBy: { stimulusStartedAt: "asc" },
-      select: { difficultyAtTrial: true, trainingSessionId: true },
+      select: { difficultyAtTrial: true, trainingSessionId: true, stimulusStartedAt: true },
     });
+    const visibleTrials = isPremium ? trials : trials.filter((t) => t.stimulusStartedAt >= historyWindowStart);
+    const historyLimitedToLast30Days = !isPremium && visibleTrials.length < trials.length;
 
     const bounds = TASK_BOUNDS[method];
     const currentDifficulty = ds.currentDifficulty;
@@ -99,20 +115,24 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
     const evidenceBadge = evidenceModule ? titleCase(evidenceModule.evidenceLevel) : "—";
     const personalBestLabel = personalBestByMethod.get(method)?.label ?? null;
 
-    if (trials.length === 0) {
+    if (visibleTrials.length === 0) {
       trainedTasks.push({
         method,
         displayName,
         evidenceBadge,
-        progressLabel: `Calibrated at Level ${currentDifficulty} — no training sessions yet`,
+        progressLabel:
+          trials.length > 0
+            ? "No sessions in the last 30 days — Premium unlocks full history"
+            : `Calibrated at Level ${currentDifficulty} — no training sessions yet`,
         progressFraction,
         personalBestLabel,
+        historyLimitedToLast30Days,
       });
       continue;
     }
 
-    const startDifficulty = trials[0].difficultyAtTrial;
-    const sessionCount = new Set(trials.map((t) => t.trainingSessionId)).size;
+    const startDifficulty = visibleTrials[0].difficultyAtTrial;
+    const sessionCount = new Set(visibleTrials.map((t) => t.trainingSessionId)).size;
     trainedTasks.push({
       method,
       displayName,
@@ -120,6 +140,7 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
       progressLabel: formatProgressLabel(method, startDifficulty, currentDifficulty, sessionCount),
       progressFraction,
       personalBestLabel,
+      historyLimitedToLast30Days,
     });
   }
 
@@ -128,11 +149,12 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
   if (readingDifficultyState) {
     const readingBest = personalBestByMethod.get(READING_METHOD);
 
-    const since = new Date(Date.now() - THIRTY_DAYS_MS);
+    // Free tier keeps the original, unchanged 30-day trend window;
+    // premium sees the full real history instead (no start-date filter).
     const readingTrials = await prisma.trial.findMany({
       where: {
         taskVersionId: readingDifficultyState.taskVersionId,
-        trainingSession: { userId, startedAt: { gte: since } },
+        trainingSession: { userId, ...(isPremium ? {} : { startedAt: { gte: historyWindowStart } }) },
       },
       orderBy: { stimulusStartedAt: "asc" },
       select: { correct: true, metadata: true, trainingSessionId: true },
@@ -176,6 +198,7 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
         endComprehensionPct,
         bestWpm: readingBest?.wpm ?? null,
         bestComprehensionPct: readingBest?.comprehensionPct ?? null,
+        isAllTimeTrend: isPremium,
       };
     }
   }
@@ -191,5 +214,6 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
     trainedTasks,
     reading,
     nearTransferAssessments,
+    isPremium,
   };
 }

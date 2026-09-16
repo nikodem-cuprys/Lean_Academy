@@ -33,6 +33,20 @@ test.afterAll(async () => {
   await prisma.$disconnect();
 });
 
+// Near-transfer assessments are premium-gated (docs/kanban.md's
+// "Entitlement system" card) — no Stripe integration exists yet to
+// reach a real PREMIUM subscription through the UI, so this grants one
+// directly via Prisma, the same pattern e2e/backward-digit-span.spec.ts
+// uses.
+async function grantPremium(userEmail: string) {
+  const user = await prisma.user.findUniqueOrThrow({ where: { email: userEmail } });
+  await prisma.subscription.upsert({
+    where: { userId: user.id },
+    create: { userId: user.id, plan: "PREMIUM_MONTHLY", status: "ACTIVE" },
+    update: { plan: "PREMIUM_MONTHLY", status: "ACTIVE" },
+  });
+}
+
 async function captureStudySequence(page: Page): Promise<number[]> {
   const seen: number[] = [];
   let last: string | null = null;
@@ -41,7 +55,11 @@ async function captureStudySequence(page: Page): Promise<number[]> {
 
   for (let i = 0; i < 400; i++) {
     if ((await submitButton.count()) > 0) break; // recall phase reached
-    const value = await highlightedCell.textContent();
+    // .catch(() => null): this element is documented as never unmounting
+    // between phases (unlike backward-digit-span.spec.ts's study-digit),
+    // but the same safety net costs nothing and matches the pattern
+    // applied there after a real, reproducible detach race was found.
+    const value = await highlightedCell.textContent().catch(() => null);
     if (value && value !== last) {
       seen.push(Number(value));
       last = value;
@@ -62,6 +80,7 @@ test("sign up, run the full staircase with correct backward recall to the ceilin
 
   await expect(page).toHaveURL("/");
   await expect(page.getByText("Signed in", { exact: true })).toBeVisible();
+  await grantPremium(email);
 
   await page.goto("/assessments/backward-spatial-span");
   await expect(page.getByText("Backward Spatial Span")).toBeVisible();

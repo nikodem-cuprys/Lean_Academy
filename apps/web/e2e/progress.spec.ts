@@ -267,6 +267,20 @@ test.afterAll(async () => {
   await prisma.user.deleteMany({ where: { email: nearTransferEmail } });
 });
 
+// Near-transfer assessments are premium-gated (docs/kanban.md's
+// "Entitlement system" card) — no Stripe integration exists yet to
+// reach a real PREMIUM subscription through the UI, so this grants one
+// directly via Prisma, the same pattern e2e/backward-digit-span.spec.ts
+// uses.
+async function grantPremium(userEmail: string) {
+  const user = await prisma.user.findUniqueOrThrow({ where: { email: userEmail } });
+  await prisma.subscription.upsert({
+    where: { userId: user.id },
+    create: { userId: user.id, plan: "PREMIUM_MONTHLY", status: "ACTIVE" },
+    update: { plan: "PREMIUM_MONTHLY", status: "ACTIVE" },
+  });
+}
+
 async function captureDigitSequence(page: Page): Promise<number[]> {
   const seen: number[] = [];
   let last: string | null = null;
@@ -275,7 +289,12 @@ async function captureDigitSequence(page: Page): Promise<number[]> {
   for (let i = 0; i < 400; i++) {
     if ((await submitButton.count()) > 0) break;
     if ((await studyDigit.count()) > 0) {
-      const value = await studyDigit.textContent();
+      // .catch(() => null): study-digit can detach between the count()
+      // check above and this call resolving — a real, reproducible race
+      // (see e2e/backward-digit-span.spec.ts's captureStudySequence,
+      // where the same fix was applied after the deadlock this could
+      // otherwise cause was actually reproduced).
+      const value = await studyDigit.textContent().catch(() => null);
       if (value && value !== last) {
         seen.push(Number(value));
         last = value;
@@ -295,6 +314,7 @@ test("Progress's Similar tasks tab shows a real near-transfer result after takin
   await page.getByPlaceholder("Password").fill(password);
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page).toHaveURL("/");
+  await grantPremium(nearTransferEmail);
 
   // Progress's top-level empty state ("Nothing trained yet") hides the
   // whole tab bar for a genuinely untouched account, same gate the
