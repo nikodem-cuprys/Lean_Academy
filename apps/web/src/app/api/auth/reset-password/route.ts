@@ -45,12 +45,16 @@ export async function POST(request: Request) {
   }
 
   const hashedPassword = await bcrypt.hash(password, 12);
-  await prisma.user.update({ where: { email }, data: { hashedPassword } });
+  const now = new Date();
+  await prisma.user.update({
+    where: { email },
+    data: { hashedPassword, passwordChangedAt: now },
+  });
 
-  // Note: sessions use the JWT strategy, so this does not invalidate any
-  // session already issued on another device — a real hardening pass
-  // would move to database sessions or a token-revocation list to close
-  // that gap.
+  // Sessions use the JWT strategy (no server-side session store), so
+  // apps/web/src/lib/auth.ts's `jwt` callback is the actual revocation
+  // mechanism: it rejects any token whose `iat` predates
+  // passwordChangedAt, signing out every other device on its next request.
 
   return NextResponse.json({ ok: true });
 }

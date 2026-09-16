@@ -39,6 +39,13 @@ model User {
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
+  /// Set whenever the password changes (currently only by the reset-password
+  /// flow). Auth.js's JWT session strategy has no server-side session store
+  /// to revoke from, so this is the revocation mechanism instead: the JWT
+  /// callback in apps/web/src/lib/auth.ts rejects any session token whose
+  /// `iat` predates this timestamp, forcing every other device to sign out
+  /// on its next request after a reset.
+  passwordChangedAt DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 

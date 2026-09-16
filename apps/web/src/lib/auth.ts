@@ -81,5 +81,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return session;
     },
+    // Session invalidation on password reset (docs/security.md), without a
+    // server-side session store: reset-password stamps
+    // User.passwordChangedAt, and this rejects any token whose `iat`
+    // predates it. `session` is only present on a fresh sign-in, when a
+    // just-issued token can't yet be stale by definition — skip the check
+    // there both to save the query and to avoid a chicken-and-egg lockout
+    // right after a reset-then-log-back-in. Every other invocation (Auth.js
+    // re-runs this callback, DB read included, on every `auth()` call — see
+    // @auth/core's "session" action) reads the real current value, so a
+    // stale session is cleared on its very next request after a reset, not
+    // merely on its next expiry.
+    async jwt({ token, trigger }) {
+      if (trigger === "signIn" || trigger === "signUp") return token;
+      if (!token.sub || typeof token.iat !== "number") return token;
+
+      const user = await prisma.user.findUnique({
+        where: { id: token.sub },
+        select: { passwordChangedAt: true },
+      });
+      if (
+        user?.passwordChangedAt &&
+        token.iat * 1000 < user.passwordChangedAt.getTime()
+      ) {
+        return null;
+      }
+      return token;
+    },
   },
 });
