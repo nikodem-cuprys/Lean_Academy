@@ -15,6 +15,7 @@ export const NEAR_TRANSFER_ASSESSMENT_INTERVAL_DAYS = 14;
 
 /** Real Assessment.name for each near-transfer assessment — the one place each is spelled, shared between its completion route and status lookups. */
 export const BACKWARD_DIGIT_SPAN_ASSESSMENT_NAME = "Backward Digit Span";
+export const BACKWARD_SPATIAL_SPAN_ASSESSMENT_NAME = "Backward Spatial Span";
 
 export interface NearTransferAssessmentStatus {
   lastTakenAt: Date | null;

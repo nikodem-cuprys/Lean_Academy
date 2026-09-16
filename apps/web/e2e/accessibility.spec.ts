@@ -66,6 +66,9 @@ test.describe("Accessibility (axe-core)", () => {
 
     await page.goto("/assessments/backward-digit-span");
     expect(await scan(page)).toEqual([]);
+
+    await page.goto("/assessments/backward-spatial-span");
+    expect(await scan(page)).toEqual([]);
   });
 
   // All 4 exercises share the same domain-tag-text + domain-colored-

@@ -152,13 +152,25 @@ The hard physiological constraint behind this: the **perceptual span** — the r
 
 **Production decision:** Not a catalog module (no `data/evidence-registry.json` entry, no `productionApproved` flag) — it is an assessment surfaced from `/assessments/backward-digit-span` and linked from Progress's "Similar tasks" tab, not a trainable exercise in the catalog `packages/evidence` gates.
 
+## 12. Near-transfer assessment — Backward Spatial Span
+
+**What it is:** Phase 6's second near-transfer assessment (same non-catalog status as §11's Backward Digit Span — not gated through `data/evidence-registry.json`, since it's an assessment, not a trainable module). The SPATIAL-domain twin of §11: the same fixed ascending-span staircase procedure, but on a 3x3 grid — the user watches a sequence of squares light up and must tap them back in reverse order, again stopping after two consecutive failures at one span length rather than using the adaptive engine.
+
+**Why this counts as a genuine near-transfer measure, not a repeat of the trained task:** the trained `visuospatial-sequence-recall-v0` exercise (`SpatialSequenceTask`) is *forward* serial recall; this assessment requires *backward* recall — a different task and form, sharing the span structure §5's Corsi-paradigm citation already establishes real near-transfer for ("near-transfer gains on related spatial-span outcomes"). No new citation search was needed here either, for the same reason given in §11: this is the intended use of an already-reviewed finding, not a new claim.
+
+**Explicitly not a reproduction of the clinical Corsi Block-Tapping Test**, which remains a standard neuropsychological instrument — out of scope permanently per the excluded-domains list below, the same boundary §5 already draws for the trained exercise. Sequences are freshly randomized on every run (`packages/cognitive-engine`'s `BackwardSpatialSpanAssessment`), not drawn from a fixed item list.
+
+**Claim limits:** identical to §11's — reported as a near-transfer spatial-working-memory-span measure only, never IQ, general intelligence, or an everyday-memory claim, always shown with a real confidence interval (`packages/psychometrics`'s `calculateProportionConfidenceInterval`, computed over the terminal span level's own trials) rather than a bare number.
+
+**Production decision:** Not a catalog module — an assessment surfaced from `/assessments/backward-spatial-span` and linked from Progress's "Similar tasks" tab, alongside Backward Digit Span, sharing the same periodic-trigger rule (`apps/web/src/lib/near-transfer-assessment.ts`).
+
 ---
 
 ## Domains reviewed and deliberately excluded from this version
 
 - **Stop-Signal Task, Task Switching** — reviewed alongside Flanker/Go-No-Go in section 6; same limited-transfer profile, same decision (not approved for MVP).
 - **Extreme-speed RSVP / "read a novel in an hour" techniques** — see section 10.
-- **Any task reproducing a protected clinical assessment verbatim** (e.g. WAIS/WISC Digit Span, standardized OSPAN) — out of scope permanently, not just for MVP; the product uses original implementations inspired by open paradigms instead (per `project_prompt.txt`'s explicit instruction).
+- **Any task reproducing a protected clinical assessment verbatim** (e.g. WAIS/WISC Digit Span, standardized OSPAN, the clinical Corsi Block-Tapping Test) — out of scope permanently, not just for MVP; the product uses original implementations inspired by open paradigms instead (per `project_prompt.txt`'s explicit instruction).
 
 ## Next research pass (tracked, not yet done)
 
