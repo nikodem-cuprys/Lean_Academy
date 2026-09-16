@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prisma } from "@lean-academy/db";
 import { createVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/email";
+import { isRateLimited } from "@/lib/rate-limit";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -21,6 +22,17 @@ export async function POST(request: Request) {
     );
   }
   const { email, password, name } = parsed.data;
+
+  // Each successful attempt sends a real verification email (see below)
+  // — this bounds both mass-account-creation abuse and email-bombing a
+  // single address, the same concern forgot-password's limiter guards
+  // against.
+  if (isRateLimited(`register:${email}`, { max: 5, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json(
+      { error: "Too many attempts. Try again later." },
+      { status: 429 }
+    );
+  }
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {

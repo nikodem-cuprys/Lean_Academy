@@ -1,8 +1,10 @@
 // Minimal in-memory sliding-window limiter. Good enough for a single dev
 // instance; a real multi-instance deployment needs a shared store
 // (Redis, etc.) instead — see docs/security.md's rate-limiting
-// requirement, which this only partially satisfies for now (it covers
-// the two new endpoints this feature added, not login/register).
+// requirement. Used on all four auth endpoints it names (login,
+// register, forgot-password, reset-password), all keyed by email since
+// this app has no trusted-proxy IP extraction yet (NextRequest.ip was
+// removed in Next 15+ and needs a hosting-provider-specific source).
 const hits = new Map<string, number[]>();
 
 export function isRateLimited(

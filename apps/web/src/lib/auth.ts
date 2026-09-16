@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@lean-academy/db";
+import { isRateLimited } from "@/lib/rate-limit";
 
 // Auth.js config. See docs/security.md: official OAuth/PKCE for Google
 // and Facebook (never ask users for their provider password), password
@@ -45,6 +46,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const parsed = credentialsSchema.safeParse(rawCredentials);
         if (!parsed.success) return null;
         const { email, password } = parsed.data;
+
+        // Same generic "invalid credentials" outcome (null) as a wrong
+        // password below — a rate-limited attempt must not be
+        // distinguishable from a bad password, or it leaks that this
+        // email is being brute-forced. See docs/security.md's
+        // rate-limiting requirement.
+        if (isRateLimited(`login:${email}`, { max: 10, windowMs: 15 * 60 * 1000 })) {
+          return null;
+        }
 
         const user = await prisma.user.findUnique({ where: { email } });
         // No hashedPassword means this account is OAuth-only — don't
