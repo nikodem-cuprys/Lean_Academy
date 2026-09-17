@@ -31,6 +31,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      // Google's OIDC discovery document (https://accounts.google.com/.well-known/openid-configuration)
+      // advertises authorization_response_iss_parameter_supported: true (RFC 9207), but its real
+      // authorization redirect doesn't actually include an `iss` param -- oauth4webapi's response
+      // validation takes the discovery doc at its word and throws "response parameter 'iss' (issuer)
+      // missing" on every real callback. Supplying these three endpoints explicitly skips OIDC
+      // discovery entirely (see @auth/core's callback/signin handlers: discovery only runs when
+      // token/userinfo URLs are absent), which is the standard workaround for this class of
+      // discovery-vs-actual-response mismatch. These are Google's own long-stable OAuth2 endpoints
+      // (unchanged for years), not something Google is expected to rotate.
+      authorization: { url: "https://accounts.google.com/o/oauth2/v2/auth" },
+      token: { url: "https://oauth2.googleapis.com/token" },
+      userinfo: { url: "https://openidconnect.googleapis.com/v1/userinfo" },
     }),
     Facebook({
       clientId: process.env.FACEBOOK_CLIENT_ID,
