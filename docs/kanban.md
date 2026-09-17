@@ -77,7 +77,27 @@ _Entries below are narrative, not the Card template — that's intentional and h
 
 **WIP limit: 1.** Exactly one card belongs here at a time — pull the next card from Backlog only when this section is empty (Definition of Ready lives in `docs/scrum.md`). When a card is pulled, move its full text here from Backlog rather than duplicating it.
 
-_Currently empty — Entitlement system + honest free/premium split (below, in Done) was Phase 7's first card, broken down ahead of Phase 6 finishing the same way Phase 6 itself was pre-broken-down ahead of Phase 5. The rest of Phase 7 is blocked on real Stripe API keys; the OAuth-redirect loose end needs real provider credentials; the longitudinal trend view needs weeks of real usage. The three Phase 3+ cards that were blocked on "needs its own research pass" (Flanker/Go-No-Go, Skimming training, Reading flexibility training) all got that pass on 2026-09-17 — none cleared the evidence bar, so they stay in Backlog, not Ready (see each card's own note for why). Nothing in the Backlog is genuinely unblocked right now, and none of the remaining blockers (external API keys/credentials, real user usage) are ones a research pass or more code can resolve — see the notes on each remaining section below._
+```text
+Title: Diagnose Google OAuth invalid_client and complete real sign-in verification
+Epic: Authentication
+Priority: P2
+Description: Real Google OAuth credentials were provided 2026-09-17 to verify the redirect/callback round-trip that's never been exercised (see the Auth: login/signup UI Done entry, which flagged this as unverified). Two genuine, unrelated bugs were found and fixed along the way while getting far enough to test this at all (both documented in CLAUDE.md):
+  1. `pnpm dev`/`next dev` silently never read the repo-root `.env` (only `apps/web`'s own directory, which has none) — fixed via `dotenv-cli` in `apps/web/package.json`'s `dev` script, port pinned explicitly since the root `.env` also carries `apps/api`'s `PORT=4000`.
+  2. Google's OIDC discovery document over-advertises RFC 9207 `iss`-parameter support that its real authorization response doesn't include, which made `oauth4webapi` reject every real callback with `response parameter "iss" (issuer) missing` — fixed in `apps/web/src/lib/auth.ts` by pointing the Google provider at explicit, long-stable endpoint URLs instead of relying on discovery.
+  Both fixes are independently verified: the dev server now loads real env values, and one real request got all the way through Google's consent screen and back to our callback (only then hitting the now-fixed `iss` bug) — proving the client ID/secret/redirect-URI wiring itself is correct. What's blocking real completion now is Google's own authorization endpoint returning `Error 401: invalid_client` ("The OAuth client was not found") on most subsequent attempts, despite Google Cloud Console showing the client as Enabled, the test user (nikodem.cuprys@gmail.com) added, and no changes made since. This has persisted over an hour past client creation, longer than Google's typical propagation window, so it may not be pure propagation delay — needs the two configuration checks below before concluding it's just Google-side timing.
+Acceptance criteria:
+- Confirm in Google Cloud Console that the OAuth client's application type is "Web application" (not Desktop/Android/iOS — a mismatched type can produce this exact error for a redirect-based flow)
+- Confirm the OAuth consent screen (where the test user was added) and the OAuth client (`153690746273-...`) belong to the same GCP project (check the project selector) — a mismatch here is a common real-world cause of "client not found"
+- If both check out and invalid_client still occurs, create a fresh OAuth client under the same consent screen and swap the new Client ID/Secret into `.env`, to rule out this specific client record being stuck on Google's side
+- Real browser verification (Claude-in-Chrome first, Playwright fallback per the Definition of Done): clicking "Continue with Google" on `/login` redirects to Google, completes a real sign-in, redirects back, sets a real session cookie, and lands the user signed in on the home page
+- Confirm a real `Account` row is created in Postgres for the Google-linked user (`provider: "google"`), not just a session — matching how the email+password path was verified in the original Auth: login/signup UI card
+- CLAUDE.md's Google `iss`-validation gotcha note (in the Design tokens section) updated to record the final resolution once the invalid_client mystery is solved, so the next person doesn't have to re-diagnose it
+Dependencies: Google Cloud Console access (user-side, to check client type/project/consent screen, or create a fresh client); real Google credentials already in `.env`
+Complexity: S — the code-level fix is done; remaining work is a Google Cloud config check plus one verification pass
+Status: Ready
+```
+
+_Ready holds the Google OAuth diagnosis card above (WIP limit 1). The Facebook OAuth verification card is detailed in Backlog's Phase 2 loose ends section below, blocked on Facebook credentials. The rest of Phase 7 is blocked on real Stripe API keys; the longitudinal trend view needs weeks of real usage. The three Phase 3+ cards that were blocked on "needs its own research pass" (Flanker/Go-No-Go, Skimming training, Reading flexibility training) all got that pass on 2026-09-17 — none cleared the evidence bar, so they stay in Backlog (see each card's own note for why)._
 
 ---
 
@@ -128,7 +148,23 @@ Both items below need inputs that don't exist yet — do not promote to Ready by
 
 ### Phase 2 loose ends (not blocking Phase 5)
 
-- **[Authentication] Verify the real Google/Facebook OAuth redirect** — **In progress 2026-09-17**, real Google credentials provided. Found and fixed two genuine bugs along the way (both documented in CLAUDE.md): (1) `pnpm dev`/`next dev` silently never read the root `.env` at all (only `apps/web`'s own directory, which has none) — fixed via `dotenv-cli` in `apps/web/package.json`'s `dev` script; (2) Google's OIDC discovery document over-advertises RFC 9207 `iss`-parameter support that its real authorization response doesn't include, which made `oauth4webapi` reject every real callback with `response parameter "iss" (issuer) missing` — fixed in `apps/web/src/lib/auth.ts` by pointing the Google provider at explicit, long-stable endpoint URLs instead of relying on discovery. Not yet closed out: a full sign-in-to-session round trip in a real browser is still unconfirmed, blocked by Google intermittently returning `Error 401: invalid_client` for the newly-created OAuth client (one request got all the way to our callback and hit the `iss` bug, proving the client/secret/redirect-URI are wired correctly, but most attempts since have failed at Google's own authorization endpoint — consistent with Google's documented credential-propagation delay, not a code issue). Facebook not yet attempted. Revisit once Google's client stabilizes.
+- The Google half of this loose end is now the detailed Ready card at the top of this file (pulled 2026-09-17) — see there for full status, findings, and acceptance criteria.
+
+```text
+Title: Verify the real Facebook OAuth redirect
+Epic: Authentication
+Priority: P2
+Description: Facebook sign-in is implemented in `apps/web/src/lib/auth.ts` (the `Facebook` provider is wired alongside Google) but has never been exercised with real credentials — `FACEBOOK_CLIENT_ID`/`FACEBOOK_CLIENT_SECRET` are still blank in `.env`. This is the Facebook half of the same loose end the Google Ready card covers; Facebook hasn't been attempted yet, and no bugs have been found or fixed for it specifically. The `pnpm dev` `.env`-loading fix from the Google card already applies here too (it's provider-agnostic), so that part of the groundwork is done — but Facebook's OIDC/OAuth discovery behavior hasn't been checked, and per the Google card's finding, a provider's discovery document overclaiming RFC 9207 `iss` support is a real, previously-unknown-until-now failure mode worth checking proactively rather than assuming Facebook is unaffected.
+Acceptance criteria:
+- A real Facebook Developer app exists with the Facebook Login product added, and `http://localhost:3000/api/auth/callback/facebook` registered as a valid OAuth redirect URI
+- Real `FACEBOOK_CLIENT_ID`/`FACEBOOK_CLIENT_SECRET` added to `.env` (gitignored, never committed)
+- Check whether Facebook's own OIDC/OAuth metadata has the same `authorization_response_iss_parameter_supported`-but-doesn't-send-it mismatch found in Google's implementation; apply the same explicit-endpoint-URLs fix in `auth.ts` if so, and document it in CLAUDE.md alongside the Google note if it recurs (evidence it's a broader oauth4webapi/provider-ecosystem pattern, not a Google-specific fluke)
+- Real browser verification (Claude-in-Chrome first, Playwright fallback per the Definition of Done): "Continue with Facebook" completes end-to-end — redirect to Facebook, real login, redirect back, real session cookie set, user lands signed in on the home page
+- Confirm a real `Account` row is created in Postgres for the Facebook-linked user (`provider: "facebook"`)
+Dependencies: real Facebook OAuth app credentials (a Meta for Developers account and app — Development mode with a registered test user is sufficient for local verification, matching how Google's "Testing" publishing status was used)
+Complexity: S
+Status: Backlog — blocked on Facebook credentials, the same class of blocker Google had until this session
+```
 
 ---
 
