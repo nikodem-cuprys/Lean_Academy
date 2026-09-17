@@ -7,7 +7,7 @@
     "experimental": "Interesting research exists but efficacy has not been established.",
     "unsupported": "Do not use as cognitive training."
   },
-  "lastReviewed": "2026-09-13",
+  "lastReviewed": "2026-09-17",
   "modules": [
     {
       "method": "adaptive-nback-v0",
@@ -124,25 +124,29 @@
     },
     {
       "method": "inhibition-flanker-gonogo-v0",
-      "displayName": "Flanker / Go-No-Go Interference Training",
-      "targetConstruct": "cognitive control (response inhibition, interference resolution)",
-      "population": "healthy adults",
+      "displayName": "Flanker / Go-No-Go / Task-Switching Interference Training",
+      "targetConstruct": "cognitive control (response inhibition, interference resolution, task-switching)",
+      "population": "healthy children, adults, and older adults",
       "evidenceLevel": "limited",
       "trainedTaskImprovement": "supported",
-      "nearTransfer": "limited — mostly restricted to tasks sharing form/function with the trained task",
-      "farTransfer": "not established",
+      "nearTransfer": "limited and paradigm-specific — not a general property of cognitive-control training; observed between closely related interference tasks but not between response-inhibition and interference-control paradigms in the same study",
+      "farTransfer": "not established — a dedicated 21-day task-switching training RCT found a clean far-transfer null (no gain on fluid intelligence, working memory, response inhibition, or interference control)",
       "productionApproved": false,
       "userFacingClaimLimits": [
-        "If shipped, must be framed strictly as within-task practice ('practice managing distraction on this task'), never as general focus/attention improvement"
+        "If shipped, must be framed strictly as within-task practice ('practice managing distraction on this task'), never as general focus/attention/impulse-control improvement"
       ],
       "limitations": [
         "Recent RCTs show limited evidence of transfer even to nearby tasks after online inhibition training",
-        "Flanker/Simon/spatial-Stroop interference scores have documented weak concurrent and convergent validity across individuals, undermining their use as a reliable individual-differences outcome",
+        "A 2024 study found Go/No-Go training did not transfer to the closely related Flanker task, direct evidence the transfer profile is paradigm-specific rather than a general 'cognitive control' construct",
+        "Flanker/Simon/spatial-Stroop interference scores have documented weak concurrent and convergent validity across individuals, undermining their use as a reliable individual-differences outcome; no 2023-2026 rebuttal or replication found that overturns this",
+        "Task-switching training, reviewed as its own paradigm in a dedicated 2026-09-17 pass, does not clear a higher evidence bar than Flanker/Go-No-Go and stays bundled under the same decision rather than becoming a separate module",
         "Not included in MVP catalog pending stronger transfer evidence or a clearly scoped within-task-only framing"
       ],
       "citations": [
         {"authors": "Various", "year": 2023, "title": "Can cognitive training capitalise on near transfer effects? Limited evidence of transfer following online inhibition training in a randomised-controlled trial", "venue": "PMC", "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10637678/"},
-        {"authors": "Rey-Mermet, Gade & Oberauer et al.", "year": 2020, "title": "Interference scores have inadequate concurrent and convergent validity: Should we stop using the flanker, Simon, and spatial Stroop tasks?", "venue": "Cognitive Research: Principles and Implications", "url": "https://link.springer.com/article/10.1186/s41235-020-0207-y"}
+        {"authors": "Rey-Mermet, Gade & Oberauer et al.", "year": 2020, "title": "Interference scores have inadequate concurrent and convergent validity: Should we stop using the flanker, Simon, and spatial Stroop tasks?", "venue": "Cognitive Research: Principles and Implications", "url": "https://link.springer.com/article/10.1186/s41235-020-0207-y"},
+        {"authors": "Wang, Li, Jia, Lian & Li", "year": 2024, "title": "The Development of Response and Interference Inhibition in Children: Evidence from Serious Game Training", "venue": "Children (Basel), PMC10887659", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10887659/"},
+        {"authors": "Zhao, Wang & Maes", "year": 2018, "title": "Training and transfer effects of extensive task-switching training in students", "venue": "Psychological Research, PMC7039846", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7039846/"}
       ]
     },
     {
@@ -231,6 +235,51 @@
       ],
       "citations": [
         {"authors": "Various", "year": 2016, "title": "Perceptual and Cognitive Factors Imposing \"Speed Limits\" on Reading Rate: A Study with Rapid Serial Visual Presentation", "venue": "PMC", "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4835101/"}
+      ]
+    },
+    {
+      "method": "skimming-scanning-v0",
+      "displayName": "Skimming/Scanning Training",
+      "targetConstruct": "reading efficiency (rapid gist/target-detail extraction)",
+      "population": "healthy adult readers (general population and medical-student eye-tracking studies)",
+      "evidenceLevel": "limited",
+      "trainedTaskImprovement": "plausible but not isolated in any dedicated training-outcome study",
+      "nearTransfer": "not supported — comprehension cost is the documented mechanism of skimming, not a side effect training removes",
+      "farTransfer": "not established",
+      "productionApproved": false,
+      "userFacingClaimLimits": [],
+      "limitations": [
+        "Skimming's speed comes from deliberately processing less of the text (fewer/shorter fixations, longer saccades) — a real, well-studied mechanism, not a debunked myth like RSVP, but incompatible with an adaptively-scored exercise that must show rising speed with preserved comprehension",
+        "An adaptive skimming exercise would structurally need rising speed alongside falling comprehension as the 'successful' outcome, conflicting with the project's permanent WPM-must-carry-comprehension rule",
+        "Adjacent ESL/EFL classroom literature claiming comprehension-score gains mostly trains skimming as an exam-answering strategy (locate the answer sentence), a narrower construct than 'read an entire text quickly with preserved comprehension', and is low-rigor (small, no-control-group, single-classroom studies)"
+      ],
+      "citations": [
+        {"authors": "Rayner, Schotter, Masson, Potter & Treiman", "year": 2016, "title": "So Much to Read, So Little Time: How Do We Read, and Can Speed Reading Help?", "venue": "Psychological Science in the Public Interest, 17(1), 4–34", "url": "https://doi.org/10.1177/1529100615623267"},
+        {"authors": "Soltan, Warrington, Sidhu et al.", "year": 2025, "title": "Reading and skimming clinical information: insights from experiments examining medical students' eye movement behaviour", "venue": "BMC Medical Education, 26:76", "url": "https://doi.org/10.1186/s12909-025-08412-z"},
+        {"authors": "Schotter et al.", "year": 2014, "title": "One page of text: eye movements during regular and thorough reading, skimming, and spell checking", "venue": "PMC7198234", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7198234/"}
+      ]
+    },
+    {
+      "method": "reading-flexibility-v0",
+      "displayName": "Reading Flexibility (pace-matches-purpose)",
+      "targetConstruct": "reading efficiency (purpose-adaptive pacing)",
+      "population": "healthy adult readers (Kaakinen & Hyönä); college freshmen (Berger 1966)",
+      "evidenceLevel": "experimental",
+      "trainedTaskImprovement": "not established — no modern study isolates training purpose-adaptive pacing as an intervention",
+      "nearTransfer": "not established",
+      "farTransfer": "not established",
+      "productionApproved": false,
+      "userFacingClaimLimits": [],
+      "limitations": [
+        "Purpose measurably changes reading behavior under instruction (well-established descriptively via eye-tracking), but no RCT or meta-analysis tests whether training someone to do this deliberately produces a benefit beyond natural ability or beyond the already-approved fixed-target paced-reading module",
+        "The one directly on-point outcome study (Berger, 1966) is a 60-year-old ERIC report predating modern trial standards (no randomization/blinding/pre-registration mentioned), with a mixed result even on its own terms",
+        "Hard to operationalize as a trainable, measurable exercise — reading-pedagogy sources treat it as an instructional heuristic, not a validated measurement protocol"
+      ],
+      "citations": [
+        {"authors": "Patberg, J. P., & Lange, J. B.", "year": 1981, "title": "Teaching Reading Flexibility in the Content Areas", "venue": "Reading Horizons: A Journal of Literacy and Language Arts, 21(3)", "url": "https://scholarworks.wmich.edu/reading_horizons/vol21/iss3/11"},
+        {"authors": "Kaakinen, J. K., & Hyönä, J.", "year": 2010, "title": "Task effects on eye movements during reading", "venue": "Journal of Experimental Psychology: Learning, Memory, and Cognition, 36(6), 1561–1566", "url": "https://pubmed.ncbi.nlm.nih.gov/20854008/"},
+        {"authors": "Kaakinen, J. K., & Hyönä, J.", "year": 2014, "title": "Task Relevance Induces Momentary Changes in the Functional Visual Field During Reading", "venue": "Psychological Science, 25(1)", "url": "https://doi.org/10.1177/0956797613512332"},
+        {"authors": "Berger, A.", "year": 1966, "title": "Effectiveness of Four Methods of Increasing Reading Rate, Comprehension, and Flexibility", "venue": "ERIC ED013718", "url": "https://eric.ed.gov/?id=ED013718"}
       ]
     }
   ]
