@@ -21,9 +21,9 @@ export function ScienceView({ data }: { data: ScienceData }) {
       </div>
 
       <div className="mb-4.5 flex gap-6 rounded-lg border border-border bg-surface p-4">
-        <StatCell value={data.reviewedCount} label="reviewed" />
-        <StatCell value={data.implementedCount} label="in your training" />
-        <StatCell value={data.excludedCount} label="excluded" />
+        <StatCell value={data.reviewedCount} label="reviewed" testId="stat-reviewed" />
+        <StatCell value={data.implementedCount} label="in your training" testId="stat-implemented" />
+        <StatCell value={data.excludedCount} label="excluded" testId="stat-excluded" />
       </div>
 
       <div className="rounded-lg border border-border bg-surface px-4.5 py-1 shadow-sm">
@@ -75,9 +75,9 @@ export function ScienceView({ data }: { data: ScienceData }) {
   );
 }
 
-function StatCell({ value, label }: { value: number; label: string }) {
+function StatCell({ value, label, testId }: { value: number; label: string; testId: string }) {
   return (
-    <div>
+    <div data-testid={testId}>
       <div className="font-num text-xl font-bold text-text">{value}</div>
       <div className="text-[11px] text-text-3">{label}</div>
     </div>

@@ -80,6 +80,14 @@ export function ProgressView({ data }: { data: ProgressData }) {
             </div>
           )}
 
+          <Link
+            href="/progress/trends"
+            className="mb-4 block rounded-lg border border-border bg-surface p-4 text-[12.5px] font-bold shadow-sm"
+            data-testid="trends-cta"
+          >
+            {data.isPremium ? "📈 View your long-term trends →" : "🔒 Long-term trends (Premium) →"}
+          </Link>
+
           <div className="mb-4 flex gap-1 rounded-full bg-surface-2 p-1">
             {(["trained", "similar", "broader"] as const).map((t) => (
               <button

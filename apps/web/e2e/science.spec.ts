@@ -34,13 +34,18 @@ test("Science page renders real evidence-registry data, not a hardcoded copy", a
   await expect(page).toHaveURL(/\/science/);
   await expect(page.getByText("The Science", { exact: true })).toBeVisible();
 
-  // Stats card reflects the real registry counts.
-  await expect(page.getByText(String(registry.modules.length), { exact: true })).toBeVisible();
-  await expect(page.getByText("reviewed", { exact: true })).toBeVisible();
-  await expect(page.getByText(String(implementedMethods.length), { exact: true })).toBeVisible();
-  await expect(page.getByText("in your training", { exact: true })).toBeVisible();
-  await expect(page.getByText(String(excluded.length), { exact: true })).toBeVisible();
-  await expect(page.getByText("excluded", { exact: true })).toBeVisible();
+  // Stats card reflects the real registry counts. Scoped by each stat's
+  // own data-testid rather than a bare exact-text digit match — the
+  // registry growing (data/evidence-registry.json now has more excluded
+  // modules than it used to) made two of these counts coincidentally
+  // equal, which a bare getByText("4") can't tell apart (Playwright
+  // strict mode correctly refuses to guess between them).
+  await expect(page.getByTestId("stat-reviewed")).toContainText(String(registry.modules.length));
+  await expect(page.getByTestId("stat-reviewed")).toContainText("reviewed");
+  await expect(page.getByTestId("stat-implemented")).toContainText(String(implementedMethods.length));
+  await expect(page.getByTestId("stat-implemented")).toContainText("in your training");
+  await expect(page.getByTestId("stat-excluded")).toContainText(String(excluded.length));
+  await expect(page.getByTestId("stat-excluded")).toContainText("excluded");
 
   // Every approved module is listed, with its real evidence level.
   for (const mod of approved) {
