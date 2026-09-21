@@ -195,4 +195,100 @@ export const READING_PASSAGES: Passage[] = [
       correctIndex: 1,
     }
   ),
+  passage(
+    "sky-is-blue",
+    "Physics",
+    "beginner",
+    "The sky looks blue because of the way sunlight interacts with gases in the atmosphere. Sunlight looks white, but it's actually every color mixed together, and each color travels as a wave of a different length. As sunlight passes through the atmosphere, it bumps into tiny gas molecules, and shorter wavelengths of light — blues and violets — scatter off those molecules far more than longer wavelengths like red and orange. This scattering, named Rayleigh scattering after the physicist who explained it, spreads blue light across the entire sky, so wherever you look, some of it reaches your eyes. Near sunset, sunlight travels through more atmosphere, so most of the blue has already scattered away, letting the remaining reds and oranges dominate.",
+    {
+      prompt: "According to the passage, why does blue light scatter more than red light in the atmosphere?",
+      choices: [
+        "Blue light travels slower through air than red light",
+        "Blue light has a shorter wavelength, which scatters more off gas molecules",
+        "Red light is absorbed by clouds before it can scatter",
+        "Blue light is scattered only near sunset",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "cat-tongue-barbs",
+    "Biology",
+    "beginner",
+    "A cat's tongue feels like sandpaper because it's covered in hundreds of tiny, backward-curving hooks called papillae, made of the same material as fingernails. Unlike smooth human tongues, these hooks aren't for tasting — they're a built-in grooming and eating tool. When a cat licks its fur, the papillae comb through it like a hairbrush, pulling out loose hair and spreading natural oils that keep the coat waterproof. The same hooks let a cat scrape every last bit of meat off a bone in the wild, something a smooth tongue couldn't manage nearly as well. Scientists studying the structure found that the hollow tips of the papillae can even scoop up and hold onto saliva, helping cats groom deep into their fur without needing to relick constantly.",
+    {
+      prompt: "According to the passage, what surprising ability did scientists find the hollow tips of a cat's papillae have?",
+      choices: [
+        "They can detect the temperature of food",
+        "They can scoop up and hold saliva for deeper grooming",
+        "They regrow within a day if damaged",
+        "They release the oils that waterproof the coat",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "spacing-effect",
+    "Psychology",
+    "intermediate",
+    "In the 1880s, the German psychologist Hermann Ebbinghaus ran a series of memory experiments on himself, memorizing lists of nonsense syllables and testing how much he forgot over time. His results produced the famous \"forgetting curve,\" showing that memory fades fastest right after learning and then levels off. But Ebbinghaus also noticed something else: if he reviewed the same material again after a delay, rather than repeating it right away, the second review strengthened his memory far more than immediate repetition did. Later researchers named this the spacing effect, and it has been replicated across languages, ages, and subjects ever since. The practical lesson is counterintuitive to how most people study: cramming the night before a test produces material that feels well-learned but fades quickly, while spacing the same amount of review across several days produces a weaker initial feeling of mastery but far stronger long-term retention. Modern spaced-repetition software is built directly on this finding, timing reviews to arrive just as a memory is about to be forgotten.",
+    {
+      prompt: "According to the passage, why does cramming the night before a test feel effective even though it produces worse long-term retention?",
+      choices: [
+        "It relies on caffeine rather than genuine memory formation",
+        "The material feels well-learned in the moment but fades quickly afterward",
+        "It activates a different part of the brain than spaced review does",
+        "Ebbinghaus proved cramming works better for nonsense syllables specifically",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "how-caves-form",
+    "Geology",
+    "intermediate",
+    "Most large caves form through a slow chemical reaction between rock and water rather than any dramatic single event. Rainwater absorbs carbon dioxide as it falls and moves through soil, turning it into a weak carbonic acid. When that slightly acidic water seeps into cracks in limestone bedrock, it slowly dissolves the calcium carbonate the rock is made of, widening the cracks over thousands of years into tunnels and chambers. This process, called karstification, happens far below the surface and can continue even after a cave's ceiling has largely stabilized. The stalactites and stalagmites often found inside form through a related but separate process: as mineral-rich water drips from the ceiling, tiny amounts of dissolved limestone are left behind each time a drop evaporates, building up formations that can take centuries to grow just a few inches. Because the entire process depends on slightly acidic water finding its way through soluble rock, caves are far more common in regions with limestone bedrock than in regions built on harder, less soluble stone like granite.",
+    {
+      prompt: "According to the passage, what is the difference between how a cave's tunnels form and how its stalactites form?",
+      choices: [
+        "Tunnels form from acid dissolving rock, while stalactites form from mineral deposits left by evaporating water",
+        "Tunnels form quickly, while stalactites take thousands of years",
+        "Stalactites form only in granite caves, while tunnels form in limestone",
+        "Both form through the exact same evaporation process",
+      ],
+      correctIndex: 0,
+    }
+  ),
+  passage(
+    "brain-neuroplasticity",
+    "Neuroscience",
+    "advanced",
+    "For much of the twentieth century, neuroscientists believed the adult brain was essentially fixed — that its network of neural connections was set during childhood and could only decline afterward. That view has been overturned by decades of research into neuroplasticity, the brain's capacity to physically reorganize itself in response to experience, learning, or injury, well into adulthood. One of the most striking demonstrations came from studying patients recovering from strokes that damaged the brain regions controlling movement or speech. Rather than those functions simply staying lost, brain-imaging studies showed neighboring or even distant regions gradually taking over some of the damaged area's responsibilities, forming new connections through a process called synaptic remodeling. This reorganization isn't automatic or guaranteed, however — it appears to depend heavily on repeated, effortful practice of the impaired skill, which is why intensive rehabilitation therapy after a stroke often produces measurably better recovery than rest alone. Researchers caution against overstating the finding: neuroplasticity doesn't mean the adult brain can rewire itself as freely as a child's, and recovery of complex functions like fluent speech remains far from guaranteed. Still, the discovery reshaped rehabilitation medicine, shifting therapy away from simply managing permanent loss and toward actively training the brain to recruit new tissue for old jobs.",
+    {
+      prompt: "According to the passage, why does intensive rehabilitation therapy tend to produce better stroke recovery than rest alone?",
+      choices: [
+        "Rest allows damaged neurons to regenerate on their own",
+        "Neuroplasticity's reorganization depends on repeated, effortful practice of the impaired skill",
+        "Therapy prevents any further brain damage from occurring",
+        "The adult brain rewires as freely as a child's brain during rehabilitation",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "coral-bleaching",
+    "Environmental Science",
+    "advanced",
+    "A coral reef's vivid color comes not from the coral animal itself, which is nearly transparent, but from microscopic algae called zooxanthellae that live inside its tissue in a close partnership: the coral provides the algae shelter and compounds it needs for photosynthesis, and in exchange the algae supply the coral with the majority of its energy and its color. That partnership becomes fragile under heat stress. When water temperatures rise even one or two degrees Celsius above a reef's normal summer maximum for an extended period, the algae's photosynthesis starts producing toxic byproducts faster than the coral can safely process them, and the coral responds by expelling its own algae en masse. Without the algae, the coral's transparent tissue reveals the white calcium-carbonate skeleton underneath, the phenomenon known as coral bleaching. A bleached coral is not automatically dead — if temperatures drop back down quickly enough, it can sometimes recruit new algae and recover — but a prolonged bleaching event leaves it without its main energy source, and corals that stay bleached for too long typically starve. Because reef-building corals grow so slowly, a reef that suffers repeated severe bleaching events in close succession often cannot regrow fast enough between them to recover, which is why scientists treat the frequency of bleaching events, not just their individual severity, as the more alarming long-term trend.",
+    {
+      prompt: "According to the passage, why do scientists consider the frequency of bleaching events, not just their severity, especially alarming?",
+      choices: [
+        "Frequent events prevent reefs from growing back before the next one hits",
+        "Frequent events cause the algae to become permanently toxic",
+        "Severity has no real effect on coral survival",
+        "Frequent bleaching events are always more severe than isolated ones",
+      ],
+      correctIndex: 0,
+    }
+  ),
 ];

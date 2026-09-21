@@ -18,6 +18,7 @@ const emails = {
   keyboard: `e2e-a11y-kb-${Date.now()}@example.com`,
   nback: `e2e-a11y-nback-${Date.now()}@example.com`,
   complexSpan: `e2e-a11y-cspan-${Date.now()}@example.com`,
+  diceSum: `e2e-a11y-dicesum-${Date.now()}@example.com`,
   spatial: `e2e-a11y-spatial-${Date.now()}@example.com`,
   reading: `e2e-a11y-reading-${Date.now()}@example.com`,
 };
@@ -81,6 +82,7 @@ test.describe("Accessibility (axe-core)", () => {
   const exerciseCases: { name: string; email: string; linkPattern: RegExp; testId: string }[] = [
     { name: "N-Back", email: emails.nback, linkPattern: /Try the N-Back exercise/, testId: "respond-button" },
     { name: "Complex Span", email: emails.complexSpan, linkPattern: /Try the Complex Span exercise/, testId: "true-button" },
+    { name: "Dice Sum", email: emails.diceSum, linkPattern: /Try the Dice Sum exercise/, testId: "hide-dice-button" },
     { name: "Spatial Sequence", email: emails.spatial, linkPattern: /Try the Spatial Sequence exercise/, testId: "grid-cell-0" },
     { name: "Paced Reading", email: emails.reading, linkPattern: /Try the Paced Reading exercise/, testId: "finish-reading-button" },
   ];

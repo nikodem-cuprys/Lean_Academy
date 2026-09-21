@@ -3,6 +3,7 @@ export * from "./complex-span";
 export * from "./spatial-sequence";
 export * from "./backward-digit-span";
 export * from "./backward-spatial-span";
+export * from "./dice-sum";
 
 /**
  * Still placeholder: verbal-sequencing-v0, and the

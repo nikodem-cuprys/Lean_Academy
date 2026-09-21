@@ -47,6 +47,40 @@ const TOTAL_PASSAGES = 5;
 const CHUNK_SIZE = 4; // words per pacer highlight step
 const FEEDBACK_MS = 1400;
 
+// Text-size and text-width are per-viewer reading comfort preferences,
+// not exercise state — persisted in localStorage (guarded, since this
+// runs client-side only) rather than the DB, same rationale as any
+// other purely-cosmetic per-device setting. Purely additive: they
+// don't touch pacing, timing, or scoring.
+type TextSize = "normal" | "large" | "xlarge";
+const TEXT_SIZES: readonly TextSize[] = ["normal", "large", "xlarge"];
+const TEXT_SIZE_CLASS: Record<TextSize, string> = {
+  normal: "text-[15.5px]",
+  large: "text-[18px]",
+  xlarge: "text-[21px]",
+};
+const TEXT_SIZE_STORAGE_KEY = "lean-academy:reading-text-size";
+const WIDE_TEXT_STORAGE_KEY = "lean-academy:reading-wide-text";
+
+function loadStringPreference<T extends string>(key: string, allowed: readonly T[], fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const stored = window.localStorage.getItem(key);
+    return (allowed as readonly string[]).includes(stored ?? "") ? (stored as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function storePreference(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Best-effort only — a private window or blocked storage just means
+    // the preference resets next visit, not a broken exercise.
+  }
+}
+
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve) => {
     const t = setTimeout(resolve, ms);
@@ -87,6 +121,25 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<{ correct: boolean; correctText: string } | null>(null);
   const [results, setResults] = useState<Results | null>(null);
+  const [textSize, setTextSize] = useState<TextSize>(() =>
+    loadStringPreference(TEXT_SIZE_STORAGE_KEY, TEXT_SIZES, "normal")
+  );
+  const [wideText, setWideText] = useState(
+    () => loadStringPreference(WIDE_TEXT_STORAGE_KEY, ["on", "off"] as const, "off") === "on"
+  );
+
+  function handleSetTextSize(size: TextSize) {
+    setTextSize(size);
+    storePreference(TEXT_SIZE_STORAGE_KEY, size);
+  }
+
+  function handleToggleWideText() {
+    setWideText((w) => {
+      const next = !w;
+      storePreference(WIDE_TEXT_STORAGE_KEY, next ? "on" : "off");
+      return next;
+    });
+  }
 
   const finishReadingResolveRef = useRef<(() => void) | null>(null);
   const submitAnswerResolveRef = useRef<((choice: number) => void) | null>(null);
@@ -245,7 +298,9 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
   }
 
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5">
+    <div
+      className={`flex w-full flex-1 flex-col px-5 py-5 transition-[max-width] ${wideText ? "max-w-[640px]" : "max-w-[390px]"}`}
+    >
       <div className="mb-2 flex items-center justify-between">
         <Link href="/" aria-label="Exit exercise">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -274,7 +329,45 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
 
       {passage && phase === "reading" && (
         <div className="flex flex-1 flex-col">
-          <div className="mb-2 flex justify-end">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <div role="group" aria-label="Text size" className="flex items-center gap-1 rounded-full border border-border p-0.5">
+                {TEXT_SIZES.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    data-testid={`text-size-${size}`}
+                    aria-pressed={textSize === size}
+                    aria-label={
+                      size === "normal" ? "Normal text size" : size === "large" ? "Large text size" : "Extra large text size"
+                    }
+                    onClick={() => handleSetTextSize(size)}
+                    className="min-h-[24px] min-w-[24px] rounded-full px-2 py-1.5 font-body font-bold leading-none"
+                    style={{
+                      fontSize: size === "normal" ? 12 : size === "large" ? 14 : 16,
+                      background: textSize === size ? "var(--color-reading-soft)" : "transparent",
+                      color: textSize === size ? "var(--color-reading)" : "var(--color-text-3)",
+                    }}
+                  >
+                    A
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                data-testid="wide-text-toggle"
+                aria-pressed={wideText}
+                onClick={handleToggleWideText}
+                className="min-h-[24px] rounded-full border-[1.5px] px-2.5 py-1.5 font-body text-[12px] font-bold"
+                style={{
+                  borderColor: wideText ? "var(--color-reading)" : "var(--color-border)",
+                  background: wideText ? "var(--color-reading-soft)" : "transparent",
+                  color: wideText ? "var(--color-reading)" : "var(--color-text-3)",
+                }}
+              >
+                Wide
+              </button>
+            </div>
             <div
               data-testid="target-wpm"
               className="rounded-full px-3 py-1 font-num text-[13px] font-bold text-reading"
@@ -283,7 +376,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
               {targetWpm} WPM
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto text-[15.5px] leading-relaxed text-text-2">
+          <div className={`flex-1 overflow-y-auto leading-relaxed text-text-2 ${TEXT_SIZE_CLASS[textSize]}`}>
             {chunkWords(passage.text).map((chunk, i) => (
               <span
                 key={i}

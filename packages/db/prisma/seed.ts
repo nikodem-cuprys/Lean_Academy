@@ -72,6 +72,7 @@ async function main() {
 const IMPLEMENTED_TASKS = [
   { method: "adaptive-nback-v0", displayName: "Adaptive N-Back", domain: "WORKING_MEMORY" },
   { method: "complex-span-v0", displayName: "Complex Span", domain: "WORKING_MEMORY" },
+  { method: "dice-sum-v0", displayName: "Dice Sum", domain: "WORKING_MEMORY" },
   { method: "visuospatial-sequence-recall-v0", displayName: "Spatial Sequence Recall", domain: "SPATIAL" },
   { method: "reading-paced-adaptive-v0", displayName: "Paced / Adaptive Reading", domain: "READING" },
 ] as const;

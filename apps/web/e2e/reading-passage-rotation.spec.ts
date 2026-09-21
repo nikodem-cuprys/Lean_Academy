@@ -220,14 +220,27 @@ test("a second real session reads the least-recently-seen passages first, not a 
   expect(unseenAfterFirstRun.length).toBe(READING_PASSAGES.length - 5);
 
   // The real rotation: every passage never read in the first run must
-  // come before any repeat in the second run.
-  const secondRunFirstBatch = secondRun.slice(0, unseenAfterFirstRun.length);
-  expect(new Set(secondRunFirstBatch)).toEqual(new Set(unseenAfterFirstRun));
+  // come before any repeat in the second run. The bank may hold more
+  // than two sessions' worth of passages (it's grown since this test
+  // was first written — see docs/kanban.md's reading-passage-bank
+  // card), in which case a whole second run can be filled by genuinely
+  // unseen passages with no repeat happening yet at all; this asserts
+  // exactly that many of the second run's reads are unseen, whether
+  // that's the full run or fewer.
+  const expectedUnseenInSecondRun = Math.min(unseenAfterFirstRun.length, secondRun.length);
+  const secondRunFirstBatch = secondRun.slice(0, expectedUnseenInSecondRun);
+  expect(secondRunFirstBatch.length).toBe(expectedUnseenInSecondRun);
+  expect(new Set(secondRunFirstBatch).size).toBe(expectedUnseenInSecondRun); // no repeats among them
+  for (const id of secondRunFirstBatch) {
+    expect(unseenAfterFirstRun).toContain(id);
+  }
 
-  // Once the never-seen ones are exhausted, the least-recently-seen of
-  // the already-read passages is whichever one was read *first* in the
-  // first run (furthest in the past by the time the second run starts).
-  const remainder = secondRun.slice(unseenAfterFirstRun.length);
+  // Once the never-seen ones are exhausted (only reachable once the
+  // bank is small enough relative to one session), the least-recently-
+  // seen of the already-read passages is whichever one was read
+  // *first* in the first run (furthest in the past by the time the
+  // second run starts).
+  const remainder = secondRun.slice(expectedUnseenInSecondRun);
   if (remainder.length > 0) {
     expect(remainder[0]).toBe(firstRun[0]);
   }

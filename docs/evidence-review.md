@@ -211,6 +211,25 @@ The hard physiological constraint behind this: the **perceptual span** — the r
 
 ---
 
+## 15. Working-memory maintenance/updating — Dice Sum (arithmetic combination task)
+
+**What it is:** A fixed set of dice faces (quantity adapts with difficulty) is shown briefly; the user must hold all of the shown values in mind, mentally sum them once they're hidden, and type the total. Structurally distinct from n-back (no continuous match judgment), complex span (no alternating processing/recall steps), and spatial sequence recall (values are shown simultaneously, not as a to-be-reordered sequence) — the combination step here is a single arithmetic operation (addition) applied across everything held in mind at once, an original task, not a reproduction of any clinical or standardized instrument.
+
+**Evidence quality: Limited.** No dedicated training study of this exact "hold several values, then sum them" task was found in this pass. Like §2's Running Memory/Keep-Track, it is treated as inheriting evidence from the broader working-memory-updating/maintenance literature that n-back and complex-span training draw on, on the reasoning that the core mechanism under exercise — holding multiple discrete items in working memory and then operating on all of them together — is the same updating/maintenance demand, not a new claim requiring its own literature search.
+
+- **Trained-task improvement:** Supported (same basis as n-back/keep-track: performance on the trained task itself reliably improves with practice).
+- **Near transfer:** Limited — shares the working-memory maintenance/updating mechanism with n-back and complex-span training but has no dedicated training studies of its own, same evidentiary position as §2.
+- **Far transfer:** Not established.
+- **Population:** Healthy adults (inherited from the n-back/WM-updating literature below; no age-specific studies of this task exist).
+- **Limitations:** No dedicated RCTs exist for this specific task shape; evidence is entirely inherited from the broader n-back/WM-updating literature, the same reasoning already applied to `running-memory-keep-track-v0`. Performance also depends partly on subitizing speed and basic addition fluency, skills this task doesn't isolate from working-memory capacity — copy must never claim it improves general math or arithmetic ability, only working-memory practice using an arithmetic response format.
+- **Citations:**
+  - Soveri, Antfolk, Karlsson, Salo & Laine (2017). *Working memory training revisited: A multi-level meta-analysis of n-back training studies.* Psychonomic Bulletin & Review. https://link.springer.com/article/10.3758/s13423-016-1217-0
+  - Melby-Lervåg, Redick & Hulme (2016). *Working Memory Training Does Not Improve Performance on Measures of Intelligence or Other Measures of "Far Transfer".* Perspectives on Psychological Science. https://journals.sagepub.com/doi/10.1177/1745691616635612
+
+**Production decision: Approved**, positioned as a secondary WM maintenance/updating practice variant (registry id `dice-sum-v0`), same evidentiary footing as Running Memory/Keep-Track — not independently validated to the same degree as n-back, and copy must never frame the arithmetic step as trained math/numeracy improvement.
+
+---
+
 ## Domains reviewed and deliberately excluded from this version
 
 - **Stop-Signal Task, Task Switching** — reviewed alongside Flanker/Go-No-Go in section 6 (task-switching given its own dedicated 2026-09-17 literature pass per the "Next research pass" item below); same limited-transfer profile, same decision (not approved for MVP).

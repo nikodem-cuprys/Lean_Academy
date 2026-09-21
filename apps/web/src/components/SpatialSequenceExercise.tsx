@@ -151,7 +151,14 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete }: Sessi
 
   function handleTap(position: number) {
     if (phase !== "recall" || sequenceLength === null) return;
-    if (tappedRef.current.includes(position)) return;
+    if (tappedRef.current.includes(position)) {
+      // Tapping an already-selected square deselects just that one,
+      // shifting later taps' order numbers down — not only undoable via
+      // the separate Undo button (which only ever removes the last tap).
+      tappedRef.current = tappedRef.current.filter((p) => p !== position);
+      setTapped(tappedRef.current);
+      return;
+    }
     if (tappedRef.current.length >= sequenceLength) return;
     tappedRef.current = [...tappedRef.current, position];
     setTapped(tappedRef.current);

@@ -123,6 +123,13 @@
    */
   --animate-fade-in-up: fade-in-up var(--duration-transition) var(--ease-standard);
   --animate-celebration-pop: celebration-pop var(--duration-celebration) var(--ease-celebration);
+  /*
+   * animate-dice-countdown: a purely decorative shrinking bar mirroring
+   * DiceSumExercise's own JS-timed SHOW_MS window (the actual timer is
+   * a setTimeout, unaffected by this) — its duration is set per-use via
+   * an inline animationDuration override, not this token's default.
+   */
+  --animate-dice-countdown: dice-countdown linear forwards;
 }
 
 @keyframes fade-in-up {
@@ -133,6 +140,15 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes dice-countdown {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
   }
 }
 

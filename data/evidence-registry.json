@@ -7,7 +7,7 @@
     "experimental": "Interesting research exists but efficacy has not been established.",
     "unsupported": "Do not use as cognitive training."
   },
-  "lastReviewed": "2026-09-17",
+  "lastReviewed": "2026-09-21",
   "modules": [
     {
       "method": "adaptive-nback-v0",
@@ -280,6 +280,29 @@
         {"authors": "Kaakinen, J. K., & Hyönä, J.", "year": 2010, "title": "Task effects on eye movements during reading", "venue": "Journal of Experimental Psychology: Learning, Memory, and Cognition, 36(6), 1561–1566", "url": "https://pubmed.ncbi.nlm.nih.gov/20854008/"},
         {"authors": "Kaakinen, J. K., & Hyönä, J.", "year": 2014, "title": "Task Relevance Induces Momentary Changes in the Functional Visual Field During Reading", "venue": "Psychological Science, 25(1)", "url": "https://doi.org/10.1177/0956797613512332"},
         {"authors": "Berger, A.", "year": 1966, "title": "Effectiveness of Four Methods of Increasing Reading Rate, Comprehension, and Flexibility", "venue": "ERIC ED013718", "url": "https://eric.ed.gov/?id=ED013718"}
+      ]
+    },
+    {
+      "method": "dice-sum-v0",
+      "displayName": "Dice Sum",
+      "targetConstruct": "working memory maintenance and updating with an arithmetic combination step",
+      "population": "healthy adults",
+      "evidenceLevel": "limited",
+      "trainedTaskImprovement": "supported",
+      "nearTransfer": "limited — shares the working-memory maintenance/updating mechanism with n-back and complex-span training but has no dedicated training studies of its own",
+      "farTransfer": "not established",
+      "productionApproved": true,
+      "userFacingClaimLimits": [
+        "Present as a variant working-memory maintenance/updating practice task, not as independently validated beyond the general n-back/complex-span updating literature",
+        "Never claim improvement in general math or arithmetic ability — the arithmetic step is a fixed-difficulty response format, not a trained skill this task adapts"
+      ],
+      "limitations": [
+        "No dedicated training-study literature exists for this exact dice-sum/arithmetic-combination task; evidence is inherited from the broader n-back/WM-updating literature, the same reasoning already applied to running-memory-keep-track-v0",
+        "Performance may be confounded by baseline subitizing speed and addition fluency rather than working-memory capacity alone, so individual variation partly reflects a skill this task doesn't isolate or train"
+      ],
+      "citations": [
+        {"authors": "Soveri, Antfolk, Karlsson, Salo & Laine", "year": 2017, "title": "Working memory training revisited: A multi-level meta-analysis of n-back training studies", "venue": "Psychonomic Bulletin & Review", "url": "https://link.springer.com/article/10.3758/s13423-016-1217-0"},
+        {"authors": "Melby-Lervåg, Redick & Hulme", "year": 2016, "title": "Working Memory Training Does Not Improve Performance on Measures of Intelligence or Other Measures of \"Far Transfer\": Evidence From a Meta-Analytic Review", "venue": "Perspectives on Psychological Science", "url": "https://journals.sagepub.com/doi/10.1177/1745691616635612"}
       ]
     }
   ]

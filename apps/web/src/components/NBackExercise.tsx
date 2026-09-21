@@ -98,6 +98,16 @@ export function NBackExercise({ initialDifficulty, onComplete }: SessionModeProp
           document.addEventListener("visibilitychange", onVis);
           respondRef.current = finish;
           const timer = setTimeout(() => finish(false), STIMULUS_MS);
+          // Without this, an aborted run (e.g. React Strict Mode's
+          // dev-only double-invoke of this effect on mount) keeps
+          // waiting out its own full STIMULUS_MS timer before checking
+          // controller.signal.aborted, during which it's still calling
+          // setState on every trial alongside the new, real run — two
+          // concurrent loops fighting over the same UI state, which is
+          // exactly what made the exercise feel broken/glitchy right
+          // after starting it in dev. Aborting now resolves this wait
+          // immediately, same as the sleep() helper already does.
+          controller.signal.addEventListener("abort", () => finish(false), { once: true });
         });
 
         if (controller.signal.aborted) return;
@@ -206,7 +216,9 @@ export function NBackExercise({ initialDifficulty, onComplete }: SessionModeProp
       </div>
 
       <div className="mb-8 text-center font-display text-[19px] font-bold text-text">
-        Tap the square if it matches {currentN ?? "…"} step{currentN === 1 ? "" : "s"} back
+        {stimulus && !stimulus.isScoreable
+          ? "Memorize this — matching hasn't started yet"
+          : `Tap the square if it matches ${currentN ?? "…"} step${currentN === 1 ? "" : "s"} back`}
       </div>
 
       <div className="flex flex-1 items-center justify-center">
@@ -252,7 +264,11 @@ export function NBackExercise({ initialDifficulty, onComplete }: SessionModeProp
         </button>
       </div>
       <div className="h-[18px] text-center text-[12.5px] font-bold text-success">
-        {feedback?.correct ? "Correct — nice catch" : ""}
+        {feedback?.correct
+          ? "Correct — nice catch"
+          : phase === "feedback" && stimulus && !stimulus.isScoreable
+            ? <span className="font-bold text-text-3">Not scored — still building the pattern</span>
+            : ""}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { NBackExercise } from "./NBackExercise";
 import { ComplexSpanExercise } from "./ComplexSpanExercise";
 import { SpatialSequenceExercise } from "./SpatialSequenceExercise";
 import { PacedReadingExercise } from "./PacedReadingExercise";
+import { DiceSumExercise } from "./DiceSumExercise";
 import type { ExerciseSessionOutcome, SessionModeProps } from "@/lib/session-types";
 import type { TodaysExercise } from "@/lib/todays-training";
 import type { StreakOutcome } from "@/lib/streak";
@@ -27,6 +28,7 @@ const EXERCISE_COMPONENTS: Record<string, React.ComponentType<SessionModeProps>>
   "complex-span-v0": ComplexSpanExercise,
   "visuospatial-sequence-recall-v0": SpatialSequenceExercise,
   "reading-paced-adaptive-v0": PacedReadingExercise,
+  "dice-sum-v0": DiceSumExercise,
 };
 
 const DOMAIN_LABELS: Record<string, string> = {
