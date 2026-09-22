@@ -6,15 +6,22 @@ import {
   PACED_METHODS,
   DIE_SIDES_OPTIONS,
   DICE_METHOD,
+  GRID_SIZE_OPTIONS,
+  SPATIAL_METHOD,
   setPacePreference,
   setDieSidesPreference,
+  setGridSizePreference,
 } from "@/lib/exercise-preferences";
 
 // Backs the /settings/exercises page — one real, free preference write
 // per exercise (see exercise-preferences.ts's own header for the scope
 // decision). A paced exercise (N-Back/Complex Span/Spatial Sequence)
 // sends { method, pace }; Dice Sum sends { method: "dice-sum-v0",
-// dieSides }.
+// dieSides }; Spatial Sequence's grid size is a second, independent
+// setting on the same method, sent as { method: "visuospatial-sequence-
+// recall-v0", gridSize } — exercise-preferences.ts's setters merge
+// into the existing settings row rather than overwriting it, so this
+// and a separate pace update never clobber each other.
 
 const dieSidesSchema = z
   .number()
@@ -22,9 +29,16 @@ const dieSidesSchema = z
     message: `dieSides must be one of ${DIE_SIDES_OPTIONS.join(", ")}`,
   });
 
+const gridSizeSchema = z
+  .number()
+  .refine((n): n is (typeof GRID_SIZE_OPTIONS)[number] => (GRID_SIZE_OPTIONS as readonly number[]).includes(n), {
+    message: `gridSize must be one of ${GRID_SIZE_OPTIONS.join(", ")}`,
+  });
+
 const bodySchema = z.union([
   z.object({ method: z.enum(PACED_METHODS), pace: z.enum(PACE_PRESETS) }),
   z.object({ method: z.literal(DICE_METHOD), dieSides: dieSidesSchema }),
+  z.object({ method: z.literal(SPATIAL_METHOD), gridSize: gridSizeSchema }),
 ]);
 
 export async function PUT(request: Request) {
@@ -41,8 +55,10 @@ export async function PUT(request: Request) {
 
   if ("pace" in parsed.data) {
     await setPacePreference(session.user.id, parsed.data.method, parsed.data.pace);
-  } else {
+  } else if ("dieSides" in parsed.data) {
     await setDieSidesPreference(session.user.id, parsed.data.dieSides);
+  } else {
+    await setGridSizePreference(session.user.id, parsed.data.gridSize);
   }
 
   return NextResponse.json({ success: true });

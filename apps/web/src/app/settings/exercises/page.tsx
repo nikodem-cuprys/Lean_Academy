@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { parseEvidenceRegistry, getApprovedModules } from "@lean-academy/evidence";
 import { auth } from "@/lib/auth";
-import { getAllExercisePreferences, PACED_METHODS, DICE_METHOD, type PacedMethod } from "@/lib/exercise-preferences";
+import { getAllExercisePreferences, PACED_METHODS, DICE_METHOD, SPATIAL_METHOD, type PacedMethod } from "@/lib/exercise-preferences";
 import { ExerciseSettingsView } from "@/components/ExerciseSettingsView";
 // Imported (not read via fs) — same reason page.tsx already documents:
 // Next's server bundle virtualizes __dirname, breaking the fs-based
@@ -32,9 +32,15 @@ export default async function ExerciseSettingsPage() {
     dieSides: preferences.dieSides,
   };
 
+  const spatialGridExercise = {
+    method: SPATIAL_METHOD,
+    displayName: displayNameByMethod.get(SPATIAL_METHOD) ?? "Spatial Sequence Recall",
+    gridSize: preferences.gridSize,
+  };
+
   return (
     <main className="flex flex-1 flex-col items-center">
-      <ExerciseSettingsView pacedExercises={pacedExercises} diceExercise={diceExercise} />
+      <ExerciseSettingsView pacedExercises={pacedExercises} diceExercise={diceExercise} spatialGridExercise={spatialGridExercise} />
     </main>
   );
 }

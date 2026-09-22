@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { SpatialSequenceTask } from "@lean-academy/cognitive-engine";
+import { SpatialSequenceTask, type SpatialGridSize } from "@lean-academy/cognitive-engine";
 import {
   epochOffsetMs,
   perfToEpochMs,
@@ -24,7 +24,18 @@ import type { PacePreset } from "@/lib/exercise-preferences";
 
 const TOTAL_SEQUENCES = 5;
 const FEEDBACK_MS = 900;
-const GRID_SIZE = 9;
+
+// Free, opt-in grid-size customization (see apps/web/src/lib/exercise-preferences.ts).
+// 9 (3x3) is the standard grid prototype/ExerciseSpatial.dc.html shows;
+// 4x4/5x5 give a genuinely bigger board (and, per SpatialSequenceTask's
+// own default, a genuinely higher difficulty ceiling) rather than just
+// a cosmetic change. Pixel width per grid so cells stay a comfortable
+// tap-target size at any size rather than shrinking a fixed 250px board.
+const GRID_WIDTH_PX_BY_SIZE: Record<SpatialGridSize, number> = {
+  9: 250,
+  16: 280,
+  25: 320,
+};
 
 // Free, opt-in pace customization (see apps/web/src/lib/exercise-preferences.ts).
 // STANDARD (800ms display / 300ms gap) is the pace this exercise's
@@ -67,11 +78,15 @@ interface Results {
 interface SpatialSequenceExerciseProps extends SessionModeProps {
   /** Free customization — defaults to STANDARD (the studied pace) when omitted, same as session mode always gets. */
   pace?: PacePreset;
+  /** Free customization — defaults to the standard 3x3 (9-cell) grid when omitted, same as session mode always gets. */
+  gridSize?: SpatialGridSize;
 }
 
-export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace }: SpatialSequenceExerciseProps = {}) {
+export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, gridSize }: SpatialSequenceExerciseProps = {}) {
   const itemDisplayMs = ITEM_DISPLAY_MS_BY_PACE[pace ?? "STANDARD"];
   const itemGapMs = ITEM_GAP_MS_BY_PACE[pace ?? "STANDARD"];
+  const effectiveGridSize: SpatialGridSize = gridSize ?? 9;
+  const gridColumns = Math.sqrt(effectiveGridSize);
   const [phase, setPhase] = useState<Phase>("study");
   const [sequenceNumber, setSequenceNumber] = useState(0);
   const [sequenceLength, setSequenceLength] = useState<number | null>(null);
@@ -85,7 +100,10 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace }:
 
   useEffect(() => {
     const controller = new AbortController();
-    const task = new SpatialSequenceTask(initialDifficulty !== undefined ? { initialDifficulty } : {});
+    const task = new SpatialSequenceTask({
+      ...(initialDifficulty !== undefined ? { initialDifficulty } : {}),
+      gridSize: effectiveGridSize,
+    });
     const startDifficulty = task.getCurrentDifficulty();
     const sequences: SequenceSummary[] = [];
     const offsetMs = epochOffsetMs();
@@ -202,7 +220,12 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace }:
   }
 
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5" data-testid="spatial-sequence-exercise" data-pace={pace ?? "STANDARD"}>
+    <div
+      className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5"
+      data-testid="spatial-sequence-exercise"
+      data-pace={pace ?? "STANDARD"}
+      data-grid-size={effectiveGridSize}
+    >
       <div className="mb-2 flex items-center justify-between">
         <Link href="/" aria-label="Exit exercise">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -243,8 +266,11 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace }:
         <div data-testid="highlighted-cell" className="hidden">
           {highlighted !== null ? highlighted : ""}
         </div>
-        <div className="mb-6 grid w-[250px] grid-cols-3 gap-3.5">
-          {Array.from({ length: GRID_SIZE }, (_, i) => {
+        <div
+          className="mb-6 grid gap-3.5"
+          style={{ width: `${GRID_WIDTH_PX_BY_SIZE[effectiveGridSize]}px`, gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` }}
+        >
+          {Array.from({ length: effectiveGridSize }, (_, i) => {
             const isHighlighted = phase === "study" && highlighted === i;
             const tapOrder = tapped.indexOf(i);
             return (

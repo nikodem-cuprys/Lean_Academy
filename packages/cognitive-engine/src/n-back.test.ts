@@ -105,17 +105,17 @@ describe("NBackTask — difficulty only moves through the rolling-window engine"
     const outcome = task.recordResponse(false, { timestamp: 1 }); // miss
     expect(outcome).toMatchObject({ scored: true, classification: "miss" });
     if (outcome.scored) {
-      expect(outcome.updatedDifficulty).toBe(2); // unchanged — window (5) not full yet
+      expect(outcome.updatedDifficulty).toBe(2); // unchanged — window (8) not full yet
     }
     expect(task.getCurrentN()).toBe(2);
   });
 
   it("steps difficulty down by exactly one after a full window of misses", () => {
     const task = new NBackTask({ initialDifficulty: 3, minDifficulty: 1, maxDifficulty: 5, random: () => 0 });
-    // Three warm-up trials (N=3), then 5 scoreable trials, all missed
+    // Three warm-up trials (N=3), then 8 scoreable trials, all missed
     // (random always forces a match, respond "no match" every time).
     for (let i = 0; i < 3; i++) task.nextStimulus();
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       task.nextStimulus();
       task.recordResponse(false, { timestamp: i });
     }

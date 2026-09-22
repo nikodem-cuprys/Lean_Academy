@@ -26,6 +26,14 @@ import type { PacePreset } from "@/lib/exercise-preferences";
 const TOTAL_SETS = 5;
 const PROCESSING_MS = 6000;
 const FEEDBACK_MS = 900;
+// Brief pause after each True/False tap showing whether it was actually
+// scored correct — a real, previously-missing gap: the engine always
+// scored processing responses (ComplexSpanTask.recordProcessingResponse
+// returns the real correct/incorrect verdict and it was already
+// reflected in the final PROCESSING ACCURACY stat), but nothing ever
+// showed that per-tap, so it read as if nothing was being checked at
+// all, unlike every other exercise's per-trial feedback.
+const PROCESSING_FEEDBACK_MS = 550;
 
 // Free, opt-in pace customization (see apps/web/src/lib/exercise-preferences.ts).
 // STANDARD (1200ms) is the memory-item display time this exercise's
@@ -77,6 +85,8 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
   const [setSize, setSetSize] = useState<number | null>(null);
   const [shownLetters, setShownLetters] = useState<string[]>([]);
   const [processingItem, setProcessingItem] = useState<ProcessingItem | null>(null);
+  const [processingFeedback, setProcessingFeedback] = useState<boolean | null>(null);
+  const [lastAnswerSaid, setLastAnswerSaid] = useState<boolean | null>(null);
   const [memoryLetter, setMemoryLetter] = useState<string | null>(null);
   const [recalled, setRecalled] = useState<string[]>([]);
   const [setFeedback, setSetFeedback] = useState<SetSummary | null>(null);
@@ -150,10 +160,18 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
           if (controller.signal.aborted) return;
 
           setPhase("processing");
+          setProcessingFeedback(null);
+          setLastAnswerSaid(null);
           const item = task.nextProcessingItem();
           setProcessingItem(item);
           const { said, interrupted } = await waitForTrueFalse();
-          if (!interrupted) task.recordProcessingResponse(said, item);
+          if (!interrupted) {
+            const correct = task.recordProcessingResponse(said, item);
+            setLastAnswerSaid(said);
+            setProcessingFeedback(correct);
+            await sleep(PROCESSING_FEEDBACK_MS, controller.signal);
+            if (controller.signal.aborted) return;
+          }
 
           if (controller.signal.aborted) return;
           setPhase("memory");
@@ -268,56 +286,115 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
         </div>
       </div>
 
-      <div className="mb-1.5 text-center text-[12.5px] text-text-3">
-        Hold onto the letters — you&rsquo;ll recall them after
-      </div>
-      <div className="mb-8 flex justify-center gap-2.5">
-        {Array.from({ length: setSize ?? 0 }, (_, i) => {
-          const letter = shownLetters[i];
-          return (
-            <div
-              key={i}
-              data-testid="letter-chip"
-              className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] font-num text-base font-bold"
-              style={
-                letter
-                  ? { background: "var(--color-wm-soft)", color: "var(--color-wm)" }
-                  : {
-                      background: "var(--color-surface-2)",
-                      color: "var(--color-text-3)",
-                      border: "1.5px dashed var(--color-border)",
-                    }
-              }
-            >
-              {letter ?? "?"}
-            </div>
-          );
-        })}
-      </div>
+      {/*
+        Real bug fix: this row used to render unconditionally across
+        every phase, including "recall" and "feedback" — meaning the
+        letters the player is supposed to be recalling from memory
+        stayed visibly displayed on screen the whole time they were
+        typing them back in, making the recall step trivial rather than
+        an actual memory test. Now shown only while letters are still
+        being built up (processing/memory phases); the recall phase has
+        its own separate "what you've typed so far" boxes below, which
+        never leak the real answer.
+      */}
+      {(phase === "processing" || phase === "memory") && (
+        <>
+          <div className="mb-1.5 text-center text-[12.5px] text-text-3">
+            Hold onto the letters — you&rsquo;ll recall them after
+          </div>
+          <div className="mb-8 flex justify-center gap-2.5">
+            {Array.from({ length: setSize ?? 0 }, (_, i) => {
+              const letter = shownLetters[i];
+              return (
+                <div
+                  key={i}
+                  data-testid="letter-chip"
+                  className="flex h-[38px] w-[38px] items-center justify-center rounded-[10px] font-num text-base font-bold"
+                  style={
+                    letter
+                      ? { background: "var(--color-wm-soft)", color: "var(--color-wm)" }
+                      : {
+                          background: "var(--color-surface-2)",
+                          color: "var(--color-text-3)",
+                          border: "1.5px dashed var(--color-border)",
+                        }
+                  }
+                >
+                  {letter ?? "?"}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       <div className="flex flex-1 flex-col items-center justify-center">
         {phase === "processing" && processingItem && (
           <>
             <div className="mb-2.5 text-[13px] text-text-3">Is this true?</div>
-            <div className="mb-8 font-num text-4xl font-bold text-text">
+            <div className="mb-5 font-num text-4xl font-bold text-text">
               {processingItem.a} {processingItem.operator} {processingItem.b} ={" "}
               {processingItem.displayedResult}
+            </div>
+            {/*
+              Real, visible timer for the PROCESSING_MS response window —
+              previously there was only a hidden setTimeout with no
+              on-screen indication of the real time pressure. Pure-CSS
+              shrinking bar (same mechanism DiceSumExercise's "show"
+              countdown already uses), remounted via `key` each new
+              processing item so the animation restarts cleanly.
+            */}
+            <div className="mb-4 h-[5px] w-full overflow-hidden rounded-full bg-surface-2">
+              {processingFeedback === null && (
+                <div
+                  key={`${setNumber}-${shownLetters.length}`}
+                  className="h-full rounded-full bg-wm animate-dice-countdown"
+                  style={{ animationDuration: `${PROCESSING_MS}ms` }}
+                />
+              )}
             </div>
             <div className="flex w-full gap-3">
               <button
                 data-testid="true-button"
                 onClick={() => handleTrueFalse(true)}
-                className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-4 text-center font-body text-[15px] font-bold text-text transition-transform duration-micro active:scale-95"
+                disabled={processingFeedback !== null}
+                className="flex-1 rounded-md border-[1.5px] py-4 text-center font-body text-[15px] font-bold transition-transform duration-micro active:scale-95 disabled:active:scale-100"
+                style={
+                  lastAnswerSaid === true
+                    ? {
+                        borderColor: processingFeedback ? "var(--color-success)" : "var(--color-caution)",
+                        background: processingFeedback ? "var(--color-success-soft)" : "var(--color-caution-soft)",
+                        color: "var(--color-text)",
+                      }
+                    : { borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" }
+                }
               >
                 True
               </button>
               <button
                 data-testid="false-button"
                 onClick={() => handleTrueFalse(false)}
-                className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-4 text-center font-body text-[15px] font-bold text-text transition-transform duration-micro active:scale-95"
+                disabled={processingFeedback !== null}
+                className="flex-1 rounded-md border-[1.5px] py-4 text-center font-body text-[15px] font-bold transition-transform duration-micro active:scale-95 disabled:active:scale-100"
+                style={
+                  lastAnswerSaid === false
+                    ? {
+                        borderColor: processingFeedback ? "var(--color-success)" : "var(--color-caution)",
+                        background: processingFeedback ? "var(--color-success-soft)" : "var(--color-caution-soft)",
+                        color: "var(--color-text)",
+                      }
+                    : { borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" }
+                }
               >
                 False
               </button>
+            </div>
+            <div className="mt-2.5 h-[18px] text-center text-[12.5px] font-bold">
+              {processingFeedback === true ? (
+                <span className="text-success">Correct</span>
+              ) : processingFeedback === false ? (
+                <span style={{ color: "var(--color-caution)" }}>Not quite</span>
+              ) : null}
             </div>
           </>
         )}

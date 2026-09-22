@@ -92,7 +92,7 @@ async function completeOnboarding(page: Page) {
   await expect(page).toHaveURL("/", { timeout: 15_000 });
 }
 
-type ExerciseKind = "n-back" | "complex-span" | "spatial-sequence" | "reading";
+type ExerciseKind = "n-back" | "complex-span" | "spatial-sequence" | "reading" | "dice-sum";
 
 async function detectExercise(page: Page): Promise<ExerciseKind> {
   const candidates: { kind: ExerciseKind; testId: string }[] = [
@@ -100,6 +100,7 @@ async function detectExercise(page: Page): Promise<ExerciseKind> {
     { kind: "complex-span", testId: "true-button" },
     { kind: "reading", testId: "finish-reading-button" },
     { kind: "spatial-sequence", testId: "grid-cell-0" },
+    { kind: "dice-sum", testId: "hide-dice-button" },
   ];
   for (let i = 0; i < 200; i++) {
     for (const c of candidates) {
@@ -155,6 +156,30 @@ async function driveSpatialSequence(page: Page) {
   }
 }
 
+async function driveDiceSum(page: Page) {
+  const hideDiceButton = page.getByTestId("hide-dice-button");
+  const submitButton = page.getByTestId("answer-submit");
+  for (let round = 0; round < 5; round++) {
+    await expect(hideDiceButton).toBeVisible({ timeout: 10_000 });
+    const dice = page.getByRole("img", { name: /Die showing \d+/ });
+    const diceCount = await dice.count();
+    let sum = 0;
+    for (let i = 0; i < diceCount; i++) {
+      const label = await dice.nth(i).getAttribute("aria-label");
+      const match = label?.match(/\d+/);
+      if (!match) throw new Error(`Could not parse a die face from aria-label: ${label}`);
+      sum += Number(match[0]);
+    }
+    await hideDiceButton.click();
+    await expect(submitButton).toBeVisible({ timeout: 5_000 });
+    for (const digit of String(sum)) {
+      await page.getByTestId(`keypad-key-${digit}`).click();
+    }
+    await expect(submitButton).toBeEnabled();
+    await submitButton.click();
+  }
+}
+
 async function driveReading(page: Page) {
   const finishReadingButton = page.getByTestId("finish-reading-button");
   const submitAnswerButton = page.getByTestId("submit-answer-button");
@@ -196,6 +221,7 @@ test("Progress page shows an honest empty state after calibration, then real dat
     if (kind === "n-back") await driveNBack(page);
     else if (kind === "complex-span") await driveComplexSpan(page);
     else if (kind === "spatial-sequence") await driveSpatialSequence(page);
+    else if (kind === "dice-sum") await driveDiceSum(page);
     else await driveReading(page);
     if (step < 2) {
       await expect(page.getByText("Nice work")).toBeVisible({ timeout: 10_000 });
@@ -213,6 +239,7 @@ test("Progress page shows an honest empty state after calibration, then real dat
     if (kind === "n-back") await driveNBack(page);
     else if (kind === "complex-span") await driveComplexSpan(page);
     else if (kind === "spatial-sequence") await driveSpatialSequence(page);
+    else if (kind === "dice-sum") await driveDiceSum(page);
     else await driveReading(page);
     if (step < 2) {
       await expect(page.getByText("Nice work")).toBeVisible({ timeout: 10_000 });

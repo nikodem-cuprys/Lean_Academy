@@ -87,14 +87,14 @@ describe("PacedReadingTask — target WPM only moves through the rolling-window 
     const startingWpm = task.getCurrentTargetWpm();
     task.nextPassage();
     const outcome = task.recordPassageResult({ answeredCorrectly: false, elapsedMs: 20_000, timestamp: 1 });
-    expect(outcome.updatedDifficulty).toBe(3); // window (5) not full yet
+    expect(outcome.updatedDifficulty).toBe(3); // window (8) not full yet
     expect(task.getCurrentTargetWpm()).toBe(startingWpm);
   });
 
   it("steps target WPM down after a full window of wrong comprehension answers", () => {
     const task = new PacedReadingTask({ initialDifficulty: 3, minDifficulty: 1, maxDifficulty: 9 });
     const startingDifficulty = task.getCurrentDifficulty();
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       task.nextPassage();
       task.recordPassageResult({ answeredCorrectly: false, elapsedMs: 20_000, timestamp: i });
     }
@@ -104,7 +104,7 @@ describe("PacedReadingTask — target WPM only moves through the rolling-window 
   it("steps target WPM up after a full window of correct comprehension answers", () => {
     const task = new PacedReadingTask({ initialDifficulty: 3, minDifficulty: 1, maxDifficulty: 9 });
     const startingDifficulty = task.getCurrentDifficulty();
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       task.nextPassage();
       task.recordPassageResult({ answeredCorrectly: true, elapsedMs: 20_000, timestamp: i });
     }

@@ -11,10 +11,12 @@ import { READING_PASSAGES } from "@lean-academy/reading-engine";
 // itself marked COMPLETED via POST /api/training-sessions/:id/complete.
 //
 // getTodaysTraining picks one exercise per domain (WORKING_MEMORY,
-// READING, SPATIAL); which WORKING_MEMORY exercise (N-Back or Complex
-// Span) it picks isn't guaranteed by this test, so each step detects
-// which exercise is actually showing (by its own unique test id) and
-// drives that one, rather than assuming a fixed exercise.
+// READING, SPATIAL); which WORKING_MEMORY exercise (N-Back, Complex
+// Span, or Dice Sum — the latter lazily gets a real DifficultyState the
+// first time it's needed for an already-onboarded user, see
+// todays-training.ts) it picks isn't guaranteed by this test, so each
+// step detects which exercise is actually showing (by its own unique
+// test id) and drives that one, rather than assuming a fixed exercise.
 
 test.setTimeout(180_000);
 
@@ -98,7 +100,7 @@ async function captureSpatialHighlight(page: Page, testId = "calibration-highlig
   return values.map(Number);
 }
 
-type ExerciseKind = "n-back" | "complex-span" | "spatial-sequence" | "reading";
+type ExerciseKind = "n-back" | "complex-span" | "spatial-sequence" | "reading" | "dice-sum";
 
 async function detectExercise(page: Page): Promise<ExerciseKind> {
   const candidates: { kind: ExerciseKind; testId: string }[] = [
@@ -106,6 +108,7 @@ async function detectExercise(page: Page): Promise<ExerciseKind> {
     { kind: "complex-span", testId: "true-button" },
     { kind: "reading", testId: "finish-reading-button" },
     { kind: "spatial-sequence", testId: "grid-cell-0" },
+    { kind: "dice-sum", testId: "hide-dice-button" },
   ];
   for (let i = 0; i < 200; i++) {
     for (const c of candidates) {
@@ -162,6 +165,30 @@ async function driveSpatialSequence(page: Page) {
   }
 }
 
+async function driveDiceSum(page: Page) {
+  const hideDiceButton = page.getByTestId("hide-dice-button");
+  const submitButton = page.getByTestId("answer-submit");
+  for (let round = 0; round < 5; round++) {
+    await expect(hideDiceButton).toBeVisible({ timeout: 10_000 });
+    const dice = page.getByRole("img", { name: /Die showing \d+/ });
+    const diceCount = await dice.count();
+    let sum = 0;
+    for (let i = 0; i < diceCount; i++) {
+      const label = await dice.nth(i).getAttribute("aria-label");
+      const match = label?.match(/\d+/);
+      if (!match) throw new Error(`Could not parse a die face from aria-label: ${label}`);
+      sum += Number(match[0]);
+    }
+    await hideDiceButton.click();
+    await expect(submitButton).toBeVisible({ timeout: 5_000 });
+    for (const digit of String(sum)) {
+      await page.getByTestId(`keypad-key-${digit}`).click();
+    }
+    await expect(submitButton).toBeEnabled();
+    await submitButton.click();
+  }
+}
+
 async function driveReading(page: Page) {
   const finishReadingButton = page.getByTestId("finish-reading-button");
   const submitAnswerButton = page.getByTestId("submit-answer-button");
@@ -198,6 +225,7 @@ test("complete onboarding, run a full training session, and see real Trial rows 
     if (kind === "n-back") await driveNBack(page);
     else if (kind === "complex-span") await driveComplexSpan(page);
     else if (kind === "spatial-sequence") await driveSpatialSequence(page);
+    else if (kind === "dice-sum") await driveDiceSum(page);
     else await driveReading(page);
 
     if (step < 2) {

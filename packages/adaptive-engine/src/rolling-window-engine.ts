@@ -22,11 +22,25 @@ export interface RollingWindowConfig {
   decreaseThreshold: number;
 }
 
+// windowSize was 5 through the project's first several sessions; raised
+// to 8 in response to real user feedback that difficulty ramped too
+// fast — with every exercise's rounds-per-session at 5 or 20, a
+// windowSize of 5 meant even a single strong session (or, for N-Back's
+// 20 trials, up to 4 windows within one session) could push difficulty
+// up multiple times before the user had much chance to feel settled at
+// a level. A wider window requires more sustained evidence before any
+// change, up or down, which is the standard way to slow an adaptive
+// system's response rate without making it directionally unfair (see
+// the alternative considered and rejected in this change's own commit:
+// raising increaseThreshold alone, with a 5-trial window, only offers
+// fifths as achievable accuracy values, so anything above 0.8 would
+// have silently demanded literal 100% — a much harsher, all-or-nothing
+// change rather than a genuinely smoother one).
 export const DEFAULT_ROLLING_WINDOW_CONFIG: Omit<
   RollingWindowConfig,
   "initialDifficulty" | "minDifficulty" | "maxDifficulty"
 > = {
-  windowSize: 5,
+  windowSize: 8,
   increaseThreshold: 0.8,
   decreaseThreshold: 0.5,
 };

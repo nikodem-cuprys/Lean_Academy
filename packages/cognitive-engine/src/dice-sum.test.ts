@@ -116,7 +116,7 @@ describe("DiceSumTask — difficulty only moves through the rolling-window engin
 
   it("steps dice count down by exactly one after a full window of wrong rounds", () => {
     const task = new DiceSumTask({ initialDifficulty: 4, minDifficulty: 1, maxDifficulty: 8, random: () => 0 });
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       task.startRound();
       task.submitAnswer(-1, { timestamp: i }); // guaranteed wrong every time
     }
@@ -125,7 +125,7 @@ describe("DiceSumTask — difficulty only moves through the rolling-window engin
 
   it("steps dice count up by exactly one after a full window of correct rounds", () => {
     const task = new DiceSumTask({ initialDifficulty: 4, minDifficulty: 1, maxDifficulty: 8, random: () => 0 });
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       const dice = task.startRound();
       task.submitAnswer(
         dice.reduce((a, b) => a + b, 0),

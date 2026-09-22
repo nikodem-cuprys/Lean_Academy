@@ -139,7 +139,13 @@ test("complete the full onboarding flow and see real DB rows land", async ({ pag
   expect(dailyGoal?.targetMinutes).toBe(10);
 
   const difficultyStates = await prisma.difficultyState.findMany({ where: { userId: user!.id } });
-  expect(difficultyStates.length).toBe(4);
+  // 4 real rows from calibration (N-Back, Complex Span, Spatial Sequence,
+  // Reading) plus a 5th, real, lazily-created one for Dice Sum — landing
+  // on Home right after onboarding calls getTodaysTraining, which gives
+  // an already-onboarded user a real starting DifficultyState for Dice
+  // Sum the first time it's needed rather than requiring a dedicated
+  // onboarding calibration step of its own (see todays-training.ts).
+  expect(difficultyStates.length).toBe(5);
 
   const assessmentResult = await prisma.assessmentResult.findFirst({ where: { userId: user!.id } });
   expect(assessmentResult).not.toBeNull();

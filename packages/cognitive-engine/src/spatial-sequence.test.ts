@@ -1,6 +1,36 @@
 import { describe, expect, it } from "vitest";
 import { SpatialSequenceTask, SPATIAL_GRID_SIZE } from "./spatial-sequence";
 
+describe("SpatialSequenceTask — configurable grid size (free customization, see apps/web/src/lib/exercise-preferences.ts)", () => {
+  it("defaults to the standard 3x3 (9-cell) grid when gridSize is omitted, and reports it via getGridSize", () => {
+    const task = new SpatialSequenceTask({ initialDifficulty: 4, minDifficulty: 4, maxDifficulty: 4 });
+    expect(task.getGridSize()).toBe(9);
+  });
+
+  it("never produces a position outside a configured 5x5 (25-cell) grid, and can hold a sequence longer than 9", () => {
+    const task = new SpatialSequenceTask({ initialDifficulty: 12, minDifficulty: 12, maxDifficulty: 12, gridSize: 25 });
+    expect(task.getGridSize()).toBe(25);
+    task.startSequence();
+    for (let i = 0; i < 12; i++) {
+      const position = task.nextSequenceItem();
+      expect(position).toBeGreaterThanOrEqual(0);
+      expect(position).toBeLessThan(25);
+    }
+    expect(task.isSequenceComplete()).toBe(true);
+  });
+
+  it("defaults maxDifficulty to the configured gridSize when not explicitly overridden, so a bigger grid genuinely raises the ceiling", () => {
+    const task = new SpatialSequenceTask({ initialDifficulty: 9, gridSize: 16, random: () => 0 });
+    for (let s = 0; s < 8; s++) {
+      task.startSequence();
+      const sequence = Array.from({ length: task.getCurrentDifficulty() }, () => task.nextSequenceItem());
+      task.submitRecall(sequence, { timestamp: s });
+    }
+    // 8 fully-correct sequences (a full rolling window) steps difficulty up by exactly one, past the old fixed 9-cap.
+    expect(task.getCurrentDifficulty()).toBe(10);
+  });
+});
+
 describe("SpatialSequenceTask — sequence lifecycle", () => {
   it("throws if nextSequenceItem is called before startSequence", () => {
     const task = new SpatialSequenceTask();
@@ -108,13 +138,13 @@ describe("SpatialSequenceTask — difficulty only moves through the rolling-wind
     task.nextSequenceItem();
     const outcome = task.submitRecall([], { timestamp: 1 }); // guaranteed wrong
     expect(outcome.fullyCorrect).toBe(false);
-    expect(outcome.updatedDifficulty).toBe(3); // window (5) not full yet
+    expect(outcome.updatedDifficulty).toBe(3); // window (8) not full yet
     expect(task.getCurrentSequenceLength()).toBe(3);
   });
 
   it("steps sequence length down by exactly one after a full window of failed sequences", () => {
     const task = new SpatialSequenceTask({ initialDifficulty: 3, minDifficulty: 1, maxDifficulty: 5, random: () => 0 });
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       task.startSequence();
       for (let j = 0; j < task.getCurrentSequenceLength(); j++) task.nextSequenceItem();
       task.submitRecall([], { timestamp: i }); // guaranteed wrong every time
@@ -124,7 +154,7 @@ describe("SpatialSequenceTask — difficulty only moves through the rolling-wind
 
   it("steps sequence length up by exactly one after a full window of perfect sequences", () => {
     const task = new SpatialSequenceTask({ initialDifficulty: 3, minDifficulty: 1, maxDifficulty: 5, random: () => 0 });
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       task.startSequence();
       const sequence = Array.from({ length: task.getCurrentSequenceLength() }, () => task.nextSequenceItem());
       task.submitRecall(sequence, { timestamp: i });

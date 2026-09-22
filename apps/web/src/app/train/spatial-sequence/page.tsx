@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { SpatialSequenceExercise } from "@/components/SpatialSequenceExercise";
-import { getPacePreference } from "@/lib/exercise-preferences";
+import { getPacePreference, getGridSizePreference } from "@/lib/exercise-preferences";
 
 export default async function SpatialSequencePage() {
   const session = await auth();
@@ -9,11 +9,14 @@ export default async function SpatialSequencePage() {
     redirect("/login");
   }
 
-  const pace = await getPacePreference(session.user.id, "visuospatial-sequence-recall-v0");
+  const [pace, gridSize] = await Promise.all([
+    getPacePreference(session.user.id, "visuospatial-sequence-recall-v0"),
+    getGridSizePreference(session.user.id),
+  ]);
 
   return (
     <main className="flex flex-1 flex-col items-center">
-      <SpatialSequenceExercise pace={pace} />
+      <SpatialSequenceExercise pace={pace} gridSize={gridSize} />
     </main>
   );
 }

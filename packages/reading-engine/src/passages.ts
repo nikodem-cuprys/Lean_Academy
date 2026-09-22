@@ -17,6 +17,14 @@
  * guidance. This is independent of the adaptive engine's target-WPM
  * difficulty (paced-reading-task.ts) — no passage is gated to a
  * particular WPM level; tier only describes the text's own complexity.
+ *
+ * Grew from 15 to 30 passages (a real user complaint: with
+ * reading-passage-rotation.ts's least-recently-seen ordering and 5
+ * passages per session, a 15-passage bank repeats the exact same set
+ * every 3 sessions) — doubling the bank doubles that cycle to 6
+ * sessions before anything repeats. The 15 new ones follow the same
+ * per-tier length envelope and non-guessable-question rule as the
+ * originals, on topics none of the existing 15 already cover.
  */
 
 export type ReadingDifficultyTier = "beginner" | "intermediate" | "advanced";
@@ -271,6 +279,246 @@ export const READING_PASSAGES: Passage[] = [
         "Neuroplasticity's reorganization depends on repeated, effortful practice of the impaired skill",
         "Therapy prevents any further brain damage from occurring",
         "The adult brain rewires as freely as a child's brain during rehabilitation",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "yawning-contagious",
+    "Everyday Science",
+    "beginner",
+    "Yawning is oddly contagious — seeing, hearing, or even reading about someone yawning can trigger one of your own within moments. Scientists don't fully agree on why, but one leading idea ties it to empathy: brain scans show the same regions active during a contagious yawn are also involved in recognizing other people's emotional states, suggesting it may be a subtle form of social bonding. Contagious yawning shows up in only a handful of other species, including chimpanzees and dogs. In dogs, it seems to happen more often when the yawn comes from someone familiar rather than a stranger, which hints that social closeness plays a real role in whether a yawn actually catches on.",
+    {
+      prompt: "According to the passage, when are dogs more likely to catch a yawn from a person?",
+      choices: [
+        "When the yawn comes from someone familiar to them",
+        "Only when they are tired themselves",
+        "When multiple people yawn at once",
+        "Dogs never catch yawns from humans",
+      ],
+      correctIndex: 0,
+    }
+  ),
+  passage(
+    "rainbow-formation",
+    "Physics",
+    "beginner",
+    "A rainbow appears when sunlight passes through raindrops still hanging in the air, usually right after a shower. Each drop acts like a tiny prism: light enters the drop, bends, bounces off the inside back wall, and bends again as it exits, splitting the white sunlight into its full range of colors. Red light bends the least and violet bends the most, which is why the colors always appear in the same order, red on the outer edge and violet on the inner edge. Because the angle between the sun, the raindrops, and your eyes has to be just right, no two people ever see exactly the same rainbow — each person's rainbow is really a personal arrangement of a different set of drops.",
+    {
+      prompt: "According to the passage, why does red light end up on the outer edge of a rainbow?",
+      choices: [
+        "Red light bends the least as it passes through a raindrop",
+        "Red light travels fastest through the air",
+        "Red drops are larger than violet drops",
+        "Red light reflects off the ground before reaching your eyes",
+      ],
+      correctIndex: 0,
+    }
+  ),
+  passage(
+    "bread-rising-yeast",
+    "Everyday Science",
+    "beginner",
+    "Bread dough rises because of yeast, a living microorganism that feeds on the sugars in flour. As yeast digests those sugars, it releases carbon dioxide gas and a small amount of alcohol, a process called fermentation. The gas forms tiny bubbles trapped inside the stretchy network of gluten that kneading develops in the dough, and as more bubbles form, the whole loaf puffs up. Warm temperatures speed up the yeast's activity, which is why bakers often let dough rise somewhere warm, while the fridge slows fermentation down dramatically, letting bakers delay baking for hours or even a full day. When the bread finally bakes, the heat kills the yeast and the alcohol evaporates, leaving behind the light, airy texture the gas bubbles created.",
+    {
+      prompt: "According to the passage, what does yeast release as it digests sugar in dough?",
+      choices: [
+        "Carbon dioxide gas and a small amount of alcohol",
+        "Only water vapor",
+        "Extra gluten",
+        "Salt and sugar crystals",
+      ],
+      correctIndex: 0,
+    }
+  ),
+  passage(
+    "compass-works",
+    "Physics",
+    "beginner",
+    "A compass works because Earth itself behaves like an enormous magnet, with a magnetic north and south pole roughly near its geographic poles. Deep inside the planet, swirling currents of molten iron generate this magnetic field, which stretches far out into space and surrounds the whole Earth. A compass needle is a small magnet, free to spin on a low-friction pivot, and like any magnet it aligns itself with the magnetic field lines passing through it. That's why the needle consistently points toward magnetic north instead of settling in a random direction. Interestingly, magnetic north isn't exactly the same as true geographic north, and it actually drifts slowly over years as the currents inside the Earth shift, so mapmakers have to update the difference between the two from time to time.",
+    {
+      prompt: "According to the passage, what generates Earth's magnetic field?",
+      choices: [
+        "Swirling currents of molten iron deep inside the planet",
+        "The compass needle itself",
+        "Sunlight reflecting off the poles",
+        "Satellites orbiting the Earth",
+      ],
+      correctIndex: 0,
+    }
+  ),
+  passage(
+    "goosebumps",
+    "Biology",
+    "beginner",
+    "Goosebumps appear when tiny muscles at the base of each hair follicle contract, pulling the hair upright and puckering the skin around it into a small bump. In animals with thick fur, this reaction traps a layer of warming air close to the skin when it's cold, or makes the animal look larger and more threatening when it's scared. Humans still have the same muscles and the same reflex, even though our body hair is too thin and sparse to trap meaningful warmth or bulk anymore. The reflex is controlled automatically by the nervous system, which is why goosebumps show up not just from cold, but from fear, awe, or even powerful music — moments that trigger a similar rush of the same stress hormone responsible for the reaction.",
+    {
+      prompt: "According to the passage, why do goosebumps still occur in humans even though they no longer trap useful warmth?",
+      choices: [
+        "Humans have thicker fur than most animals",
+        "The same automatic reflex and muscles are still present, just no longer useful for warmth",
+        "Goosebumps in humans serve a completely different biological purpose",
+        "The passage says goosebumps no longer occur in humans at all",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "vaccine-immune-training",
+    "Biology",
+    "intermediate",
+    "A vaccine works by showing the immune system a safe preview of a pathogen — a weakened or inactivated version of a virus, or sometimes just a harmless piece of it, like a single protein from its outer surface. The immune system reacts to this preview the same way it would react to a real infection, producing specialized cells called antibodies that are shaped to recognize and latch onto that specific pathogen. Crucially, the immune system also creates memory cells that persist for months, years, or sometimes a lifetime, ready to mount a much faster and stronger response if the real pathogen ever shows up. That faster second response is usually enough to stop an infection before it causes serious symptoms, which is the whole point: the vaccinated person gets the protective memory without ever having to survive the actual disease first.",
+    {
+      prompt: "According to the passage, what is the main advantage of the memory cells a vaccine produces?",
+      choices: [
+        "They prevent the immune system from ever reacting again",
+        "They let the body mount a faster, stronger response if the real pathogen appears later",
+        "They destroy the vaccine's weakened pathogen immediately",
+        "They only last for a few days after vaccination",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "wright-brothers-first-flight",
+    "History",
+    "intermediate",
+    "When Orville and Wilbur Wright chose Kitty Hawk, North Carolina, for their first powered-flight attempts in 1903, the site wasn't random — they picked it largely for its wind. The brothers needed steady, strong headwinds to help generate enough lift for a fragile, underpowered aircraft to get off the ground, and Kitty Hawk's flat, open dunes along the Atlantic coast reliably delivered exactly that. On December 17, 1903, with a wind of around 27 miles per hour blowing in from the north, Orville piloted the Wright Flyer for 12 seconds, covering about 120 feet — shorter than the wingspan of a modern jumbo jet. They flew three more times that day, with Wilbur's final flight covering 852 feet in 59 seconds. Contemporary newspapers largely ignored the achievement, and it took several more years of refinement and public demonstrations before the world took the Wright brothers' claim seriously.",
+    {
+      prompt: "According to the passage, why did the Wright brothers specifically choose Kitty Hawk for their first flight attempts?",
+      choices: [
+        "It was close to their home workshop",
+        "Its steady, strong winds helped generate enough lift for their aircraft",
+        "It had the flattest paved runways available at the time",
+        "Newspapers were already based there to cover the event",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "glass-from-sand",
+    "Chemistry",
+    "intermediate",
+    "Ordinary glass is made by melting sand — specifically silica, or silicon dioxide, the same mineral that makes up most beach sand — at extremely high temperatures, well over 1,600 degrees Celsius, until it becomes a thick liquid. On its own, pure melted silica cools into glass at such a high temperature that it's expensive and difficult to work with, so most manufacturers add soda ash to lower the melting point substantially, making the process far cheaper and more practical. Soda-lime glass, the type used in windows and bottles, also includes limestone, which makes the finished glass more chemically stable and resistant to dissolving back into water over time. What makes glass unusual as a material is that it never fully organizes into the neat, repeating crystal structure typical of solids; instead its molecules stay in a disordered, liquid-like arrangement even after hardening, which is part of why glass is technically classified as an amorphous solid rather than a true crystal.",
+    {
+      prompt: "According to the passage, why do most glass manufacturers add soda ash to melted silica?",
+      choices: [
+        "To make the glass more colorful",
+        "To lower the melting point and make the process cheaper and more practical",
+        "To make the glass melt at a higher temperature",
+        "To prevent the glass from becoming transparent",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "penicillin-discovery",
+    "History",
+    "intermediate",
+    "In 1928, the Scottish bacteriologist Alexander Fleming returned from a summer vacation to find that one of his bacterial culture dishes, accidentally left uncovered, had grown a patch of mold — and that the bacteria near the mold had died off. Rather than discarding the contaminated dish, Fleming investigated further and identified the mold as a strain of Penicillium, and found that whatever substance it produced could kill a wide range of disease-causing bacteria without harming human cells. He named the substance penicillin, but Fleming himself struggled to purify enough of it to test on live patients, and his findings attracted little attention for over a decade. It wasn't until the early 1940s, when a team led by Howard Florey and Ernst Chain developed methods to mass-produce a stable, purified version, that penicillin became a practical treatment — arriving just in time to treat wounded soldiers during World War II and beginning the modern antibiotic era.",
+    {
+      prompt: "According to the passage, what problem prevented Fleming's discovery from becoming a usable treatment right away?",
+      choices: [
+        "The mold itself was too dangerous to handle safely",
+        "Fleming struggled to purify enough penicillin to test on live patients",
+        "No bacteria were found to be affected by it",
+        "World War II delayed all medical research at the time",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "tides-moon-gravity",
+    "Astronomy",
+    "intermediate",
+    "Ocean tides are caused mainly by the Moon's gravity pulling on Earth's water. The pull is strongest on the side of Earth facing the Moon, bulging the ocean outward there, but a second bulge forms on the exact opposite side of the planet too — not because the Moon pulls harder there, but because the solid Earth itself is pulled toward the Moon slightly more than the far-side water is, effectively leaving that water behind. As Earth rotates roughly once every 24 hours, a given coastline usually passes through both bulges, producing the familiar pattern of two high tides and two low tides most days. The Sun also pulls on Earth's oceans, though its effect is weaker than the Moon's despite the Sun's far greater mass, simply because it's so much farther away. When the Sun and Moon align during a new or full moon, their pulls combine to produce unusually high \"spring tides,\" while at other times they partially cancel out, producing gentler \"neap tides.\"",
+    {
+      prompt: "According to the passage, why does a tidal bulge form on the side of Earth facing away from the Moon?",
+      choices: [
+        "The Moon's gravity is actually stronger on that side",
+        "The solid Earth is pulled toward the Moon slightly more than the far-side water is, leaving that water behind",
+        "The Sun's gravity pushes water toward that side",
+        "Wind patterns push the ocean toward the far side",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "survivorship-bias-wald",
+    "Statistics",
+    "advanced",
+    "During World War II, the U.S. military examined bomber aircraft returning from combat missions, tallying where each plane had taken bullet damage, with an eye toward reinforcing those areas with additional armor. The data showed damage concentrated heavily on the wings, tail, and fuselage, and the initial instinct was to armor precisely those spots. The statistician Abraham Wald, working with a military research group, argued the opposite: the planes being studied were, by definition, the ones that had survived their damage and made it home. Damage to the wings and tail, however severe it looked, evidently wasn't fatal enough to bring a plane down. The far more important damage was on the areas with no bullet holes at all in the returning sample — most obviously the engines and cockpit — because planes hit there most likely never made it back to be counted. Wald's insight, now known as survivorship bias, is the general error of drawing conclusions only from the survivors of some selection process while overlooking the entire group that didn't survive to be observed at all. The same reasoning error shows up far beyond aviation, in fields from finance to medicine to studies of successful companies, wherever researchers unknowingly study only the outcomes that happened to make it into the sample.",
+    {
+      prompt: "According to the passage, what was Wald's key insight about where the returning bombers were NOT damaged?",
+      choices: [
+        "Those undamaged areas, like the engines and cockpit, were probably fatal when hit, so those planes never made it back to be studied",
+        "Those areas simply never got hit by enemy fire during the entire war",
+        "The military had already reinforced those exact areas before the study began",
+        "Pilots deliberately avoided flying routes that would expose those areas",
+      ],
+      correctIndex: 0,
+    }
+  ),
+  passage(
+    "tragedy-of-the-commons",
+    "Economics",
+    "advanced",
+    "The \"tragedy of the commons\" describes a situation where individuals sharing a limited resource each have a rational incentive to use as much of it as they personally can, even though the combined effect of everyone doing so depletes or destroys the resource for the whole group. The classic illustration, popularized by ecologist Garrett Hardin in 1968, imagines a shared pasture open to every herder in a village: each herder gains the full benefit of adding one more animal to graze there, while the cost of that extra grazing — a slightly more worn-down pasture — is spread thinly across everyone. Because the personal benefit outweighs the personal share of the cost, every herder is individually motivated to add more animals, even while collectively understanding that the pasture will eventually be ruined if everyone does so. Real-world examples researchers point to include overfished ocean fisheries, groundwater aquifers pumped faster than they can refill, and, more recently, the atmosphere's capacity to absorb greenhouse gases without disruptive climate change. Economists and policy researchers have proposed several kinds of solutions, ranging from privatizing the resource so a single owner bears the full cost of overuse, to government-imposed usage limits, to Nobel laureate Elinor Ostrom's extensively documented finding that communities can often manage shared resources successfully on their own, through locally developed rules and social enforcement, without needing either private ownership or outside government regulation.",
+    {
+      prompt: "According to the passage, what did Elinor Ostrom's research find about managing shared resources?",
+      choices: [
+        "Privatization is the only solution that reliably works",
+        "Communities can often successfully manage shared resources themselves, through locally developed rules, without private ownership or government regulation",
+        "Government regulation is always required to prevent overuse",
+        "Shared resources inevitably collapse no matter what is tried",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "crispr-gene-editing",
+    "Biology",
+    "advanced",
+    "CRISPR-Cas9 is a gene-editing tool adapted from a natural defense system that bacteria use against viruses. In nature, bacteria that survive a viral infection store a short snippet of the virus's genetic code in their own DNA, using it later as a reference to recognize and cut up that same virus if it attacks again — the CRISPR sequences are essentially a genetic mugshot file, and Cas9 is the molecular scissors that acts on it. Researchers realized this system could be reprogrammed: by supplying Cas9 with a custom-designed guide sequence instead of a bacterial one, scientists can direct it to cut a specific, chosen location in virtually any organism's DNA, including human cells. Once the DNA is cut, the cell's own repair machinery takes over, and scientists can exploit that repair process either to simply disable a gene or to insert a new, specific sequence in its place. This has made genetic research dramatically faster and cheaper than older editing techniques, and it has opened real, if still-developing, medical possibilities, including treatments for certain inherited blood disorders that have already received regulatory approval. The technology also raises serious ethical questions, particularly around the prospect of editing embryos in ways that would be passed down to future generations, which is why most countries currently restrict or ban that specific application even as therapeutic editing of an individual patient's own cells moves forward.",
+    {
+      prompt: "According to the passage, what role does CRISPR play in bacteria's natural biology, before any human adaptation?",
+      choices: [
+        "It helps bacteria digest nutrients more efficiently",
+        "It stores snippets of viral DNA so bacteria can recognize and cut up that virus if it attacks again",
+        "It allows bacteria to reproduce more quickly",
+        "It protects bacteria from extreme temperatures",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "dunning-kruger-effect",
+    "Psychology",
+    "advanced",
+    "In 1999, psychologists David Dunning and Justin Kruger published a study describing a pattern that has since become widely known, and widely misunderstood, as the Dunning-Kruger effect: people with limited skill or knowledge in a given area tend to overestimate their own competence, in part because the same lack of skill that produces poor performance also prevents them from recognizing that performance is poor. Judging whether an answer to a logic puzzle, or a piece of writing, or a joke is any good requires some of the same underlying competence needed to produce a good one in the first place, so a genuine novice is often missing the very yardstick they'd need to judge their own weak performance accurately. In the original study, participants who scored in the bottom quartile on tests of logic, grammar, and humor substantially overestimated where their scores ranked compared to their peers. A frequently repeated but less accurate version of the finding claims that the least competent people are consistently the most confident of all, full stop — the original data doesn't support that stronger claim; the most competent participants in the study were, on average, slightly more accurate about their own ranking than the least competent, but they too showed a smaller, different bias, generally underestimating how well they'd done relative to others, likely because they assumed a difficult task must have been just as easy for everyone else.",
+    {
+      prompt: "According to the passage, what does the original 1999 study data NOT support, despite being a commonly repeated version of the finding?",
+      choices: [
+        "That people with limited skill tend to overestimate their competence at all",
+        "That the least competent people are consistently the single most confident of everyone, full stop",
+        "That competence and self-assessment accuracy are related in any way",
+        "That highly skilled people ever misjudge their own performance",
+      ],
+      correctIndex: 1,
+    }
+  ),
+  passage(
+    "gravitational-lensing",
+    "Astronomy",
+    "advanced",
+    "Gravitational lensing occurs because massive objects, like galaxies and galaxy clusters, actually bend the fabric of spacetime around them, and light travels along that curved spacetime rather than in a perfectly straight line. When light from a distant galaxy passes close to a massive foreground object on its way to Earth, that light's path bends, sometimes dramatically, which can make the distant galaxy appear stretched into an arc, magnified, or even split into multiple duplicate images, depending on exactly how the light happens to be bent. Albert Einstein predicted this effect as a consequence of his general theory of relativity in 1915, and it was first confirmed observationally during a solar eclipse in 1919, when astronomers measured starlight bending around the Sun by almost exactly the amount Einstein's equations predicted — a result that made Einstein internationally famous almost overnight. Beyond confirming relativity, gravitational lensing has become a genuinely practical tool for modern astronomy: because the amount of bending depends on the total mass doing the bending, including invisible mass, astronomers use lensing patterns to map the distribution of dark matter, which emits no light of its own and would otherwise be undetectable. Lensing by massive galaxy clusters can also act as a natural magnifying glass, letting telescopes observe extremely distant, faint galaxies that would be too dim to detect directly, effectively turning the universe's own geometry into part of the telescope.",
+    {
+      prompt: "According to the passage, how do astronomers use gravitational lensing to study dark matter?",
+      choices: [
+        "Dark matter blocks lensing entirely, so its absence reveals where it is not located",
+        "Since the amount of light-bending depends on total mass, including invisible mass, lensing patterns can map where dark matter is distributed",
+        "Dark matter emits a faint light that lensing makes visible directly",
+        "Lensing only detects normal matter, so dark matter must be inferred by its complete absence from any lensing effect",
       ],
       correctIndex: 1,
     }

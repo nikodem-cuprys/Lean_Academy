@@ -147,13 +147,13 @@ describe("ComplexSpanTask — difficulty only moves through the rolling-window e
     task.nextMemoryItem();
     const outcome = task.submitRecall([], { timestamp: 1 }); // guaranteed wrong
     expect(outcome.fullyCorrect).toBe(false);
-    expect(outcome.updatedDifficulty).toBe(3); // window (5) not full yet
+    expect(outcome.updatedDifficulty).toBe(3); // window (8) not full yet
     expect(task.getCurrentSetSize()).toBe(3);
   });
 
   it("steps set size down by exactly one after a full window of failed sets", () => {
     const task = new ComplexSpanTask({ initialDifficulty: 3, minDifficulty: 1, maxDifficulty: 5, random: () => 0 });
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       task.startSet();
       for (let j = 0; j < task.getCurrentSetSize(); j++) task.nextMemoryItem();
       task.submitRecall([], { timestamp: i }); // guaranteed wrong every time
@@ -163,7 +163,7 @@ describe("ComplexSpanTask — difficulty only moves through the rolling-window e
 
   it("steps set size up by exactly one after a full window of perfect sets", () => {
     const task = new ComplexSpanTask({ initialDifficulty: 3, minDifficulty: 1, maxDifficulty: 5, random: () => 0 });
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 8; i++) {
       task.startSet();
       const sequence = Array.from({ length: task.getCurrentSetSize() }, () => task.nextMemoryItem());
       task.submitRecall(sequence, { timestamp: i });

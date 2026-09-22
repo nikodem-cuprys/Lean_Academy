@@ -27,7 +27,7 @@ describe("RollingWindowAdaptiveEngine", () => {
     expect(e.recommendNextDifficulty()).toBe(3);
     e.recordTrial(trial(false));
     expect(e.recommendNextDifficulty()).toBe(3);
-    // Still short of windowSize (5)
+    // Still short of windowSize (8)
     e.recordTrial(trial(true));
     e.recordTrial(trial(true));
     expect(e.recommendNextDifficulty()).toBe(3);
@@ -35,20 +35,20 @@ describe("RollingWindowAdaptiveEngine", () => {
 
   it("steps up by exactly one level once a full window is consistently strong", () => {
     const e = engine();
-    for (let i = 0; i < 5; i++) e.recordTrial(trial(true)); // 100% over window
+    for (let i = 0; i < 8; i++) e.recordTrial(trial(true)); // 100% over window
     expect(e.recommendNextDifficulty()).toBe(4);
   });
 
   it("steps down by exactly one level once a full window is consistently weak", () => {
     const e = engine();
-    for (let i = 0; i < 5; i++) e.recordTrial(trial(false)); // 0% over window
+    for (let i = 0; i < 8; i++) e.recordTrial(trial(false)); // 0% over window
     expect(e.recommendNextDifficulty()).toBe(2);
   });
 
   it("does not change difficulty in the comfortable middle band", () => {
     const e = engine();
-    // 3/5 correct = 60% accuracy, between decreaseThreshold(0.5) and increaseThreshold(0.8)
-    [true, true, true, false, false].forEach((c) => e.recordTrial(trial(c)));
+    // 5/8 correct = 62.5% accuracy, between decreaseThreshold(0.5) and increaseThreshold(0.8)
+    [true, true, true, true, true, false, false, false].forEach((c) => e.recordTrial(trial(c)));
     expect(e.recommendNextDifficulty()).toBe(3);
   });
 
@@ -72,7 +72,7 @@ describe("RollingWindowAdaptiveEngine", () => {
 
   it("resets the window after a change, requiring a fresh full window before the next one", () => {
     const e = engine();
-    for (let i = 0; i < 5; i++) e.recordTrial(trial(true));
+    for (let i = 0; i < 8; i++) e.recordTrial(trial(true));
     expect(e.recommendNextDifficulty()).toBe(4); // triggers a step + window reset
 
     // Only 2 trials recorded since the reset — must not step again yet.

@@ -6,9 +6,12 @@ import {
   PACE_PRESET_LABELS,
   PACE_PRESET_DESCRIPTIONS,
   DIE_SIDES_OPTIONS,
+  GRID_SIZE_OPTIONS,
+  GRID_SIZE_LABELS,
   type PacePreset,
   type PacedMethod,
   type DieSides,
+  type GridSize,
 } from "@/lib/exercise-pacing";
 
 // No prototype/*.dc.html artboard exists for this screen (checked) —
@@ -32,9 +35,17 @@ interface DiceExercise {
   dieSides: DieSides;
 }
 
+interface SpatialGridExercise {
+  method: string;
+  displayName: string;
+  gridSize: GridSize;
+}
+
 type SaveState = "idle" | "saving" | "saved" | "error";
 
-async function saveExercisePreference(body: { method: string; pace: PacePreset } | { method: string; dieSides: DieSides }) {
+async function saveExercisePreference(
+  body: { method: string; pace: PacePreset } | { method: string; dieSides: DieSides } | { method: string; gridSize: GridSize }
+) {
   const res = await fetch("/api/exercise-preferences", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -147,12 +158,59 @@ function DiceRow({ exercise }: { exercise: DiceExercise }) {
   );
 }
 
+function GridSizeRow({ exercise }: { exercise: SpatialGridExercise }) {
+  const [gridSize, setGridSize] = useState<GridSize>(exercise.gridSize);
+  const [saveState, setSaveState] = useState<SaveState>("idle");
+
+  async function handleChange(next: GridSize) {
+    setGridSize(next);
+    setSaveState("saving");
+    try {
+      await saveExercisePreference({ method: exercise.method, gridSize: next });
+      setSaveState("saved");
+    } catch {
+      setSaveState("error");
+    }
+  }
+
+  return (
+    <div data-testid={`exercise-setting-${exercise.method}-grid`} className="border-b border-border py-4 last:border-0">
+      <div className="mb-1 flex items-center justify-between">
+        <div className="text-[14px] font-bold text-text">Grid size</div>
+        <SaveStatus state={saveState} />
+      </div>
+      <div className="mb-2.5 text-xs text-text-3">Bigger grids can also hold longer sequences.</div>
+      <div className="grid grid-cols-3 gap-1.5">
+        {GRID_SIZE_OPTIONS.map((size) => (
+          <button
+            key={size}
+            type="button"
+            data-testid={`grid-size-${size}`}
+            onClick={() => handleChange(size)}
+            aria-pressed={gridSize === size}
+            className="rounded-[10px] border py-2 text-center font-num text-[13px] font-bold transition-colors"
+            style={
+              gridSize === size
+                ? { borderColor: "var(--color-spatial)", background: "var(--color-spatial-soft)", color: "var(--color-spatial)" }
+                : { borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-2)" }
+            }
+          >
+            {GRID_SIZE_LABELS[size]}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ExerciseSettingsView({
   pacedExercises,
   diceExercise,
+  spatialGridExercise,
 }: {
   pacedExercises: PacedExercise[];
   diceExercise: DiceExercise;
+  spatialGridExercise: SpatialGridExercise;
 }) {
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
@@ -164,7 +222,10 @@ export function ExerciseSettingsView({
 
       <div className="rounded-lg border border-border bg-surface px-4.5 shadow-sm">
         {pacedExercises.map((exercise) => (
-          <PaceRow key={exercise.method} exercise={exercise} />
+          <div key={exercise.method}>
+            <PaceRow exercise={exercise} />
+            {exercise.method === spatialGridExercise.method ? <GridSizeRow exercise={spatialGridExercise} /> : null}
+          </div>
         ))}
         <DiceRow exercise={diceExercise} />
       </div>
