@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { TASK_BOUNDS, type TaskBounds } from "@/lib/task-bounds";
 import { checkFirstAssessmentAchievement } from "@/lib/achievements";
 import { syncWeeklyChallengeProgress } from "@/lib/weekly-challenges";
+import { syncDailyQuestProgress } from "@/lib/daily-quests";
 
 // Implements project_prompt.txt's onboarding sequence: "goals ->
 // available time -> experience level -> short calibration -> recommended
@@ -134,6 +135,7 @@ export async function POST(request: Request) {
   });
   await checkFirstAssessmentAchievement(userId);
   await syncWeeklyChallengeProgress(userId);
+  await syncDailyQuestProgress(userId);
 
   return NextResponse.json({ success: true });
 }

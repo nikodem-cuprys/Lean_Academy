@@ -6,8 +6,16 @@ import { loadEvidenceRegistry } from "@lean-academy/evidence";
 // data/evidence-registry.json via packages/evidence (not a hand-
 // maintained copy), cross-referenced against the real TaskDefinition
 // rows for which methods are actually implemented. Requires the DB
-// seed to have run (`pnpm --filter @lean-academy/db seed`) so
-// TaskDefinition rows exist for the 4 implemented exercises.
+// seed to have run (`pnpm --filter @lean-academy/db seed`).
+//
+// This test used to hardcode its own local "implemented methods" list
+// to compare against — apps/web/src/lib/science-data.ts's own comment
+// explicitly warns against exactly that ("not a second hardcoded
+// list"), and that hardcoded copy is exactly what silently went stale
+// and broke this test when Dice Sum became a 5th real implemented
+// method without anyone updating it here. Fixed by querying the same
+// real TaskDefinition rows the app itself reads from, so this test
+// can't drift from reality again.
 
 const email = `e2e-science-${Date.now()}@example.com`;
 const password = "correcthorsebattery123";
@@ -21,7 +29,7 @@ test("Science page renders real evidence-registry data, not a hardcoded copy", a
   const registry = loadEvidenceRegistry();
   const approved = registry.modules.filter((m) => m.productionApproved);
   const excluded = registry.modules.filter((m) => !m.productionApproved);
-  const implementedMethods = ["adaptive-nback-v0", "complex-span-v0", "visuospatial-sequence-recall-v0", "reading-paced-adaptive-v0"];
+  const implementedMethods = await prisma.taskDefinition.findMany({ select: { method: true } });
 
   await page.goto("/signup");
   await page.getByPlaceholder("Name").fill("E2E Bot");

@@ -64,6 +64,7 @@ model User {
   xpEntries               XpEntry[]
   devices                 Device[]
   notificationPreference  NotificationPreference?
+  exercisePreferences     ExercisePreference[]
 }
 
 model Account {
@@ -434,6 +435,7 @@ model Streak {
 
 enum ChallengeType {
   WEEKLY
+  DAILY
 }
 
 model Challenge {
@@ -468,6 +470,28 @@ model ChallengeProgress {
   completedAt   DateTime?
 
   @@unique([challengeId, userId])
+}
+
+/// A user's saved presentation-parameter customization for one exercise
+/// (e.g. inter-stimulus pace, die sides) — never the trained-task logic
+/// itself, which stays defined by the exercise's own TaskDefinition and
+/// the evidence-gating chain. `method` matches TaskDefinition.method
+/// (e.g. "adaptive-nback-v0", "dice-sum-v0"). `settings` is a small,
+/// per-method JSON shape owned and validated by
+/// apps/web/src/lib/exercise-preferences.ts — kept generic here (one
+/// table for every exercise) rather than one column-per-setting model,
+/// since each exercise's customizable knobs differ and this project
+/// already uses the same "generic Json, typed at the read/write
+/// boundary" pattern for Challenge.criteria.
+model ExercisePreference {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  method    String
+  settings  Json
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, method])
 }
 
 // ---------- Evidence (relational mirror of data/evidence-registry.json) ----------

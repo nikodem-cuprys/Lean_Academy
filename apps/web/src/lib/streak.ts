@@ -1,4 +1,5 @@
 import { prisma } from "@lean-academy/db";
+import { startOfUtcWeek } from "@/lib/date-utils";
 
 // Streaks epic (Phase 5 — see docs/kanban.md). Called once per completed
 // TrainingSession from /api/training-sessions/[id]/complete.
@@ -151,4 +152,41 @@ export async function getStreakStatus(userId: string, now: Date = new Date()): P
     trainedToday: daysSinceLastActive === 0,
     daysSinceLastActive,
   };
+}
+
+export interface WeeklyActivityDay {
+  /** 0 = Monday .. 6 = Sunday, matching startOfUtcWeek's own boundary. */
+  dayOfWeek: number;
+  trained: boolean;
+  isToday: boolean;
+}
+
+/**
+ * Real per-day training activity for the current UTC week (Monday
+ * start, same boundary weekly-challenges.ts/achievements.ts already
+ * use), for the desktop dashboard's "This week" strip — genuinely
+ * derived from real TrainingSession.completedAt rows, never a
+ * fabricated pattern. Only returns days up to and including today
+ * (not the full 7), since a day that hasn't happened yet isn't
+ * meaningfully "missed."
+ */
+export async function getWeeklyActivity(userId: string, now: Date = new Date()): Promise<WeeklyActivityDay[]> {
+  const weekStart = startOfUtcWeek(now);
+  const todayIndex = utcDayNumber(now) - utcDayNumber(weekStart);
+
+  const sessions = await prisma.trainingSession.findMany({
+    where: { userId, status: "COMPLETED", completedAt: { gte: weekStart } },
+    select: { completedAt: true },
+  });
+  const trainedDayIndices = new Set(
+    sessions
+      .filter((s) => s.completedAt)
+      .map((s) => utcDayNumber(s.completedAt as Date) - utcDayNumber(weekStart))
+  );
+
+  return Array.from({ length: Math.min(todayIndex + 1, 7) }, (_, dayOfWeek) => ({
+    dayOfWeek,
+    trained: trainedDayIndices.has(dayOfWeek),
+    isToday: dayOfWeek === todayIndex,
+  }));
 }

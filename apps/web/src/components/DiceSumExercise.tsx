@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { DiceSumTask } from "@lean-academy/cognitive-engine";
+import { DiceSumTask, DICE_SUM_MAX_COUNT, type DiceSides } from "@lean-academy/cognitive-engine";
 import {
   epochOffsetMs,
   perfToEpochMs,
@@ -27,7 +27,6 @@ import {
 const TOTAL_ROUNDS = 5;
 const SHOW_MS = 4000;
 const FEEDBACK_MS = 1400;
-const MAX_TYPED_DIGITS = 2; // up to 8 dice * face 6 = 48, two digits always suffice
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve) => {
@@ -85,25 +84,41 @@ const PIP_LAYOUTS: Record<number, [number, number][]> = {
   ],
 };
 
-function Die({ face }: { face: number }) {
+// Only a real 6-sided die shows pips — every other real tabletop die
+// size (d4/d8/d10/d12/d20) is conventionally printed with numerals, not
+// pip patterns, so a non-standard dieSides falls back to a numeral to
+// match how those dice actually look.
+function Die({ face, dieSides }: { face: number; dieSides: number }) {
+  const showPips = dieSides === 6;
   return (
     <div
-      className="relative h-[46px] w-[46px] flex-shrink-0 rounded-xl border-[1.5px] border-border bg-surface shadow-sm"
+      className="relative flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-xl border-[1.5px] border-border bg-surface shadow-sm"
       role="img"
       aria-label={`Die showing ${face}`}
     >
-      {(PIP_LAYOUTS[face] ?? []).map(([top, left], i) => (
-        <span
-          key={i}
-          className="absolute h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{ top: `${top}%`, left: `${left}%`, background: "var(--color-wm)" }}
-        />
-      ))}
+      {showPips ? (
+        (PIP_LAYOUTS[face] ?? []).map(([top, left], i) => (
+          <span
+            key={i}
+            className="absolute h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ top: `${top}%`, left: `${left}%`, background: "var(--color-wm)" }}
+          />
+        ))
+      ) : (
+        <span className="font-num text-lg font-bold text-wm">{face}</span>
+      )}
     </div>
   );
 }
 
-export function DiceSumExercise({ initialDifficulty, onComplete }: SessionModeProps = {}) {
+interface DiceSumExerciseProps extends SessionModeProps {
+  /** Free customization (see apps/web/src/lib/exercise-preferences.ts) — defaults to the standard 6-sided die when omitted, same as session mode always gets. */
+  dieSides?: DiceSides;
+}
+
+export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: DiceSumExerciseProps = {}) {
+  const effectiveDieSides = dieSides ?? 6;
+  const maxTypedDigits = String(effectiveDieSides * DICE_SUM_MAX_COUNT).length;
   const [phase, setPhase] = useState<Phase>("show");
   const [roundNumber, setRoundNumber] = useState(0);
   const [dice, setDice] = useState<number[]>([]);
@@ -117,7 +132,10 @@ export function DiceSumExercise({ initialDifficulty, onComplete }: SessionModePr
 
   useEffect(() => {
     const controller = new AbortController();
-    const task = new DiceSumTask(initialDifficulty !== undefined ? { initialDifficulty } : {});
+    const task = new DiceSumTask({
+      ...(initialDifficulty !== undefined ? { initialDifficulty } : {}),
+      dieSides: effectiveDieSides,
+    });
     const startDifficulty = task.getCurrentDifficulty();
     const rounds: RoundSummary[] = [];
     const offsetMs = epochOffsetMs();
@@ -216,7 +234,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete }: SessionModePr
   }
 
   function handlePressDigit(n: number) {
-    if (typedRef.current.length >= MAX_TYPED_DIGITS) return;
+    if (typedRef.current.length >= maxTypedDigits) return;
     typedRef.current = typedRef.current + String(n);
     setTyped(typedRef.current);
   }
@@ -238,7 +256,11 @@ export function DiceSumExercise({ initialDifficulty, onComplete }: SessionModePr
   }
 
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5">
+    <div
+      className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5"
+      data-testid="dice-sum-exercise"
+      data-die-sides={effectiveDieSides}
+    >
       <div className="mb-2 flex items-center justify-between">
         <Link href="/" aria-label="Exit exercise">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -269,7 +291,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete }: SessionModePr
             Remember these — you&rsquo;ll add them up
           </div>
           <div className="mb-2 text-center text-[12.5px] text-text-3">
-            {dice.length} dice · shown for {SHOW_MS / 1000} seconds
+            {dice.length} {effectiveDieSides === 6 ? "" : `d${effectiveDieSides} `}dice · shown for {SHOW_MS / 1000} seconds
           </div>
           <div className="mb-9 h-[5px] overflow-hidden rounded-full bg-surface-2">
             <div
@@ -280,7 +302,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete }: SessionModePr
           </div>
           <div className="flex flex-1 flex-wrap items-center justify-center gap-3" data-testid="dice-display">
             {dice.map((face, i) => (
-              <Die key={i} face={face} />
+              <Die key={i} face={face} dieSides={effectiveDieSides} />
             ))}
           </div>
           <button
@@ -332,7 +354,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete }: SessionModePr
                     type="button"
                     data-testid={`keypad-key-${n}`}
                     onClick={() => handlePressDigit(n)}
-                    disabled={typed.length >= MAX_TYPED_DIGITS}
+                    disabled={typed.length >= maxTypedDigits}
                     className="aspect-square rounded-[14px] border border-border bg-surface font-num text-lg font-bold text-text disabled:opacity-40"
                   >
                     {n}
@@ -351,7 +373,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete }: SessionModePr
                   type="button"
                   data-testid="keypad-key-0"
                   onClick={() => handlePressDigit(0)}
-                  disabled={typed.length >= MAX_TYPED_DIGITS}
+                  disabled={typed.length >= maxTypedDigits}
                   className="aspect-square rounded-[14px] border border-border bg-surface font-num text-lg font-bold text-text disabled:opacity-40"
                 >
                   0

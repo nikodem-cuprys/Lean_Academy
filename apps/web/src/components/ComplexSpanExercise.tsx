@@ -12,6 +12,7 @@ import {
   type SessionModeProps,
   type TrialInput,
 } from "@/lib/session-types";
+import type { PacePreset } from "@/lib/exercise-preferences";
 
 // Adapted from prototype/ExerciseComplexSpan.dc.html, which only shows
 // one representative moment (the processing step) — the recall UI is
@@ -24,8 +25,18 @@ import {
 
 const TOTAL_SETS = 5;
 const PROCESSING_MS = 6000;
-const MEMORY_DISPLAY_MS = 1200;
 const FEEDBACK_MS = 900;
+
+// Free, opt-in pace customization (see apps/web/src/lib/exercise-preferences.ts).
+// STANDARD (1200ms) is the memory-item display time this exercise's
+// evidence base was studied at — every other preset is a presentation
+// change only, never claimed to carry the same research backing.
+const MEMORY_DISPLAY_MS_BY_PACE: Record<PacePreset, number> = {
+  RELAXED: 2000,
+  STANDARD: 1200,
+  QUICK: 700,
+  NO_DELAY: 300,
+};
 
 const RECALL_LETTERS = [
   "B", "C", "D", "F", "G", "H", "J", "K", "L", "M",
@@ -54,7 +65,13 @@ interface Results {
   processingAccuracy: { correct: number; total: number };
 }
 
-export function ComplexSpanExercise({ initialDifficulty, onComplete }: SessionModeProps = {}) {
+interface ComplexSpanExerciseProps extends SessionModeProps {
+  /** Free customization — defaults to STANDARD (the studied pace) when omitted, same as session mode always gets. */
+  pace?: PacePreset;
+}
+
+export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: ComplexSpanExerciseProps = {}) {
+  const memoryDisplayMs = MEMORY_DISPLAY_MS_BY_PACE[pace ?? "STANDARD"];
   const [phase, setPhase] = useState<Phase>("processing");
   const [setNumber, setSetNumber] = useState(0);
   const [setSize, setSetSize] = useState<number | null>(null);
@@ -143,7 +160,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete }: SessionMo
           const letter = task.nextMemoryItem();
           setMemoryLetter(letter);
           setShownLetters((prev) => [...prev, letter]);
-          await sleep(MEMORY_DISPLAY_MS, controller.signal);
+          await sleep(memoryDisplayMs, controller.signal);
           if (controller.signal.aborted) return;
         }
 
@@ -224,7 +241,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete }: SessionMo
   }
 
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5">
+    <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5" data-testid="complex-span-exercise" data-pace={pace ?? "STANDARD"}>
       <div className="mb-2 flex items-center justify-between">
         <Link href="/" aria-label="Exit exercise">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">

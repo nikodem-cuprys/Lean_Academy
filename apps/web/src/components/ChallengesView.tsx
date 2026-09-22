@@ -1,34 +1,52 @@
 import type { WeeklyChallengeStatus } from "@/lib/weekly-challenges";
+import type { DailyQuestStatus } from "@/lib/daily-quests";
 
-// No prototype/*.dc.html artboard exists for Weekly Challenges (checked
-// — see docs/kanban.md's Done entry for this card) — built to match the
-// visual pattern AchievementsView.tsx already established (same card
-// shell, same earned/progress-bar row layout) rather than inventing a
-// new one, since the two screens are conceptually siblings (real
-// progress toward a real, checkable milestone).
+// No prototype/*.dc.html artboard exists for Weekly Challenges or Daily
+// Quests (checked — see docs/kanban.md's Done entry for the Weekly
+// Challenges card) — built to match the visual pattern
+// AchievementsView.tsx already established (same card shell, same
+// earned/progress-bar row layout) rather than inventing a new one,
+// since all three screens are conceptually siblings (real progress
+// toward a real, checkable milestone). Daily Quests render first, above
+// Weekly Challenges, matching Duolingo's own convention of surfacing
+// the shorter-cadence goal first.
 
-function formatEndsAt(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+type QuestLikeStatus = WeeklyChallengeStatus | DailyQuestStatus;
+
+function formatEndsAt(iso: string, style: "date" | "time"): string {
+  const d = new Date(iso);
+  return style === "date"
+    ? d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    : d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
 
-export function ChallengesView({ challenges }: { challenges: WeeklyChallengeStatus[] }) {
-  const completedCount = challenges.filter((c) => c.completed).length;
-  const endsAt = challenges[0]?.endsAt;
+function QuestSection({
+  title,
+  icon,
+  items,
+  resetLabel,
+}: {
+  title: string;
+  icon: string;
+  items: QuestLikeStatus[];
+  resetLabel: string | null;
+}) {
+  const completedCount = items.filter((c) => c.completed).length;
 
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
-      <h1 className="font-display text-[23px] font-bold text-text">Weekly Challenges</h1>
+    <div className="mb-6">
+      <h2 className="font-display text-[17px] font-bold text-text">{title}</h2>
       <div className="mb-3 text-[13px] text-text-2">
-        {completedCount} of {challenges.length} complete{endsAt ? ` — resets ${formatEndsAt(endsAt)}` : ""}
+        {completedCount} of {items.length} complete{resetLabel ? ` — resets ${resetLabel}` : ""}
       </div>
 
       <div className="rounded-lg border border-border bg-surface px-4.5 shadow-sm">
-        {challenges.map((c, i) => (
+        {items.map((c, i) => (
           <div
             key={c.slug}
             data-testid={`challenge-${c.slug}`}
             className="flex items-center gap-3.5 py-3.5"
-            style={{ borderBottom: i < challenges.length - 1 ? "1px solid var(--color-border)" : "none" }}
+            style={{ borderBottom: i < items.length - 1 ? "1px solid var(--color-border)" : "none" }}
           >
             <div
               className="flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-[11px] text-[17px]"
@@ -39,7 +57,7 @@ export function ChallengesView({ challenges }: { challenges: WeeklyChallengeStat
               }
               aria-hidden="true"
             >
-              {c.completed ? "✅" : "🎯"}
+              {c.completed ? "✅" : icon}
             </div>
             <div className="flex-1">
               <div className="text-[14px] font-bold text-text">{c.title}</div>
@@ -63,6 +81,36 @@ export function ChallengesView({ challenges }: { challenges: WeeklyChallengeStat
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+export function ChallengesView({
+  dailyQuests,
+  weeklyChallenges,
+}: {
+  dailyQuests: DailyQuestStatus[];
+  weeklyChallenges: WeeklyChallengeStatus[];
+}) {
+  const dailyEndsAt = dailyQuests[0]?.endsAt;
+  const weeklyEndsAt = weeklyChallenges[0]?.endsAt;
+
+  return (
+    <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
+      <h1 className="mb-4 font-display text-[23px] font-bold text-text">Quests & Challenges</h1>
+
+      <QuestSection
+        title="Daily Quests"
+        icon="🎯"
+        items={dailyQuests}
+        resetLabel={dailyEndsAt ? formatEndsAt(dailyEndsAt, "time") : null}
+      />
+      <QuestSection
+        title="Weekly Challenges"
+        icon="🏆"
+        items={weeklyChallenges}
+        resetLabel={weeklyEndsAt ? formatEndsAt(weeklyEndsAt, "date") : null}
+      />
     </div>
   );
 }

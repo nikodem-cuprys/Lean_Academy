@@ -9,6 +9,7 @@ import {
   type SessionModeProps,
   type TrialInput,
 } from "@/lib/session-types";
+import type { PacePreset } from "@/lib/exercise-preferences";
 
 // Adapted from prototype/Exercise.dc.html + prototype/ExerciseResults.dc.html.
 // One real, honest deviation from the mockup: the prototype's "Exercise 1
@@ -20,8 +21,18 @@ import {
 // task actually is (data/evidence-registry.json's adaptive-nback-v0).
 
 const TOTAL_TRIALS = 20;
-const STIMULUS_MS = 2500;
 const FEEDBACK_MS = 650;
+
+// Free, opt-in pace customization (see apps/web/src/lib/exercise-preferences.ts).
+// STANDARD (2500ms) is the response window this exercise's evidence
+// base was studied at — every other preset is a presentation change
+// only, never claimed to carry the same research backing.
+const STIMULUS_MS_BY_PACE: Record<PacePreset, number> = {
+  RELAXED: 4000,
+  STANDARD: 2500,
+  QUICK: 1500,
+  NO_DELAY: 800,
+};
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve) => {
@@ -37,7 +48,13 @@ interface Results {
   scoredTrials: number;
 }
 
-export function NBackExercise({ initialDifficulty, onComplete }: SessionModeProps = {}) {
+interface NBackExerciseProps extends SessionModeProps {
+  /** Free customization — defaults to STANDARD (the studied pace) when omitted, same as session mode always gets. */
+  pace?: PacePreset;
+}
+
+export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExerciseProps = {}) {
+  const stimulusMs = STIMULUS_MS_BY_PACE[pace ?? "STANDARD"];
   const [phase, setPhase] = useState<"stimulus" | "feedback" | "done">("stimulus");
   const [stimulus, setStimulus] = useState<NBackStimulus | null>(null);
   const [currentN, setCurrentN] = useState<number | null>(null);
@@ -97,10 +114,10 @@ export function NBackExercise({ initialDifficulty, onComplete }: SessionModeProp
           };
           document.addEventListener("visibilitychange", onVis);
           respondRef.current = finish;
-          const timer = setTimeout(() => finish(false), STIMULUS_MS);
+          const timer = setTimeout(() => finish(false), stimulusMs);
           // Without this, an aborted run (e.g. React Strict Mode's
           // dev-only double-invoke of this effect on mount) keeps
-          // waiting out its own full STIMULUS_MS timer before checking
+          // waiting out its own full stimulusMs timer before checking
           // controller.signal.aborted, during which it's still calling
           // setState on every trial alongside the new, real run — two
           // concurrent loops fighting over the same UI state, which is
@@ -183,7 +200,7 @@ export function NBackExercise({ initialDifficulty, onComplete }: SessionModeProp
   }
 
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5">
+    <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5" data-testid="n-back-exercise" data-pace={pace ?? "STANDARD"}>
       <div className="mb-2 flex items-center justify-between">
         <Link href="/" aria-label="Exit exercise">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">

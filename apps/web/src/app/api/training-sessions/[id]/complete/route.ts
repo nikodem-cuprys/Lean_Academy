@@ -6,6 +6,7 @@ import { recordActiveDayForStreak } from "@/lib/streak";
 import { checkSessionCompletionAchievements } from "@/lib/achievements";
 import { recordSessionCompletionXp } from "@/lib/xp";
 import { syncWeeklyChallengeProgress } from "@/lib/weekly-challenges";
+import { syncDailyQuestProgress } from "@/lib/daily-quests";
 
 const bodySchema = z.object({
   totalDurationSeconds: z.number().int().min(0),
@@ -42,6 +43,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   await checkSessionCompletionAchievements(session.user.id, streak.currentStreakDays);
   const xp = await recordSessionCompletionXp(session.user.id, id, streak.currentStreakDays);
   await syncWeeklyChallengeProgress(session.user.id);
+  await syncDailyQuestProgress(session.user.id);
 
   return NextResponse.json({ success: true, streak, xp });
 }

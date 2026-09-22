@@ -28,6 +28,10 @@ import {
 export const DICE_FACE_MIN = 1;
 export const DICE_FACE_MAX = 6;
 
+/** Free, opt-in customization (see apps/web/src/lib/exercise-preferences.ts) — the standard 6-sided die plus the common tabletop sizes. */
+export const DICE_SIDE_OPTIONS = [4, 6, 8, 10, 12, 20] as const;
+export type DiceSides = (typeof DICE_SIDE_OPTIONS)[number];
+
 export const DICE_SUM_MIN_COUNT = 3;
 export const DICE_SUM_MAX_COUNT = 8;
 export const DICE_SUM_DEFAULT_INITIAL_COUNT = 5;
@@ -44,6 +48,8 @@ export interface DiceSumTaskConfig {
   initialDifficulty?: Difficulty;
   minDifficulty?: Difficulty;
   maxDifficulty?: Difficulty;
+  /** Sides per die — defaults to the standard 6. See DICE_SIDE_OPTIONS. Difficulty still adapts dice count only, never this. */
+  dieSides?: DiceSides;
   /** Injectable for deterministic tests; defaults to Math.random. */
   random?: () => number;
 }
@@ -51,12 +57,14 @@ export interface DiceSumTaskConfig {
 export class DiceSumTask {
   private readonly adaptiveEngine: RollingWindowAdaptiveEngine;
   private readonly random: () => number;
+  private readonly dieSides: number;
 
   private currentDice: number[] = [];
   private roundStarted = false;
 
   constructor(config: DiceSumTaskConfig = {}) {
     this.random = config.random ?? Math.random;
+    this.dieSides = config.dieSides ?? DICE_FACE_MAX;
     this.adaptiveEngine = new RollingWindowAdaptiveEngine({
       initialDifficulty: config.initialDifficulty ?? DICE_SUM_DEFAULT_INITIAL_COUNT,
       minDifficulty: config.minDifficulty ?? DICE_SUM_MIN_COUNT,
@@ -78,12 +86,17 @@ export class DiceSumTask {
     return this.adaptiveEngine.calculatePerformance();
   }
 
-  /** Rolls this round's dice (each 1-6) and returns them for display. */
+  /** Sides per die this task is configured for (defaults to 6). */
+  getDieSides(): number {
+    return this.dieSides;
+  }
+
+  /** Rolls this round's dice (each 1-dieSides) and returns them for display. */
   startRound(): number[] {
     const count = this.getCurrentDiceCount();
     this.currentDice = Array.from(
       { length: count },
-      () => DICE_FACE_MIN + Math.floor(this.random() * (DICE_FACE_MAX - DICE_FACE_MIN + 1))
+      () => DICE_FACE_MIN + Math.floor(this.random() * (this.dieSides - DICE_FACE_MIN + 1))
     );
     this.roundStarted = true;
     return [...this.currentDice];

@@ -9,6 +9,7 @@ import {
   type SessionModeProps,
   type TrialInput,
 } from "@/lib/session-types";
+import type { PacePreset } from "@/lib/exercise-preferences";
 
 // Adapted from prototype/ExerciseSpatial.dc.html (a 3x3 grid, cells light
 // up in sequence, then the player taps them back in the same order).
@@ -22,10 +23,25 @@ import {
 // to race against, same as Complex Span's memory-display phase.
 
 const TOTAL_SEQUENCES = 5;
-const ITEM_DISPLAY_MS = 800;
-const ITEM_GAP_MS = 300;
 const FEEDBACK_MS = 900;
 const GRID_SIZE = 9;
+
+// Free, opt-in pace customization (see apps/web/src/lib/exercise-preferences.ts).
+// STANDARD (800ms display / 300ms gap) is the pace this exercise's
+// evidence base was studied at — every other preset is a presentation
+// change only, never claimed to carry the same research backing.
+const ITEM_DISPLAY_MS_BY_PACE: Record<PacePreset, number> = {
+  RELAXED: 1200,
+  STANDARD: 800,
+  QUICK: 500,
+  NO_DELAY: 300,
+};
+const ITEM_GAP_MS_BY_PACE: Record<PacePreset, number> = {
+  RELAXED: 500,
+  STANDARD: 300,
+  QUICK: 150,
+  NO_DELAY: 0,
+};
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve) => {
@@ -48,7 +64,14 @@ interface Results {
   sequences: SequenceSummary[];
 }
 
-export function SpatialSequenceExercise({ initialDifficulty, onComplete }: SessionModeProps = {}) {
+interface SpatialSequenceExerciseProps extends SessionModeProps {
+  /** Free customization — defaults to STANDARD (the studied pace) when omitted, same as session mode always gets. */
+  pace?: PacePreset;
+}
+
+export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace }: SpatialSequenceExerciseProps = {}) {
+  const itemDisplayMs = ITEM_DISPLAY_MS_BY_PACE[pace ?? "STANDARD"];
+  const itemGapMs = ITEM_GAP_MS_BY_PACE[pace ?? "STANDARD"];
   const [phase, setPhase] = useState<Phase>("study");
   const [sequenceNumber, setSequenceNumber] = useState(0);
   const [sequenceLength, setSequenceLength] = useState<number | null>(null);
@@ -91,10 +114,10 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete }: Sessi
           if (controller.signal.aborted) return;
           const position = task.nextSequenceItem();
           setHighlighted(position);
-          await sleep(ITEM_DISPLAY_MS, controller.signal);
+          await sleep(itemDisplayMs, controller.signal);
           if (controller.signal.aborted) return;
           setHighlighted(null);
-          await sleep(ITEM_GAP_MS, controller.signal);
+          await sleep(itemGapMs, controller.signal);
           if (controller.signal.aborted) return;
         }
 
@@ -179,7 +202,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete }: Sessi
   }
 
   return (
-    <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5">
+    <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5" data-testid="spatial-sequence-exercise" data-pace={pace ?? "STANDARD"}>
       <div className="mb-2 flex items-center justify-between">
         <Link href="/" aria-label="Exit exercise">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">

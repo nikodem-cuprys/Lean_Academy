@@ -9,6 +9,7 @@ import {
 import { auth } from "@/lib/auth";
 import { checkFirstAssessmentAchievement } from "@/lib/achievements";
 import { syncWeeklyChallengeProgress } from "@/lib/weekly-challenges";
+import { syncDailyQuestProgress } from "@/lib/daily-quests";
 import { BACKWARD_SPATIAL_SPAN_ASSESSMENT_NAME } from "@/lib/near-transfer-assessment";
 import { isPremiumUser } from "@/lib/entitlements";
 
@@ -96,6 +97,7 @@ export async function POST(request: Request) {
 
   await checkFirstAssessmentAchievement(userId);
   await syncWeeklyChallengeProgress(userId);
+  await syncDailyQuestProgress(userId);
 
   return NextResponse.json({ success: true, resultId: result.id, confidenceInterval });
 }

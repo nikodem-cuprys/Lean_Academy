@@ -70,3 +70,23 @@ export async function getAchievementsStatus(userId: string, now: Date = new Date
     };
   });
 }
+
+export interface LatestAchievement {
+  title: string;
+  earnedAt: string;
+}
+
+/**
+ * The single most recently earned real achievement, for the desktop
+ * dashboard's "Recent achievement" card (see prototype/HomeDesktop.dc.html)
+ * — null when the user hasn't earned one yet, never a placeholder.
+ */
+export async function getLatestEarnedAchievement(userId: string): Promise<LatestAchievement | null> {
+  const latest = await prisma.userAchievement.findFirst({
+    where: { userId },
+    orderBy: { earnedAt: "desc" },
+    include: { achievement: true },
+  });
+  if (!latest) return null;
+  return { title: latest.achievement.title, earnedAt: latest.earnedAt.toISOString() };
+}

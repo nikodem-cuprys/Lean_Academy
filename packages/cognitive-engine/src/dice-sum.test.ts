@@ -40,6 +40,30 @@ describe("DiceSumTask — round lifecycle", () => {
     });
     expect(task.startRound()).toEqual([1, 2, 3, 4, 5, 6]);
   });
+
+  it("defaults to a 6-sided die when dieSides is omitted, and reports it via getDieSides", () => {
+    const task = new DiceSumTask({ initialDifficulty: 4, minDifficulty: 4, maxDifficulty: 4 });
+    expect(task.getDieSides()).toBe(6);
+  });
+
+  it("rolls within 1-dieSides when a non-default dieSides is configured (free customization, see apps/web/src/lib/exercise-preferences.ts)", () => {
+    const task = new DiceSumTask({ initialDifficulty: 5, minDifficulty: 5, maxDifficulty: 5, dieSides: 20 });
+    expect(task.getDieSides()).toBe(20);
+    for (let i = 0; i < 20; i++) {
+      const dice = task.startRound();
+      expect(dice.length).toBe(5);
+      for (const face of dice) {
+        expect(face).toBeGreaterThanOrEqual(1);
+        expect(face).toBeLessThanOrEqual(20);
+      }
+      task.submitAnswer(dice.reduce((a, b) => a + b, 0), { timestamp: i });
+    }
+  });
+
+  it("rolls the max face of a configured dieSides when random() returns just under 1", () => {
+    const task = new DiceSumTask({ initialDifficulty: 1, minDifficulty: 1, maxDifficulty: 1, dieSides: 4, random: () => 0.9999 });
+    expect(task.startRound()).toEqual([4]);
+  });
 });
 
 describe("DiceSumTask — scoring", () => {

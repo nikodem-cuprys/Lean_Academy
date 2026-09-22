@@ -14,3 +14,8 @@ export function startOfUtcWeek(now: Date): Date {
   const utcMidnightToday = Math.floor(now.getTime() / MS_PER_DAY) * MS_PER_DAY;
   return new Date(utcMidnightToday - daysSinceMonday * MS_PER_DAY);
 }
+
+/** 00:00 UTC of the real calendar day containing `now` — same UTC-day simplification streak.ts/xp.ts already use, reused here for Daily Quests. */
+export function startOfUtcDay(now: Date): Date {
+  return new Date(Math.floor(now.getTime() / MS_PER_DAY) * MS_PER_DAY);
+}
