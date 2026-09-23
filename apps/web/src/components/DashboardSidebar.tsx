@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // Desktop-only left nav (see apps/web/src/app/page.tsx's responsive
 // rebuild) — adapted from prototype/HomeDesktop.dc.html's sidebar, with
@@ -60,18 +62,19 @@ const SETTINGS_ICON = (
 );
 
 const NAV_ITEMS = [
-  { href: "/", label: "Home", icon: HOME_ICON },
-  { href: "/progress", label: "Progress", icon: CHART_ICON },
-  { href: "/science", label: "Science", icon: FLASK_ICON },
-  { href: "/achievements", label: "Achievements", icon: TROPHY_ICON },
-  { href: "/challenges", label: "Quests & Challenges", icon: TARGET_ICON },
-  { href: "/settings/exercises", label: "Customize exercises", icon: SETTINGS_ICON },
+  { href: "/", labelKey: "home", icon: HOME_ICON },
+  { href: "/progress", labelKey: "progress", icon: CHART_ICON },
+  { href: "/science", labelKey: "science", icon: FLASK_ICON },
+  { href: "/achievements", labelKey: "achievements", icon: TROPHY_ICON },
+  { href: "/challenges", labelKey: "challenges", icon: TARGET_ICON },
+  { href: "/settings/exercises", labelKey: "customize", icon: SETTINGS_ICON },
 ] as const;
 
 export function DashboardSidebar({ active }: { active: string }) {
+  const t = useTranslations("nav");
   return (
     <nav
-      aria-label="Main"
+      aria-label={t("main")}
       className="flex w-[232px] flex-shrink-0 flex-col border-r border-border px-4 py-6"
     >
       <div className="mb-8 px-2.5 font-display text-lg font-bold text-text">LeanAcademy</div>
@@ -91,12 +94,13 @@ export function DashboardSidebar({ active }: { active: string }) {
                 }
               >
                 {item.icon}
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             </li>
           );
         })}
       </ul>
+      <LanguageSwitcher className="mt-auto px-2.5 pt-6" />
     </nav>
   );
 }

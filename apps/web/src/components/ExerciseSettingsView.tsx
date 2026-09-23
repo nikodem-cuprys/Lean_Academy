@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   PACE_PRESETS,
-  PACE_PRESET_LABELS,
-  PACE_PRESET_DESCRIPTIONS,
   DIE_SIDES_OPTIONS,
   GRID_SIZE_OPTIONS,
   GRID_SIZE_LABELS,
@@ -13,6 +12,7 @@ import {
   type DieSides,
   type GridSize,
 } from "@/lib/exercise-pacing";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 // No prototype/*.dc.html artboard exists for this screen (checked) —
 // built to match the card-shell visual pattern ChallengesView.tsx/
@@ -55,13 +55,23 @@ async function saveExercisePreference(
 }
 
 function SaveStatus({ state }: { state: SaveState }) {
-  if (state === "saving") return <span className="text-xs text-text-3">Saving…</span>;
-  if (state === "saved") return <span className="text-xs text-success">Saved</span>;
-  if (state === "error") return <span className="text-xs" style={{ color: "var(--color-caution)" }}>Couldn&rsquo;t save — try again</span>;
+  const t = useTranslations("settings");
+  if (state === "saving") return <span className="text-xs text-text-3">{t("saving")}</span>;
+  if (state === "saved") return <span className="text-xs text-success">{t("saved")}</span>;
+  if (state === "error") return <span className="text-xs" style={{ color: "var(--color-caution)" }}>{t("saveError")}</span>;
   return null;
 }
 
+// Exercise names shown in the viewer's language (messages "methods"),
+// falling back to the registry's English displayName.
+function useExerciseName() {
+  const tm = useTranslations("methods");
+  return (method: string, fallback: string) => (tm.has(method as never) ? tm(method as never) : fallback);
+}
+
 function PaceRow({ exercise }: { exercise: PacedExercise }) {
+  const t = useTranslations("settings");
+  const exerciseName = useExerciseName();
   const [pace, setPace] = useState<PacePreset>(exercise.pace);
   const [saveState, setSaveState] = useState<SaveState>("idle");
 
@@ -79,10 +89,10 @@ function PaceRow({ exercise }: { exercise: PacedExercise }) {
   return (
     <div data-testid={`exercise-setting-${exercise.method}`} className="border-b border-border py-4 last:border-0">
       <div className="mb-1 flex items-center justify-between">
-        <div className="text-[14px] font-bold text-text">{exercise.displayName}</div>
+        <div className="text-[14px] font-bold text-text">{exerciseName(exercise.method, exercise.displayName)}</div>
         <SaveStatus state={saveState} />
       </div>
-      <div className="mb-2.5 text-xs text-text-3">Stimulus pace</div>
+      <div className="mb-2.5 text-xs text-text-3">{t("stimulusPace")}</div>
       <div className="grid grid-cols-4 gap-1.5">
         {PACE_PRESETS.map((preset) => (
           <button
@@ -91,7 +101,7 @@ function PaceRow({ exercise }: { exercise: PacedExercise }) {
             data-testid={`pace-${exercise.method}-${preset}`}
             onClick={() => handleChange(preset)}
             aria-pressed={pace === preset}
-            title={PACE_PRESET_DESCRIPTIONS[preset]}
+            title={t(`pace.${preset}.description`)}
             className="rounded-[10px] border px-1.5 py-2 text-center text-[11.5px] font-bold transition-colors"
             style={
               pace === preset
@@ -99,16 +109,18 @@ function PaceRow({ exercise }: { exercise: PacedExercise }) {
                 : { borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text-2)" }
             }
           >
-            {PACE_PRESET_LABELS[preset]}
+            {t(`pace.${preset}.label`)}
           </button>
         ))}
       </div>
-      <div className="mt-1.5 text-[11.5px] text-text-3">{PACE_PRESET_DESCRIPTIONS[pace]}</div>
+      <div className="mt-1.5 text-[11.5px] text-text-3">{t(`pace.${pace}.description`)}</div>
     </div>
   );
 }
 
 function DiceRow({ exercise }: { exercise: DiceExercise }) {
+  const t = useTranslations("settings");
+  const exerciseName = useExerciseName();
   const [dieSides, setDieSides] = useState<DieSides>(exercise.dieSides);
   const [saveState, setSaveState] = useState<SaveState>("idle");
 
@@ -126,10 +138,10 @@ function DiceRow({ exercise }: { exercise: DiceExercise }) {
   return (
     <div data-testid={`exercise-setting-${exercise.method}`} className="border-b border-border py-4 last:border-0">
       <div className="mb-1 flex items-center justify-between">
-        <div className="text-[14px] font-bold text-text">{exercise.displayName}</div>
+        <div className="text-[14px] font-bold text-text">{exerciseName(exercise.method, exercise.displayName)}</div>
         <SaveStatus state={saveState} />
       </div>
-      <div className="mb-2.5 text-xs text-text-3">Die sides</div>
+      <div className="mb-2.5 text-xs text-text-3">{t("dieSides")}</div>
       <div className="grid grid-cols-6 gap-1.5">
         {DIE_SIDES_OPTIONS.map((sides) => (
           <button
@@ -150,15 +162,14 @@ function DiceRow({ exercise }: { exercise: DiceExercise }) {
         ))}
       </div>
       <div className="mt-1.5 text-[11.5px] text-text-3">
-        {dieSides === 6
-          ? "The standard 6-sided die — dice count still adapts to your difficulty."
-          : `A ${dieSides}-sided die makes each round's sums bigger — dice count still adapts to your difficulty separately.`}
+        {dieSides === 6 ? t("dieStandard") : t("dieCustom", { sides: dieSides })}
       </div>
     </div>
   );
 }
 
 function GridSizeRow({ exercise }: { exercise: SpatialGridExercise }) {
+  const t = useTranslations("settings");
   const [gridSize, setGridSize] = useState<GridSize>(exercise.gridSize);
   const [saveState, setSaveState] = useState<SaveState>("idle");
 
@@ -176,10 +187,10 @@ function GridSizeRow({ exercise }: { exercise: SpatialGridExercise }) {
   return (
     <div data-testid={`exercise-setting-${exercise.method}-grid`} className="border-b border-border py-4 last:border-0">
       <div className="mb-1 flex items-center justify-between">
-        <div className="text-[14px] font-bold text-text">Grid size</div>
+        <div className="text-[14px] font-bold text-text">{t("gridSize")}</div>
         <SaveStatus state={saveState} />
       </div>
-      <div className="mb-2.5 text-xs text-text-3">Bigger grids can also hold longer sequences.</div>
+      <div className="mb-2.5 text-xs text-text-3">{t("gridSizeHint")}</div>
       <div className="grid grid-cols-3 gap-1.5">
         {GRID_SIZE_OPTIONS.map((size) => (
           <button
@@ -212,13 +223,16 @@ export function ExerciseSettingsView({
   diceExercise: DiceExercise;
   spatialGridExercise: SpatialGridExercise;
 }) {
+  const t = useTranslations("settings");
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
-      <h1 className="font-display text-[23px] font-bold text-text">Customize exercises</h1>
-      <p className="mb-4 text-[13px] text-text-2">
-        Applies to standalone practice only, not your daily training session — which stays at the pace its research
-        was studied at so your adaptive difficulty progression stays comparable session to session.
-      </p>
+      <h1 className="font-display text-[23px] font-bold text-text">{t("title")}</h1>
+      <p className="mb-4 text-[13px] text-text-2">{t("intro")}</p>
+
+      <div className="mb-4 flex items-center justify-between rounded-lg border border-border bg-surface px-4.5 py-3.5 shadow-sm">
+        <div className="text-[14px] font-bold text-text">{t("language")}</div>
+        <LanguageSwitcher />
+      </div>
 
       <div className="rounded-lg border border-border bg-surface px-4.5 shadow-sm">
         {pacedExercises.map((exercise) => (

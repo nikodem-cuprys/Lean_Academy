@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const inputClass =
   "w-full rounded-md border border-border bg-surface px-3.5 py-3 font-body text-[14.5px] text-text placeholder:text-text-3 focus:outline-none focus:ring-2 focus:ring-accent";
@@ -13,6 +14,8 @@ export function ResetPasswordForm({
   email: string;
   token: string;
 }) {
+  const t = useTranslations("auth.reset");
+  const tc = useTranslations("common");
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -25,7 +28,7 @@ export function ResetPasswordForm({
     setError(null);
 
     if (password !== confirm) {
-      setError("Passwords don't match.");
+      setError(t("mismatch"));
       return;
     }
 
@@ -38,7 +41,7 @@ export function ResetPasswordForm({
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        setError(body?.error ?? "Something went wrong — please try again.");
+        setError(typeof body?.error === "string" ? body.error : tc("somethingWentWrong"));
         return;
       }
       setDone(true);
@@ -52,9 +55,9 @@ export function ResetPasswordForm({
     return (
       <div className="mx-auto flex w-full max-w-[390px] flex-1 flex-col justify-center px-6 py-7 text-center">
         <div className="mb-2 font-display text-[22px] font-bold text-text">
-          Password updated
+          {t("updated")}
         </div>
-        <p className="text-[14px] text-text-2">Taking you to login…</p>
+        <p className="text-[14px] text-text-2">{t("redirecting")}</p>
       </div>
     );
   }
@@ -65,16 +68,16 @@ export function ResetPasswordForm({
         LeanAcademy
       </div>
       <div className="mb-1.5 font-display text-[23px] font-bold text-text">
-        Choose a new password
+        {t("title")}
       </div>
       <div className="mb-7 text-[13.5px] text-text-2">
-        For {email}
+        {t("forEmail", { email })}
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
         <input
           className={inputClass}
-          placeholder="New password"
+          placeholder={t("newPassword")}
           type="password"
           required
           minLength={8}
@@ -84,7 +87,7 @@ export function ResetPasswordForm({
         />
         <input
           className={inputClass}
-          placeholder="Confirm new password"
+          placeholder={t("confirmPassword")}
           type="password"
           required
           minLength={8}
@@ -107,7 +110,7 @@ export function ResetPasswordForm({
           disabled={submitting}
           className="mt-2 w-full rounded-full bg-accent py-3.5 font-body text-[15px] font-bold text-on-accent disabled:opacity-60"
         >
-          {submitting ? "Saving…" : "Save new password"}
+          {submitting ? t("saving") : t("save")}
         </button>
       </form>
     </div>

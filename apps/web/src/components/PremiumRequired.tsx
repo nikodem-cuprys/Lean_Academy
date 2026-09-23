@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 /**
  * Shared honest gate state for a premium-only feature — no
@@ -12,6 +13,7 @@ import Link from "next/link";
  * separate, still-blocked card.
  */
 export function PremiumRequired({ featureName }: { featureName: string }) {
+  const t = useTranslations("premium");
   return (
     <div className="mx-auto flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
       <div
@@ -19,17 +21,16 @@ export function PremiumRequired({ featureName }: { featureName: string }) {
         data-testid="premium-required"
       >
         <h1 className="mb-2 font-display text-[17px] font-bold text-text">
-          {featureName} is a premium feature
+          {t("title", { feature: featureName })}
         </h1>
         <div className="mb-4 text-[13px] leading-relaxed text-text-2">
-          Subscriptions aren&rsquo;t available yet — check back soon. Your trained exercises, progress, and the
-          full science behind them stay free either way.
+          {t("body")}
         </div>
         <Link
           href="/progress"
           className="block w-full rounded-full bg-accent py-3 text-center font-body text-[15px] font-bold text-on-accent"
         >
-          Back to Progress
+          {t("back")}
         </Link>
       </div>
     </div>

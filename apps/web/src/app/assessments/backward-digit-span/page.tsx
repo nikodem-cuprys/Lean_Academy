@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import {
   getNearTransferAssessmentStatus,
@@ -15,9 +16,10 @@ export default async function BackwardDigitSpanPage() {
   }
 
   if (!(await isPremiumUser(session.user.id))) {
+    const t = await getTranslations("premium.features");
     return (
       <main className="flex flex-1 flex-col items-center">
-        <PremiumRequired featureName="The Backward Digit Span assessment" />
+        <PremiumRequired featureName={t("backwardDigitSpan")} />
       </main>
     );
   }

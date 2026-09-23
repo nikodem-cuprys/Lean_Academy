@@ -20,8 +20,10 @@ export interface ScienceModule {
   method: string;
   displayName: string;
   targetConstruct: string;
-  /** Title-cased evidenceLevel, e.g. "Moderate". */
+  /** Title-cased evidenceLevel, e.g. "Moderate" — English fallback for the UI's translated badge. */
   evidenceBadge: string;
+  /** Raw registry evidenceLevel, the key the UI translates the badge by (messages evidence.<level>). */
+  evidenceLevel: string;
   implemented: boolean;
 }
 
@@ -45,6 +47,7 @@ export async function getScienceData(): Promise<ScienceData> {
     displayName: m.displayName,
     targetConstruct: m.targetConstruct,
     evidenceBadge: titleCase(m.evidenceLevel),
+    evidenceLevel: m.evidenceLevel,
     implemented: implementedMethods.has(m.method),
   }));
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useFormatter, useTranslations } from "next-intl";
 import {
   BackwardDigitSpanAssessment as BackwardDigitSpanEngine,
   type BackwardDigitSpanScore,
@@ -38,6 +39,9 @@ export interface BackwardDigitSpanStatusProps {
 }
 
 export function BackwardDigitSpanAssessment({ status }: { status: BackwardDigitSpanStatusProps }) {
+  const t = useTranslations("digitSpan");
+  const ta = useTranslations("assessment");
+  const tc = useTranslations("common");
   const [phase, setPhase] = useState<Phase>("intro");
   const [span, setSpan] = useState<number>(0);
   const [studyDigit, setStudyDigit] = useState<number | null>(null);
@@ -145,10 +149,10 @@ export function BackwardDigitSpanAssessment({ status }: { status: BackwardDigitS
     return (
       <div className="flex w-full max-w-[390px] flex-1 flex-col items-center justify-center gap-4 px-6 py-7 text-center">
         <p className="text-[13.5px] text-text-2">
-          Something went wrong saving your result. Please try again.
+          {ta("saveError")}
         </p>
         <Link href="/" className="rounded-full bg-accent px-6 py-3 font-body text-[15px] font-bold text-on-accent">
-          Back home
+          {tc("backHome")}
         </Link>
       </div>
     );
@@ -157,7 +161,7 @@ export function BackwardDigitSpanAssessment({ status }: { status: BackwardDigitS
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5">
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label="Exit assessment">
+        <Link href="/" aria-label={ta("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
@@ -166,21 +170,21 @@ export function BackwardDigitSpanAssessment({ status }: { status: BackwardDigitS
         <div className="w-[18px]" />
       </div>
       <div className="mb-5 text-center text-xs text-text-3">
-        Span length {span}
+        {ta("spanLength", { span })}
       </div>
 
-      <h1 className="sr-only">Backward Digit Span assessment</h1>
+      <h1 className="sr-only">{t("srTitle")}</h1>
       <div className="mb-2.5 flex items-center justify-center gap-1.5">
         <div className="h-[7px] w-[7px] rounded-full bg-wm" />
         <div className="text-[12.5px] font-bold tracking-wide text-wm">
-          WORKING MEMORY · BACKWARD DIGIT SPAN
+          {t("tag")}
         </div>
       </div>
 
       {phase === "study" && (
         <>
           <div className="mb-8 text-center font-display text-[19px] font-bold text-text">
-            Watch the numbers
+            {t("watch")}
           </div>
           <div className="flex flex-1 items-center justify-center">
             <div
@@ -198,9 +202,9 @@ export function BackwardDigitSpanAssessment({ status }: { status: BackwardDigitS
           <div className="mb-4 text-center font-display text-[19px] font-bold text-text">
             {phase === "feedback"
               ? lastOutcome?.correct
-                ? "Correct"
-                : "Not quite"
-              : "Enter the numbers, in reverse order"}
+                ? ta("correct")
+                : ta("notQuite")
+              : t("enterReverse")}
           </div>
           <div className="mb-8 flex flex-wrap justify-center gap-2.5">
             {Array.from({ length: span }, (_, i) => (
@@ -242,6 +246,7 @@ export function BackwardDigitSpanAssessment({ status }: { status: BackwardDigitS
                 ))}
                 <button
                   data-testid="digit-backspace"
+                  aria-label={t("backspace")}
                   onClick={handleBackspace}
                   disabled={recalled.length === 0}
                   className="aspect-square rounded-[14px] border border-border bg-surface text-sm text-text-2"
@@ -265,7 +270,7 @@ export function BackwardDigitSpanAssessment({ status }: { status: BackwardDigitS
                 className="w-full rounded-full py-3.5 text-center font-body text-[15px] font-bold text-on-accent disabled:opacity-40"
                 style={{ background: "var(--color-wm)" }}
               >
-                Submit
+                {ta("submit")}
               </button>
             </>
           )}
@@ -276,51 +281,51 @@ export function BackwardDigitSpanAssessment({ status }: { status: BackwardDigitS
 }
 
 function IntroScreen({ status, onStart }: { status: BackwardDigitSpanStatusProps; onStart: () => void }) {
+  const t = useTranslations("digitSpan");
+  const ta = useTranslations("assessment");
+  const format = useFormatter();
   const lastTaken = status.lastTakenAt ? new Date(status.lastTakenAt) : null;
   const nextDue = status.nextDueAt ? new Date(status.nextDueAt) : null;
 
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
-      <Link href="/" aria-label="Exit assessment" className="mb-4">
+      <Link href="/" aria-label={ta("exit")} className="mb-4">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
       </Link>
-      <h1 className="mb-2 font-display text-[21px] font-bold text-text">Backward Digit Span</h1>
+      <h1 className="mb-2 font-display text-[21px] font-bold text-text">{t("name")}</h1>
       <p className="mb-4 text-[13.5px] leading-relaxed text-text-2">
-        A short, different-shaped task from your trained exercises: you&rsquo;ll see a sequence of digits, then
-        enter them back in <strong>reverse</strong> order. The sequence gets longer as you succeed and stops after
-        two misses in a row.
+        {t.rich("intro", { strong: (chunks) => <strong>{chunks}</strong> })}
       </p>
-      <p className="mb-4 text-[13.5px] leading-relaxed text-text-2">
-        This measures a near-transfer working-memory outcome sharing structure with your trained tasks — it does
-        not measure IQ, general intelligence, or everyday memory.
-      </p>
+      <p className="mb-4 text-[13.5px] leading-relaxed text-text-2">{t("disclaimer")}</p>
       <div className="mb-6 rounded-lg border border-border bg-surface p-4 text-[12.5px] text-text-3" data-testid="assessment-status">
         {lastTaken ? (
           <>
-            Last taken {lastTaken.toLocaleDateString()}.{" "}
+            {ta("lastTaken", { date: format.dateTime(lastTaken) })}{" "}
             {status.isDue
-              ? "It's been a while — a fresh measurement is due."
-              : `Measured periodically, not every session — next recommended around ${nextDue?.toLocaleDateString()}.`}
+              ? ta("due")
+              : ta("nextDue", { date: nextDue ? format.dateTime(nextDue) : "" })}
           </>
         ) : (
-          "You haven't taken this assessment yet."
+          ta("neverTaken")
         )}{" "}
-        You can take it any time.
+        {ta("anyTime")}
       </div>
       <button
         onClick={onStart}
         data-testid="start-assessment"
         className="mt-auto w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent"
       >
-        Start
+        {ta("start")}
       </button>
     </div>
   );
 }
 
 function ResultsScreen({ score }: { score: BackwardDigitSpanScore }) {
+  const t = useTranslations("digitSpan");
+  const ta = useTranslations("assessment");
   const { finalSpan, totalCorrect, totalTrials, finalSpanCorrect, finalSpanTrials } = score;
 
   return (
@@ -331,20 +336,20 @@ function ResultsScreen({ score }: { score: BackwardDigitSpanScore }) {
             <path d="M5 13l4 4L19 7" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <h1 className="font-display text-[23px] font-bold text-text">Assessment complete</h1>
-        <div className="mt-1.5 text-[13.5px] text-text-2">Backward Digit Span</div>
+        <h1 className="font-display text-[23px] font-bold text-text">{ta("complete")}</h1>
+        <div className="mt-1.5 text-[13.5px] text-text-2">{t("name")}</div>
       </div>
 
       <div className="mb-4 flex justify-around rounded-lg border border-border bg-surface p-5 shadow-sm">
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">BACKWARD SPAN</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{ta("backwardSpan")}</div>
           <div className="font-num text-2xl font-bold text-text" data-testid="final-span">
             {finalSpan}
           </div>
         </div>
         <div className="w-px bg-border" />
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">AT THAT LENGTH</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{ta("atThatLength")}</div>
           <div className="font-num text-2xl font-bold text-text">
             {finalSpanCorrect}/{finalSpanTrials}
           </div>
@@ -353,15 +358,12 @@ function ResultsScreen({ score }: { score: BackwardDigitSpanScore }) {
 
       <div className="mb-auto rounded-lg border border-border bg-surface p-4.5">
         <p className="text-[13.5px] leading-relaxed text-text-2">
-          Across the whole run you recalled {totalCorrect} of {totalTrials} sequences correctly. This is a
-          near-transfer measure — a genuinely different task from your trained exercises that shares their
-          working-memory span structure. It doesn&rsquo;t measure IQ, general intelligence, or everyday memory,
-          and results at a single length from a handful of trials carry real uncertainty.
+          {t("resultNote", { correct: totalCorrect, total: totalTrials })}
         </p>
       </div>
 
       <Link href="/" className="mt-6 block w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent">
-        Done
+        {ta("done")}
       </Link>
     </div>
   );

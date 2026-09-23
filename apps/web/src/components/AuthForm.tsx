@@ -4,6 +4,8 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 type Mode = "login" | "signup";
 
@@ -30,6 +32,8 @@ async function signInWithCsrfRaceRetry(credentials: {
 }
 
 export function AuthForm({ initialMode }: { initialMode: Mode }) {
+  const t = useTranslations("auth");
+  const tc = useTranslations("common");
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [name, setName] = useState("");
@@ -64,7 +68,7 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
         });
         if (!res.ok) {
           const body = await res.json().catch(() => null);
-          setError(readableError(body));
+          setError(readableError(body) ?? tc("somethingWentWrong"));
           return;
         }
       }
@@ -74,13 +78,21 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
       if (result?.error) {
         setError(
           signup
-            ? "Account created, but automatic sign-in failed — try logging in."
-            : "Incorrect email or password."
+            ? t("autoSignInFailed")
+            : t("incorrectCredentials")
         );
         return;
       }
 
-      router.push("/");
+      // A full page load, not router.push: signing in can change the UI
+      // language (the account's saved User.locale — see src/i18n/locale.ts),
+      // and a client-side navigation keeps the root layout — its
+      // <html lang> and NextIntlClientProvider messages — from this
+      // signed-out page, so client components would stay in the old
+      // language until the next reload.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- a full reload is the point (see above)
+      window.location.assign("/");
+      return;
     } finally {
       setSubmitting(false);
     }
@@ -88,8 +100,9 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
 
   return (
     <div className="mx-auto flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
-      <div className="mb-9 font-display text-lg font-bold text-text">
-        LeanAcademy
+      <div className="mb-9 flex items-center justify-between gap-3">
+        <div className="font-display text-lg font-bold text-text">LeanAcademy</div>
+        <LanguageSwitcher />
       </div>
 
       <div className="mb-7 flex border-b border-border">
@@ -102,7 +115,7 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
               : "border-transparent text-text-3"
           }`}
         >
-          Log in
+          {t("logIn")}
         </button>
         <button
           type="button"
@@ -113,17 +126,17 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
               : "border-transparent text-text-3"
           }`}
         >
-          Sign up
+          {t("signUp")}
         </button>
       </div>
 
       <h1 className="mb-1.5 font-display text-[23px] font-bold text-text">
-        {signup ? "Create your account" : "Welcome back"}
+        {signup ? t("createTitle") : t("welcomeBack")}
       </h1>
       <div className="mb-7 text-[13.5px] text-text-2">
         {signup
-          ? "Start with a free 6-minute session."
-          : "Log in to continue your training."}
+          ? t("createSubtitle")
+          : t("loginSubtitle")}
       </div>
 
       <div className="mb-5.5 flex flex-col gap-2.5">
@@ -150,7 +163,7 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
               d="M12 4.75c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0 7.28 0 3.24 2.7 1.27 6.59l4.01 3.1C6.23 6.86 8.88 4.75 12 4.75z"
             />
           </svg>
-          Continue with Google
+          {t("continueGoogle")}
         </button>
         <button
           type="button"
@@ -163,13 +176,13 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
               d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.09 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.89v2.25h3.32l-.53 3.49h-2.79V24C19.61 23.09 24 18.1 24 12.07z"
             />
           </svg>
-          Continue with Facebook
+          {t("continueFacebook")}
         </button>
       </div>
 
       <div className="mb-5.5 flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />
-        <div className="text-xs text-text-3">or</div>
+        <div className="text-xs text-text-3">{t("or")}</div>
         <div className="h-px flex-1 bg-border" />
       </div>
 
@@ -177,7 +190,7 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
         {signup && (
           <input
             className={inputClass}
-            placeholder="Name"
+            placeholder={t("name")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             autoComplete="name"
@@ -185,7 +198,7 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
         )}
         <input
           className={inputClass}
-          placeholder="Email"
+          placeholder={tc("email")}
           type="email"
           required
           value={email}
@@ -194,7 +207,7 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
         />
         <input
           className={inputClass}
-          placeholder="Password"
+          placeholder={t("password")}
           type="password"
           required
           minLength={8}
@@ -218,10 +231,10 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
           className="mt-2 w-full rounded-full bg-accent py-3.5 font-body text-[15px] font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-60 disabled:active:scale-100"
         >
           {submitting
-            ? "Please wait…"
+            ? tc("pleaseWait")
             : signup
-              ? "Create account"
-              : "Log in"}
+              ? t("createAccount")
+              : t("logIn")}
         </button>
       </form>
 
@@ -230,18 +243,20 @@ export function AuthForm({ initialMode }: { initialMode: Mode }) {
           href="/forgot-password"
           className="mt-4 block text-center text-[13px] font-semibold text-accent"
         >
-          Forgot your password?
+          {t("forgotPassword")}
         </Link>
       )}
 
       <div className="mt-4.5 text-center text-xs leading-relaxed text-text-3">
-        By continuing you agree to our Terms and Privacy Policy.
+        {t("terms")}
       </div>
     </div>
   );
 }
 
-function readableError(body: unknown): string {
+// The API routes already translate their own messages (see
+// src/app/api/auth/register/route.ts), so these are shown verbatim.
+function readableError(body: unknown): string | null {
   if (
     body &&
     typeof body === "object" &&
@@ -263,5 +278,5 @@ function readableError(body: unknown): string {
     const firstMessage = Object.values(fieldErrors).flat()[0];
     if (firstMessage) return firstMessage;
   }
-  return "Something went wrong — please try again.";
+  return null;
 }

@@ -27,14 +27,24 @@ export interface TrainedTaskProgress {
   displayName: string;
   /** Title-cased evidenceLevel from data/evidence-registry.json, e.g. "Moderate". */
   evidenceBadge: string;
+  /** English summary line — kept for callers/tests; the UI renders `progress` in the viewer's language instead. */
   progressLabel: string;
+  /** The numbers behind progressLabel, so ProgressView can phrase them in any language. */
+  progress: TrainedTaskProgressDescriptor;
   /** 0-1, current difficulty's position on this task's own min-max range. */
   progressFraction: number;
   /** The Personal Bests card's real, all-time best on this task — see apps/web/src/lib/personal-bests.ts. Null if no Trial rows exist yet. Always all-time, regardless of tier — see entitlements.ts's comment on what "full history" means here. */
   personalBestLabel: string | null;
+  /** The raw value behind personalBestLabel (a level, or a span length for Complex Span). */
+  personalBestValue: number | null;
   /** True only when this specific task has real trial history older than 30 days that a free account isn't shown — never true for a premium account, and never true just because the account is free with nothing older to hide. */
   historyLimitedToLast30Days: boolean;
 }
+
+export type TrainedTaskProgressDescriptor =
+  | { kind: "trend"; start: number; end: number; sessions: number }
+  | { kind: "noRecentSessions" }
+  | { kind: "calibrated"; level: number };
 
 export interface ReadingProgress {
   /** Whether a real 30-day WPM/comprehension trend exists (needs 2+ sessions in the window) — independent of the all-time personal best below, which can exist from a single session. */
@@ -114,6 +124,7 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
     const evidenceModule = findModule(registry, method);
     const evidenceBadge = evidenceModule ? titleCase(evidenceModule.evidenceLevel) : "—";
     const personalBestLabel = personalBestByMethod.get(method)?.label ?? null;
+    const personalBestValue = personalBestByMethod.get(method)?.value ?? null;
 
     if (visibleTrials.length === 0) {
       trainedTasks.push({
@@ -124,8 +135,10 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
           trials.length > 0
             ? "No sessions in the last 30 days — Premium unlocks full history"
             : `Calibrated at Level ${currentDifficulty} — no training sessions yet`,
+        progress: trials.length > 0 ? { kind: "noRecentSessions" } : { kind: "calibrated", level: currentDifficulty },
         progressFraction,
         personalBestLabel,
+        personalBestValue,
         historyLimitedToLast30Days,
       });
       continue;
@@ -138,8 +151,10 @@ export async function getProgressData(userId: string): Promise<ProgressData> {
       displayName,
       evidenceBadge,
       progressLabel: formatProgressLabel(method, startDifficulty, currentDifficulty, sessionCount),
+      progress: { kind: "trend", start: startDifficulty, end: currentDifficulty, sessions: sessionCount },
       progressFraction,
       personalBestLabel,
+      personalBestValue,
       historyLimitedToLast30Days,
     });
   }

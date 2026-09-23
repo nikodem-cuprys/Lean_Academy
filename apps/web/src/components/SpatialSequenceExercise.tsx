@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { SpatialSequenceTask, type SpatialGridSize } from "@lean-academy/cognitive-engine";
 import {
   epochOffsetMs,
@@ -83,6 +84,8 @@ interface SpatialSequenceExerciseProps extends SessionModeProps {
 }
 
 export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, gridSize }: SpatialSequenceExerciseProps = {}) {
+  const t = useTranslations("spatial");
+  const tx = useTranslations("exercise");
   const itemDisplayMs = ITEM_DISPLAY_MS_BY_PACE[pace ?? "STANDARD"];
   const itemGapMs = ITEM_GAP_MS_BY_PACE[pace ?? "STANDARD"];
   const effectiveGridSize: SpatialGridSize = gridSize ?? 9;
@@ -174,7 +177,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
           startDifficulty,
           endDifficulty,
           trials,
-          summaryLabel: `Level ${startDifficulty} → ${endDifficulty}`,
+          summaryLabel: tx("levelSummary", { start: startDifficulty, end: endDifficulty }),
         });
         return;
       }
@@ -227,7 +230,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
       data-grid-size={effectiveGridSize}
     >
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label="Exit exercise">
+        <Link href="/" aria-label={tx("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
@@ -241,25 +244,28 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
         <div className="w-[18px]" />
       </div>
       <div className="mb-4 text-center text-xs text-text-3">
-        Sequence {sequenceNumber} of {TOTAL_SEQUENCES}
+        {t("sequenceOf", { current: sequenceNumber, total: TOTAL_SEQUENCES })}
       </div>
 
-      <h1 className="sr-only">Spatial Sequence Recall exercise</h1>
+      <h1 className="sr-only">{t("srTitle")}</h1>
       <div className="mb-2 flex items-center justify-center gap-1.5">
         <div className="h-[7px] w-[7px] rounded-full bg-spatial" />
         <div className="text-[12.5px] font-bold tracking-wide text-spatial">
-          SPATIAL MEMORY · SEQUENCE RECALL
+          {t("tag")}
         </div>
       </div>
 
       <div className="mb-8 text-center font-display text-lg font-bold text-text">
         {phase === "study"
-          ? "Watch the squares light up"
+          ? t("watch")
           : phase === "feedback"
             ? sequenceFeedback?.fullyCorrect
-              ? "Perfect recall"
-              : `${sequenceFeedback?.correctPositions ?? 0} of ${sequenceFeedback?.sequenceLength ?? sequenceLength} in the right order`
-            : "Tap the squares in the order they lit up"}
+              ? t("perfectRecall")
+              : t("rightOrder", {
+                  correct: sequenceFeedback?.correctPositions ?? 0,
+                  total: sequenceFeedback?.sequenceLength ?? sequenceLength ?? 0,
+                })
+            : t("tapOrder")}
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center">
@@ -278,7 +284,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
                 key={i}
                 type="button"
                 data-testid={`grid-cell-${i}`}
-                aria-label={isHighlighted ? `Grid cell ${i + 1}, lit up` : `Grid cell ${i + 1}`}
+                aria-label={isHighlighted ? t("cellLit", { n: i + 1 }) : t("cell", { n: i + 1 })}
                 onClick={() => handleTap(i)}
                 disabled={phase !== "recall"}
                 className="flex aspect-square items-center justify-center rounded-md border-[1.5px] font-num text-base font-bold transition-transform duration-micro active:scale-90 disabled:active:scale-100"
@@ -302,7 +308,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
               disabled={tapped.length === 0}
               className="flex-1 rounded-full border-[1.5px] border-border py-3 font-body text-sm font-bold text-text-2 transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
             >
-              Undo
+              {t("undo")}
             </button>
             <button
               data-testid="recall-submit"
@@ -310,7 +316,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
               disabled={tapped.length !== sequenceLength}
               className="flex-1 rounded-full bg-accent py-3 font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
             >
-              Submit sequence
+              {t("submit")}
             </button>
           </div>
         )}
@@ -320,16 +326,18 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
 }
 
 function SpatialSequenceResults({ results }: { results: Results }) {
+  const t = useTranslations("spatial");
+  const tx = useTranslations("exercise");
   const { startDifficulty, endDifficulty, sequences } = results;
   const perfectSequences = sequences.filter((s) => s.fullyCorrect).length;
 
   let note: string;
   if (endDifficulty > startDifficulty) {
-    note = `You recalled full sequences accurately enough that the sequence length increased — that's the sign to keep going.`;
+    note = t("noteUp");
   } else if (endDifficulty < startDifficulty) {
-    note = `Sequence length eased back a notch to keep this challenging but doable. That's the adaptive engine working as intended, not a setback.`;
+    note = t("noteDown");
   } else {
-    note = `You held steady at this sequence length across ${sequences.length} rounds.`;
+    note = t("noteSteady", { rounds: sequences.length });
   }
 
   const lengthIncreased = endDifficulty > startDifficulty;
@@ -342,20 +350,20 @@ function SpatialSequenceResults({ results }: { results: Results }) {
             <path d="M5 13l4 4L19 7" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <h1 className="font-display text-[23px] font-bold text-text">Exercise complete</h1>
-        <div className="mt-1.5 text-[13.5px] text-text-2">Spatial Sequence Recall</div>
+        <h1 className="font-display text-[23px] font-bold text-text">{tx("complete")}</h1>
+        <div className="mt-1.5 text-[13.5px] text-text-2">{t("name")}</div>
       </div>
 
       <div className="mb-4 flex justify-around rounded-lg border border-border bg-surface p-5 shadow-sm">
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">PERFECT SEQUENCES</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{t("perfectSequences")}</div>
           <div className="font-num text-2xl font-bold text-text">
             {perfectSequences}/{sequences.length}
           </div>
         </div>
         <div className="w-px bg-border" />
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">SEQUENCE LENGTH</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{t("sequenceLength")}</div>
           <div className={`font-num text-2xl font-bold text-text ${lengthIncreased ? "animate-celebration-pop" : ""}`}>
             {startDifficulty} → {endDifficulty}
           </div>
@@ -370,7 +378,7 @@ function SpatialSequenceResults({ results }: { results: Results }) {
         href="/"
         className="mt-6 block w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent"
       >
-        Done
+        {tx("done")}
       </Link>
     </div>
   );

@@ -165,8 +165,11 @@ export async function syncDailyQuestProgress(userId: string, now: Date = new Dat
 
 export interface DailyQuestStatus {
   slug: string;
+  /** English copy as stored on the Challenge row — the fallback if the slug has no translation. */
   title: string;
   description: string;
+  /** Values the translated title/description interpolate (messages challenges.items.<slug>). */
+  messageParams: Record<string, number>;
   progressCurrent: number;
   progressTarget: number;
   completed: boolean;
@@ -191,6 +194,7 @@ export async function getDailyQuestsStatus(userId: string, now: Date = new Date(
         slug: quest.slug,
         title: quest.title,
         description: quest.description,
+        messageParams: { count: target, amount: target, pct: Math.round(DAILY_ACCURACY_FLOOR * 100) },
         progressCurrent: Math.min(progress?.progressValue ?? 0, target),
         progressTarget: target,
         completed: progress?.completedAt != null,

@@ -1,11 +1,15 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const inputClass =
   "w-full rounded-md border border-border bg-surface px-3.5 py-3 font-body text-[14.5px] text-text placeholder:text-text-3 focus:outline-none focus:ring-2 focus:ring-accent";
 
 export function ForgotPasswordForm() {
+  const t = useTranslations("auth.forgot");
+  const tc = useTranslations("common");
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
@@ -31,11 +35,13 @@ export function ForgotPasswordForm() {
     return (
       <div className="mx-auto flex w-full max-w-[390px] flex-1 flex-col justify-center px-6 py-7 text-center">
         <div className="mb-2 font-display text-[22px] font-bold text-text">
-          Check your email
+          {t("checkEmail")}
         </div>
         <p className="text-[14px] text-text-2">
-          If an account exists for <strong className="text-text">{email}</strong>,
-          we&rsquo;ve sent a link to reset your password. It expires in 1 hour.
+          {t.rich("sentBody", {
+            email,
+            strong: (chunks) => <strong className="text-text">{chunks}</strong>,
+          })}
         </p>
       </div>
     );
@@ -43,20 +49,21 @@ export function ForgotPasswordForm() {
 
   return (
     <div className="mx-auto flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
-      <div className="mb-9 font-display text-lg font-bold text-text">
-        LeanAcademy
+      <div className="mb-9 flex items-center justify-between gap-3">
+        <div className="font-display text-lg font-bold text-text">LeanAcademy</div>
+        <LanguageSwitcher />
       </div>
       <div className="mb-1.5 font-display text-[23px] font-bold text-text">
-        Reset your password
+        {t("title")}
       </div>
       <div className="mb-7 text-[13.5px] text-text-2">
-        Enter your email and we&rsquo;ll send you a link to reset it.
+        {t("subtitle")}
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
         <input
           className={inputClass}
-          placeholder="Email"
+          placeholder={tc("email")}
           type="email"
           required
           value={email}
@@ -68,7 +75,7 @@ export function ForgotPasswordForm() {
           disabled={submitting}
           className="mt-2 w-full rounded-full bg-accent py-3.5 font-body text-[15px] font-bold text-on-accent disabled:opacity-60"
         >
-          {submitting ? "Sending…" : "Send reset link"}
+          {submitting ? t("sending") : t("send")}
         </button>
       </form>
     </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { NBackExercise } from "./NBackExercise";
 import { ComplexSpanExercise } from "./ComplexSpanExercise";
 import { SpatialSequenceExercise } from "./SpatialSequenceExercise";
@@ -31,12 +32,6 @@ const EXERCISE_COMPONENTS: Record<string, React.ComponentType<SessionModeProps>>
   "dice-sum-v0": DiceSumExercise,
 };
 
-const DOMAIN_LABELS: Record<string, string> = {
-  WORKING_MEMORY: "Working Memory",
-  READING: "Reading",
-  SPATIAL: "Spatial Memory",
-};
-
 const DOMAIN_COLOR_CLASS: Record<string, string> = {
   WORKING_MEMORY: "wm",
   READING: "reading",
@@ -48,6 +43,9 @@ const TRANSITION_MS = 1800;
 type Phase = "exercise" | "transition" | "complete";
 
 export function TrainingSessionRunner({ exercises }: { exercises: TodaysExercise[] }) {
+  const t = useTranslations("session");
+  const td = useTranslations("domains");
+  const tc = useTranslations("common");
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("exercise");
   const [summaries, setSummaries] = useState<ExerciseSessionOutcome[]>([]);
@@ -139,8 +137,10 @@ export function TrainingSessionRunner({ exercises }: { exercises: TodaysExercise
     const next = exercises[index + 1];
     return (
       <div className="flex w-full max-w-[390px] flex-1 flex-col items-center justify-center px-6 py-7 text-center">
-        <div className="mb-2 font-display text-xl font-bold text-text">Nice work</div>
-        <div className="text-[14px] text-text-2">Next up: {DOMAIN_LABELS[next.domain] ?? next.displayName}</div>
+        <div className="mb-2 font-display text-xl font-bold text-text">{t("niceWork")}</div>
+        <div className="text-[14px] text-text-2">
+          {t("nextUp", { name: td.has(next.domain as never) ? td(next.domain as never) : next.displayName })}
+        </div>
       </div>
     );
   }
@@ -150,9 +150,9 @@ export function TrainingSessionRunner({ exercises }: { exercises: TodaysExercise
   if (!ExerciseComponent) {
     return (
       <div className="flex w-full max-w-[390px] flex-1 flex-col items-center justify-center px-6 py-7 text-center">
-        <div className="text-sm text-text-2">Unknown exercise: {current.method}</div>
+        <div className="text-sm text-text-2">{t("unknownExercise", { method: current.method })}</div>
         <Link href="/" className="mt-4 text-sm font-semibold text-accent underline">
-          Back home
+          {tc("backHome")}
         </Link>
       </div>
     );
@@ -182,6 +182,10 @@ function SessionCompleteScreen({
   xp: SessionCompletionXpResult | null;
   personalBests: Record<string, boolean>;
 }) {
+  const t = useTranslations("session");
+  const tm = useTranslations("methods");
+  const tx = useTranslations("exercise");
+  const th = useTranslations("home");
   const displayNameByMethod = new Map(exercises.map((e) => [e.method, e]));
 
   return (
@@ -198,9 +202,9 @@ function SessionCompleteScreen({
             />
           </svg>
         </div>
-        <div className="font-display text-[25px] font-bold text-text">Session complete</div>
+        <div className="font-display text-[25px] font-bold text-text">{t("complete")}</div>
         <div className="mt-1.5 text-[13.5px] text-text-2">
-          {totalMinutes} minute{totalMinutes === 1 ? "" : "s"} · {summaries.length} exercise{summaries.length === 1 ? "" : "s"}
+          {t("stats", { minutes: totalMinutes, exercises: summaries.length })}
         </div>
       </div>
 
@@ -220,10 +224,12 @@ function SessionCompleteScreen({
                 style={{ background: `var(--color-${colorKey}-soft)` }}
               />
               <div className="flex-1">
-                <div className="text-[13.5px] font-semibold text-text">{exercise?.displayName ?? s.method}</div>
+                <div className="text-[13.5px] font-semibold text-text">
+                  {tm.has(s.method as never) ? tm(s.method as never) : exercise?.displayName ?? s.method}
+                </div>
                 {isNewPersonalBest ? (
                   <div className="text-[11px] font-bold text-accent" data-testid="new-personal-best-tag">
-                    🏆 New personal best
+                    {t("newPersonalBest")}
                   </div>
                 ) : null}
               </div>
@@ -237,8 +243,8 @@ function SessionCompleteScreen({
         <div className="mb-4 flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-3 text-[13.5px] font-semibold text-text-2" data-testid="streak-update">
           <span aria-hidden="true">🔥</span>
           <span>
-            {streak.currentStreakDays}-day streak
-            {streak.usedFreeze ? " — a streak freeze protected yesterday" : ""}
+            {th("streak", { days: streak.currentStreakDays })}
+            {streak.usedFreeze ? t("freezeUsed") : ""}
           </span>
         </div>
       ) : null}
@@ -249,7 +255,10 @@ function SessionCompleteScreen({
           data-testid="xp-update"
         >
           <span aria-hidden="true">⭐</span>
-          <span>+{xp.awarded} XP{xp.leveledUp ? ` — Training Level ${xp.levelAfter}!` : ""}</span>
+          <span>
+            {t("xpAwarded", { xp: xp.awarded })}
+            {xp.leveledUp ? t("leveledUp", { level: xp.levelAfter }) : ""}
+          </span>
         </div>
       ) : null}
 
@@ -259,7 +268,7 @@ function SessionCompleteScreen({
         href="/"
         className="mt-6 block w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent"
       >
-        Done
+        {tx("done")}
       </Link>
     </div>
   );

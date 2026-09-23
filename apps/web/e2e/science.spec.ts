@@ -40,7 +40,7 @@ test("Science page renders real evidence-registry data, not a hardcoded copy", a
 
   await page.getByRole("link", { name: /See the science/ }).click();
   await expect(page).toHaveURL(/\/science/);
-  await expect(page.getByText("The Science", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "The Science" })).toBeVisible();
 
   // Stats card reflects the real registry counts. Scoped by each stat's
   // own data-testid rather than a bare exact-text digit match — the

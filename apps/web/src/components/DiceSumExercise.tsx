@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { DiceSumTask, DICE_SUM_MAX_COUNT, type DiceSides } from "@lean-academy/cognitive-engine";
 import {
   epochOffsetMs,
@@ -89,12 +90,13 @@ const PIP_LAYOUTS: Record<number, [number, number][]> = {
 // pip patterns, so a non-standard dieSides falls back to a numeral to
 // match how those dice actually look.
 function Die({ face, dieSides }: { face: number; dieSides: number }) {
+  const t = useTranslations("diceSum");
   const showPips = dieSides === 6;
   return (
     <div
       className="relative flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-xl border-[1.5px] border-border bg-surface shadow-sm"
       role="img"
-      aria-label={`Die showing ${face}`}
+      aria-label={t("dieShowing", { face })}
     >
       {showPips ? (
         (PIP_LAYOUTS[face] ?? []).map(([top, left], i) => (
@@ -117,6 +119,8 @@ interface DiceSumExerciseProps extends SessionModeProps {
 }
 
 export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: DiceSumExerciseProps = {}) {
+  const t = useTranslations("diceSum");
+  const tx = useTranslations("exercise");
   const effectiveDieSides = dieSides ?? 6;
   const maxTypedDigits = String(effectiveDieSides * DICE_SUM_MAX_COUNT).length;
   const [phase, setPhase] = useState<Phase>("show");
@@ -217,7 +221,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
           startDifficulty,
           endDifficulty,
           trials,
-          summaryLabel: `${startDifficulty} → ${endDifficulty} dice`,
+          summaryLabel: t("summary", { start: startDifficulty, end: endDifficulty }),
         });
         return;
       }
@@ -262,7 +266,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
       data-die-sides={effectiveDieSides}
     >
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label="Exit exercise">
+        <Link href="/" aria-label={tx("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
@@ -276,22 +280,24 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
         <div className="w-[18px]" />
       </div>
       <div className="mb-4 text-center text-xs text-text-3">
-        Round {roundNumber} of {TOTAL_ROUNDS}
+        {tx("roundOf", { current: roundNumber, total: TOTAL_ROUNDS })}
       </div>
 
-      <h1 className="sr-only">Dice Sum exercise</h1>
+      <h1 className="sr-only">{t("srTitle")}</h1>
       <div className="mb-4 flex items-center justify-center gap-1.5">
         <div className="h-[7px] w-[7px] rounded-full bg-wm" />
-        <div className="text-[12.5px] font-bold tracking-wide text-wm">WORKING MEMORY · DICE SUM</div>
+        <div className="text-[12.5px] font-bold tracking-wide text-wm">{t("tag")}</div>
       </div>
 
       {phase === "show" && (
         <div className="flex flex-1 flex-col">
           <div className="text-center font-display text-lg font-bold text-text">
-            Remember these — you&rsquo;ll add them up
+            {t("remember")}
           </div>
           <div className="mb-2 text-center text-[12.5px] text-text-3">
-            {dice.length} {effectiveDieSides === 6 ? "" : `d${effectiveDieSides} `}dice · shown for {SHOW_MS / 1000} seconds
+            {effectiveDieSides === 6
+              ? t("shownFor", { count: dice.length, seconds: SHOW_MS / 1000 })
+              : t("shownForSided", { count: dice.length, sides: effectiveDieSides, seconds: SHOW_MS / 1000 })}
           </div>
           <div className="mb-9 h-[5px] overflow-hidden rounded-full bg-surface-2">
             <div
@@ -321,16 +327,16 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
           <div className="mb-1 text-center font-display text-lg font-bold text-text">
             {phase === "feedback"
               ? feedback?.correct
-                ? "Correct"
-                : "Not quite"
-              : "What's the total?"}
+                ? t("correct")
+                : t("notQuite")
+              : t("whatsTotal")}
           </div>
           <div className="mb-8 text-center text-[12.5px] text-text-3">
             {phase === "feedback"
               ? feedback?.correct
-                ? `${feedback.diceCount} dice summed to ${feedback.correctSum}`
-                : `The total was ${feedback?.correctSum}`
-              : `Add up all ${dice.length} dice`}
+                ? t("summedTo", { count: feedback.diceCount, sum: feedback.correctSum })
+                : t("totalWas", { sum: feedback?.correctSum ?? 0 })
+              : t("addUp", { count: dice.length })}
           </div>
           <div className="mb-8 flex justify-center">
             <div
@@ -365,6 +371,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
                   data-testid="keypad-backspace"
                   onClick={handleBackspace}
                   disabled={typed.length === 0}
+                  aria-label={t("backspace")}
                   className="aspect-square rounded-[14px] border border-border bg-surface text-sm text-text-2 disabled:opacity-40"
                 >
                   ⌫
@@ -387,7 +394,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
                 disabled={typed.length === 0}
                 className="w-full rounded-full bg-wm py-3.5 text-center font-body text-[15px] font-bold text-on-accent disabled:opacity-40"
               >
-                Submit
+                {t("submit")}
               </button>
             </>
           )}
@@ -398,16 +405,18 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
 }
 
 function DiceSumResults({ results }: { results: Results }) {
+  const t = useTranslations("diceSum");
+  const tx = useTranslations("exercise");
   const { startDifficulty, endDifficulty, rounds } = results;
   const correctRounds = rounds.filter((r) => r.correct).length;
 
   let note: string;
   if (endDifficulty > startDifficulty) {
-    note = `You summed correctly enough that the dice count increased — that's the sign to keep going.`;
+    note = t("noteUp");
   } else if (endDifficulty < startDifficulty) {
-    note = `Dice count eased back a notch to keep this challenging but doable. That's the adaptive engine working as intended, not a setback.`;
+    note = t("noteDown");
   } else {
-    note = `You held steady at this dice count across ${rounds.length} rounds.`;
+    note = t("noteSteady", { rounds: rounds.length });
   }
 
   const countIncreased = endDifficulty > startDifficulty;
@@ -420,20 +429,20 @@ function DiceSumResults({ results }: { results: Results }) {
             <path d="M5 13l4 4L19 7" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <h1 className="font-display text-[23px] font-bold text-text">Exercise complete</h1>
-        <div className="mt-1.5 text-[13.5px] text-text-2">Dice Sum</div>
+        <h1 className="font-display text-[23px] font-bold text-text">{tx("complete")}</h1>
+        <div className="mt-1.5 text-[13.5px] text-text-2">{t("name")}</div>
       </div>
 
       <div className="mb-4 flex justify-around rounded-lg border border-border bg-surface p-5 shadow-sm">
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">CORRECT SUMS</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{t("correctSums")}</div>
           <div className="font-num text-2xl font-bold text-text">
             {correctRounds}/{rounds.length}
           </div>
         </div>
         <div className="w-px bg-border" />
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">DICE COUNT</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{t("diceCount")}</div>
           <div className={`font-num text-2xl font-bold text-text ${countIncreased ? "animate-celebration-pop" : ""}`}>
             {startDifficulty} → {endDifficulty}
           </div>
@@ -448,7 +457,7 @@ function DiceSumResults({ results }: { results: Results }) {
         href="/"
         className="mt-6 block w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent"
       >
-        Done
+        {tx("done")}
       </Link>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { NBackTask, type NBackStimulus } from "@lean-academy/cognitive-engine";
 import {
   epochOffsetMs,
@@ -54,6 +55,8 @@ interface NBackExerciseProps extends SessionModeProps {
 }
 
 export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExerciseProps = {}) {
+  const t = useTranslations("nBack");
+  const tx = useTranslations("exercise");
   const stimulusMs = STIMULUS_MS_BY_PACE[pace ?? "STANDARD"];
   const [phase, setPhase] = useState<"stimulus" | "feedback" | "done">("stimulus");
   const [stimulus, setStimulus] = useState<NBackStimulus | null>(null);
@@ -173,7 +176,7 @@ export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExer
           startDifficulty,
           endDifficulty,
           trials,
-          summaryLabel: `Level ${startDifficulty} → ${endDifficulty}`,
+          summaryLabel: tx("levelSummary", { start: startDifficulty, end: endDifficulty }),
         });
         return;
       }
@@ -202,7 +205,7 @@ export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExer
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5" data-testid="n-back-exercise" data-pace={pace ?? "STANDARD"}>
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label="Exit exercise">
+        <Link href="/" aria-label={tx("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path
               d="M6 6l12 12M18 6L6 18"
@@ -221,21 +224,23 @@ export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExer
         <div className="w-[18px]" />
       </div>
       <div className="mb-5 text-center text-xs text-text-3">
-        Trial {trialNumber} of {TOTAL_TRIALS}
+        {tx("trialOf", { current: trialNumber, total: TOTAL_TRIALS })}
       </div>
 
-      <h1 className="sr-only">Adaptive N-Back exercise</h1>
+      <h1 className="sr-only">{t("srTitle")}</h1>
       <div className="mb-2.5 flex items-center justify-center gap-1.5">
         <div className="h-[7px] w-[7px] rounded-full bg-wm" />
         <div className="text-[12.5px] font-bold tracking-wide text-wm">
-          WORKING MEMORY · N-BACK
+          {t("tag")}
         </div>
       </div>
 
       <div className="mb-8 text-center font-display text-[19px] font-bold text-text">
         {stimulus && !stimulus.isScoreable
-          ? "Memorize this — matching hasn't started yet"
-          : `Tap the square if it matches ${currentN ?? "…"} step${currentN === 1 ? "" : "s"} back`}
+          ? t("memorize")
+          : currentN == null
+            ? t("instructionPending")
+            : t("instruction", { n: currentN })}
       </div>
 
       <div className="flex flex-1 items-center justify-center">
@@ -277,14 +282,14 @@ export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExer
                 : "var(--color-wm)",
           }}
         >
-          {feedback ? (feedback.correct ? "Got it" : "Missed") : "Match"}
+          {feedback ? (feedback.correct ? t("gotIt") : t("missed")) : t("match")}
         </button>
       </div>
       <div className="h-[18px] text-center text-[12.5px] font-bold text-success">
         {feedback?.correct
-          ? "Correct — nice catch"
+          ? t("correct")
           : phase === "feedback" && stimulus && !stimulus.isScoreable
-            ? <span className="font-bold text-text-3">Not scored — still building the pattern</span>
+            ? <span className="font-bold text-text-3">{t("notScored")}</span>
             : ""}
       </div>
     </div>
@@ -292,16 +297,18 @@ export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExer
 }
 
 function NBackResults({ results }: { results: Results }) {
+  const t = useTranslations("nBack");
+  const tx = useTranslations("exercise");
   const { startDifficulty, endDifficulty, accuracy, scoredTrials } = results;
   const accuracyPct = Math.round(accuracy * 100);
 
   let note: string;
   if (endDifficulty > startDifficulty) {
-    note = `Your accuracy held up while the difficulty increased — that's the sign to keep going, not just a faster pace.`;
+    note = t("noteUp");
   } else if (endDifficulty < startDifficulty) {
-    note = `Difficulty eased back a level to keep this challenging but doable. That's the adaptive engine working as intended, not a setback.`;
+    note = t("noteDown");
   } else {
-    note = `You held steady at this level across ${scoredTrials} scored trials.`;
+    note = t("noteSteady", { trials: scoredTrials });
   }
 
   const levelIncreased = endDifficulty > startDifficulty;
@@ -321,23 +328,23 @@ function NBackResults({ results }: { results: Results }) {
           </svg>
         </div>
         <h1 className="font-display text-[23px] font-bold text-text">
-          Exercise complete
+          {tx("complete")}
         </h1>
         <div className="mt-1.5 text-[13.5px] text-text-2">
-          Adaptive N-Back
+          {t("name")}
         </div>
       </div>
 
       <div className="mb-4 flex justify-around rounded-lg border border-border bg-surface p-5 shadow-sm">
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">ACCURACY</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{tx("accuracy")}</div>
           <div className="font-num text-2xl font-bold text-text">
             {accuracyPct}%
           </div>
         </div>
         <div className="w-px bg-border" />
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">LEVEL</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{tx("level")}</div>
           <div className={`font-num text-2xl font-bold text-text ${levelIncreased ? "animate-celebration-pop" : ""}`}>
             {startDifficulty} → {endDifficulty}
           </div>
@@ -352,7 +359,7 @@ function NBackResults({ results }: { results: Results }) {
         href="/"
         className="mt-6 block w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent"
       >
-        Done
+        {tx("done")}
       </Link>
     </div>
   );

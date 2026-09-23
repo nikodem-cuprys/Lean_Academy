@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   NBackTask,
   ComplexSpanTask,
@@ -40,35 +41,15 @@ type CalibrationMethod =
 
 type Phase = "goals" | "time" | "experience" | "calibration" | "recommend" | "submitting" | "done";
 
-const GOAL_OPTIONS: { id: Goal; label: string }[] = [
-  { id: "working-memory", label: "Improve working memory" },
-  { id: "concentration", label: "Practice concentration" },
-  { id: "reading-efficiency", label: "Read faster, without losing the plot" },
-  { id: "memory-strategies", label: "Learn better memory strategies" },
-  { id: "habit", label: "Just build a daily habit" },
-  { id: "balanced", label: "A bit of everything" },
-];
+// Option order only — every label/note is looked up in the messages
+// files (onboarding.goals.<id>, onboarding.time.<minutes>, ...).
+const GOAL_OPTIONS: Goal[] = ["working-memory", "concentration", "reading-efficiency", "memory-strategies", "habit", "balanced"];
 
-const TIME_OPTIONS = [
-  { minutes: 5, label: "5 minutes", note: "A quick daily touch" },
-  { minutes: 10, label: "10 minutes", note: "Balanced, most popular" },
-  { minutes: 15, label: "15 minutes", note: "More structured training" },
-  { minutes: 20, label: "20 minutes", note: "For focused daily practice" },
-];
+const TIME_OPTIONS = [5, 10, 15, 20] as const;
 
-const EXPERIENCE_OPTIONS: { id: ExperienceLevel; label: string; note: string }[] = [
-  { id: "new", label: "New to this", note: "Start comfortable and build up" },
-  { id: "some", label: "Some experience", note: "I've tried memory or brain-training apps" },
-  { id: "experienced", label: "Very experienced", note: "I want a real challenge from the start" },
-];
+const EXPERIENCE_OPTIONS: ExperienceLevel[] = ["new", "some", "experienced"];
 
-const DIFFICULTY_OPTIONS: { id: DifficultyLevel; label: string; note: string }[] = [
-  { id: "BEGINNER", label: "Beginner", note: "Start at the easiest end of each exercise" },
-  { id: "INTERMEDIATE", label: "Intermediate", note: "A typical comfortable starting point" },
-  { id: "ADVANCED", label: "Advanced", note: "Skip ahead, closer to each exercise's hardest end" },
-  { id: "EXPERT", label: "Expert", note: "Start at the hardest end of each exercise" },
-  { id: "AUTO", label: "Auto (recommended)", note: "Use exactly what your calibration measured" },
-];
+const DIFFICULTY_OPTIONS: DifficultyLevel[] = ["BEGINNER", "INTERMEDIATE", "ADVANCED", "EXPERT", "AUTO"];
 
 const RECALL_LETTERS = ["B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Y", "Z"];
 
@@ -104,6 +85,7 @@ function recommendLevel(experienceLevel: ExperienceLevel, accuracy: number): Dif
 }
 
 export function OnboardingFlow() {
+  const t = useTranslations("onboarding");
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("goals");
   const [goal, setGoal] = useState<Goal | null>(null);
@@ -161,17 +143,17 @@ export function OnboardingFlow() {
       router.push("/");
     } catch (err) {
       console.error("Failed to complete onboarding:", err);
-      setSubmitError("Something went wrong saving your plan. You can try again.");
+      setSubmitError(t("submitError"));
       setPhase("recommend");
     }
   }
 
   if (phase === "goals") {
     return (
-      <OnboardingStep step={1} title="What would you like to focus on?" subtitle="Pick what matters most. We'll build your plan around it — you can always train everything either way.">
-        <div role="radiogroup" aria-label="What would you like to focus on?" className="flex flex-col gap-2.5">
-          {GOAL_OPTIONS.map((opt) => (
-            <OptionRow key={opt.id} testId={`goal-${opt.id}`} selected={goal === opt.id} label={opt.label} onClick={() => setGoal(opt.id)} />
+      <OnboardingStep step={1} title={t("goalsTitle")} subtitle={t("goalsSubtitle")}>
+        <div role="radiogroup" aria-label={t("goalsTitle")} className="flex flex-col gap-2.5">
+          {GOAL_OPTIONS.map((id) => (
+            <OptionRow key={id} testId={`goal-${id}`} selected={goal === id} label={t(`goals.${id}`)} onClick={() => setGoal(id)} />
           ))}
         </div>
         <ContinueButton testId="goals-continue" disabled={!goal} onClick={goToTime} />
@@ -181,26 +163,26 @@ export function OnboardingFlow() {
 
   if (phase === "time") {
     return (
-      <OnboardingStep step={2} title="How much time can you give each day?" subtitle="We'll build sessions to fit. You can change this anytime.">
-        <div role="radiogroup" aria-label="How much time can you give each day?" className="flex flex-col gap-3">
-          {TIME_OPTIONS.map((opt) => (
+      <OnboardingStep step={2} title={t("timeTitle")} subtitle={t("timeSubtitle")}>
+        <div role="radiogroup" aria-label={t("timeTitle")} className="flex flex-col gap-3">
+          {TIME_OPTIONS.map((minutes) => (
             <OptionRow
-              key={opt.minutes}
-              testId={`time-${opt.minutes}`}
-              selected={!isCustomTime && dailyMinutes === opt.minutes}
-              label={opt.label}
-              note={opt.note}
+              key={minutes}
+              testId={`time-${minutes}`}
+              selected={!isCustomTime && dailyMinutes === minutes}
+              label={t("minutes", { minutes })}
+              note={t(`timeNotes.${minutes}`)}
               onClick={() => {
                 setIsCustomTime(false);
-                setDailyMinutes(opt.minutes);
+                setDailyMinutes(minutes);
               }}
             />
           ))}
           <OptionRow
             testId="time-custom"
             selected={isCustomTime}
-            label="Custom"
-            note="Set your own goal"
+            label={t("custom")}
+            note={t("customNote")}
             onClick={() => setIsCustomTime(true)}
           />
           {isCustomTime && (
@@ -209,7 +191,8 @@ export function OnboardingFlow() {
               type="number"
               min={1}
               max={180}
-              placeholder="Minutes per day"
+              placeholder={t("minutesPerDay")}
+              aria-label={t("minutesPerDay")}
               value={customMinutes}
               onChange={(e) => setCustomMinutes(e.target.value)}
               className="rounded-md border-[1.5px] border-border bg-surface px-3.5 py-3 text-[14.5px] text-text"
@@ -225,22 +208,22 @@ export function OnboardingFlow() {
     return (
       <OnboardingStep
         step={3}
-        title="Have you done anything like this before?"
-        subtitle="No wrong answer — this just helps your first sessions feel right. A short calibration next will fine-tune it further."
+        title={t("experienceTitle")}
+        subtitle={t("experienceSubtitle")}
       >
-        <div role="radiogroup" aria-label="Have you done anything like this before?" className="flex flex-col gap-3">
-          {EXPERIENCE_OPTIONS.map((opt) => (
+        <div role="radiogroup" aria-label={t("experienceTitle")} className="flex flex-col gap-3">
+          {EXPERIENCE_OPTIONS.map((id) => (
             <OptionRow
-              key={opt.id}
-              testId={`experience-${opt.id}`}
-              selected={experienceLevel === opt.id}
-              label={opt.label}
-              note={opt.note}
-              onClick={() => setExperienceLevel(opt.id)}
+              key={id}
+              testId={`experience-${id}`}
+              selected={experienceLevel === id}
+              label={t(`experience.${id}.label`)}
+              note={t(`experience.${id}.note`)}
+              onClick={() => setExperienceLevel(id)}
             />
           ))}
         </div>
-        <ContinueButton testId="experience-continue" label="Continue to calibration" disabled={!experienceLevel} onClick={goToCalibration} />
+        <ContinueButton testId="experience-continue" label={t("continueToCalibration")} disabled={!experienceLevel} onClick={goToCalibration} />
       </OnboardingStep>
     );
   }
@@ -253,24 +236,24 @@ export function OnboardingFlow() {
     return (
       <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-7">
         <div className="mb-6 text-center">
-          <div className="font-display text-[22px] font-bold text-text">We recommend starting at:</div>
+          <div className="font-display text-[22px] font-bold text-text">{t("recommendTitle")}</div>
         </div>
-        <div role="radiogroup" aria-label="Recommended difficulty level" className="flex flex-col gap-2.5">
-          {DIFFICULTY_OPTIONS.map((opt) => (
+        <div role="radiogroup" aria-label={t("recommendLabel")} className="flex flex-col gap-2.5">
+          {DIFFICULTY_OPTIONS.map((id) => (
             <OptionRow
-              key={opt.id}
-              testId={`difficulty-${opt.id}`}
-              selected={difficultyLevel === opt.id}
-              label={opt.label}
-              note={opt.note}
-              onClick={() => setDifficultyLevel(opt.id)}
+              key={id}
+              testId={`difficulty-${id}`}
+              selected={difficultyLevel === id}
+              label={t(`levels.${id}.label`)}
+              note={t(`levels.${id}.note`)}
+              onClick={() => setDifficultyLevel(id)}
             />
           ))}
         </div>
         {submitError && <div className="mt-3 text-[13px] text-caution">{submitError}</div>}
         <ContinueButton
           testId="finish-onboarding"
-          label={phase === "submitting" ? "Saving your plan..." : "Start training"}
+          label={phase === "submitting" ? t("saving") : t("startTraining")}
           disabled={phase === "submitting"}
           onClick={finishOnboarding}
         />
@@ -292,6 +275,7 @@ function OnboardingStep({
   subtitle: string;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("onboarding");
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
       <div className="mb-7 flex gap-1.5">
@@ -299,7 +283,7 @@ function OnboardingStep({
           <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-accent" : "bg-surface-2"}`} />
         ))}
       </div>
-      <div className="mb-2.5 text-[12.5px] font-bold tracking-wide text-text-3">STEP {step} OF 3</div>
+      <div className="mb-2.5 text-[12.5px] font-bold tracking-wide text-text-3">{t("stepOf", { step, total: 3 })}</div>
       <h1 className="mb-2 font-display text-[25px] font-bold leading-tight text-text">{title}</h1>
       <div className="mb-6 text-sm leading-relaxed text-text-2">{subtitle}</div>
       <div className="flex-1">{children}</div>
@@ -347,7 +331,7 @@ function OptionRow({
 
 function ContinueButton({
   testId,
-  label = "Continue",
+  label,
   disabled,
   onClick,
 }: {
@@ -356,6 +340,7 @@ function ContinueButton({
   disabled: boolean;
   onClick: () => void;
 }) {
+  const t = useTranslations("onboarding");
   return (
     <button
       data-testid={testId}
@@ -363,7 +348,7 @@ function ContinueButton({
       disabled={disabled}
       className="mt-5 w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent transition-transform duration-micro active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
     >
-      {label}
+      {label ?? t("continue")}
     </button>
   );
 }
@@ -391,6 +376,7 @@ type CalibrationSubPhase =
  * suppressing those lints).
  */
 function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) => void }) {
+  const t = useTranslations("onboarding.calibration");
   const [subPhase, setSubPhase] = useState<CalibrationSubPhase>("spatial-study");
   const [questionNumber, setQuestionNumber] = useState(1);
 
@@ -554,15 +540,15 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
 
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
-      <div className="mb-1 text-[12.5px] font-bold tracking-wide text-text-3">QUICK CALIBRATION</div>
+      <div className="mb-1 text-[12.5px] font-bold tracking-wide text-text-3">{t("title")}</div>
       <div className="mb-6 text-center">
         <div className="font-display text-lg font-bold text-text">
-          {(subPhase === "spatial-study" || subPhase === "spatial-tap") && "Watch, then repeat the pattern"}
-          {subPhase === "nback-stim" && "Was this the same square as last time?"}
-          {(subPhase === "complexspan-memory" || subPhase === "complexspan-recall") && "Remember the letters, in order"}
-          {(subPhase === "reading-passage" || subPhase === "reading-question") && "Read at your own pace"}
+          {(subPhase === "spatial-study" || subPhase === "spatial-tap") && t("spatial")}
+          {subPhase === "nback-stim" && t("nBack")}
+          {(subPhase === "complexspan-memory" || subPhase === "complexspan-recall") && t("complexSpan")}
+          {(subPhase === "reading-passage" || subPhase === "reading-question") && t("reading")}
         </div>
-        <div className="mt-2 text-[13.5px] text-text-2">About 90 seconds, no pass or fail — this just helps us start you at the right level.</div>
+        <div className="mt-2 text-[13.5px] text-text-2">{t("subtitle")}</div>
       </div>
 
       {(subPhase === "spatial-study" || subPhase === "spatial-tap") && (
@@ -575,7 +561,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
               disabled={spatialTapped.length !== spatialTargetLength}
               className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
             >
-              Submit
+              {t("submit")}
             </button>
           )}
         </div>
@@ -591,7 +577,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
               disabled={!nbackScoreable}
               className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-3 text-center font-body text-sm font-bold text-text transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
             >
-              Different
+              {t("different")}
             </button>
             <button
               data-testid="calibration-nback-yes"
@@ -599,7 +585,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
               disabled={!nbackScoreable}
               className="flex-1 rounded-md border-[1.5px] border-border bg-surface py-3 text-center font-body text-sm font-bold text-text transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
             >
-              Same
+              {t("same")}
             </button>
           </div>
         </div>
@@ -640,7 +626,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
                 disabled={recalled.length !== 3}
                 className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
               >
-                Submit
+                {t("submit")}
               </button>
             </>
           )}
@@ -651,21 +637,21 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
         <div className="flex flex-1 flex-col">
           {subPhase === "reading-passage" ? (
             <>
-              <div className="mb-4 max-h-64 overflow-y-auto text-[14.5px] leading-relaxed text-text-2">{passage.text}</div>
+              <div lang="en" className="mb-4 max-h-64 overflow-y-auto text-[14.5px] leading-relaxed text-text-2">{passage.text}</div>
               <button
                 data-testid="calibration-finish-reading"
                 onClick={() => resolvePending(undefined)}
                 className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95"
               >
-                I&rsquo;ve finished reading
+                {t("finishedReading")}
               </button>
             </>
           ) : (
             <>
-              <div data-testid="calibration-question-prompt" className="mb-4 font-display text-base font-bold text-text">
+              <div data-testid="calibration-question-prompt" lang="en" className="mb-4 font-display text-base font-bold text-text">
                 {passage.question.prompt}
               </div>
-              <div role="radiogroup" aria-label={passage.question.prompt} className="mb-4 flex flex-col gap-2">
+              <div role="radiogroup" aria-label={passage.question.prompt} lang="en" className="mb-4 flex flex-col gap-2">
                 {passage.question.choices.map((choice, i) => (
                   <button
                     type="button"
@@ -690,7 +676,7 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
                 disabled={selectedChoice === null}
                 className="w-full rounded-full bg-accent py-3 text-center font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
               >
-                Submit
+                {t("submit")}
               </button>
             </>
           )}
@@ -699,8 +685,8 @@ function CalibrationBattery({ onDone }: { onDone: (results: CalibrationTally[]) 
 
       <div className="mt-6">
         <div className="mb-2 flex justify-between text-xs text-text-3">
-          <span>Question {questionNumber} of 6</span>
-          <span>Memory &amp; comprehension both count</span>
+          <span>{t("questionOf", { current: questionNumber, total: 6 })}</span>
+          <span>{t("bothCount")}</span>
         </div>
         <div className="h-[5px] overflow-hidden rounded-full bg-border">
           <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${(questionNumber / 6) * 100}%` }} />

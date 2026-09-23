@@ -1,0 +1,557 @@
+{
+  "meta": {
+    "description": "基于科学证据的工作记忆与阅读效率训练。"
+  },
+  "languageSwitcher": {
+    "label": "语言"
+  },
+  "common": {
+    "somethingWentWrong": "出了点问题，请重试。",
+    "email": "电子邮箱",
+    "pleaseWait": "请稍候…",
+    "goToLogin": "前往登录",
+    "backHome": "← 返回首页"
+  },
+  "auth": {
+    "logIn": "登录",
+    "signUp": "注册",
+    "createTitle": "创建账户",
+    "welcomeBack": "欢迎回来",
+    "createSubtitle": "从一次免费的 6 分钟训练开始。",
+    "loginSubtitle": "登录以继续你的训练。",
+    "continueGoogle": "使用 Google 继续",
+    "continueFacebook": "使用 Facebook 继续",
+    "or": "或",
+    "name": "姓名",
+    "password": "密码",
+    "createAccount": "创建账户",
+    "forgotPassword": "忘记密码？",
+    "terms": "继续即表示你同意我们的服务条款和隐私政策。",
+    "autoSignInFailed": "账户已创建，但自动登录失败——请尝试手动登录。",
+    "incorrectCredentials": "邮箱或密码不正确。",
+    "forgot": {
+      "checkEmail": "请查收邮件",
+      "sentBody": "如果 <strong>{email}</strong> 已注册账户，我们已向其发送重置密码的链接。链接将在 1 小时后失效。",
+      "title": "重置密码",
+      "subtitle": "输入你的邮箱，我们会发送一个重置链接给你。",
+      "sending": "正在发送…",
+      "send": "发送重置链接"
+    },
+    "reset": {
+      "mismatch": "两次输入的密码不一致。",
+      "updated": "密码已更新",
+      "redirecting": "正在跳转到登录页…",
+      "title": "设置新密码",
+      "forEmail": "账户：{email}",
+      "newPassword": "新密码",
+      "confirmPassword": "确认新密码",
+      "saving": "正在保存…",
+      "save": "保存新密码",
+      "invalidTitle": "此链接无效",
+      "invalidBody": "请重新申请密码重置链接后再试。",
+      "requestNew": "重置密码"
+    },
+    "verify": {
+      "verified": "邮箱已验证",
+      "verifiedBody": "你的邮箱地址已确认，一切就绪。",
+      "expiredTitle": "此链接已过期",
+      "invalidTitle": "此链接无效",
+      "expiredBody": "验证链接会在 24 小时后失效。登录后我们会重新发送一个。",
+      "invalidBody": "该链接可能已被使用，或复制时出错。"
+    }
+  },
+  "apiErrors": {
+    "invalidEmail": "邮箱地址无效。",
+    "passwordTooShort": "密码至少需要 8 个字符",
+    "tooManyAttempts": "尝试次数过多，请稍后再试。",
+    "accountExists": "该邮箱已注册账户。",
+    "resetGeneric": "如果该邮箱已注册账户，我们已发送重置链接。",
+    "resetExpired": "此重置链接已过期，请重新申请。",
+    "resetInvalid": "此重置链接无效。"
+  },
+  "emails": {
+    "verify": {
+      "subject": "验证你的 LeanAcademy 邮箱",
+      "text": "请确认你的邮箱地址：{url}\n\n此链接将在 24 小时后失效。",
+      "welcome": "欢迎加入 LeanAcademy。",
+      "confirmLink": "确认你的邮箱地址",
+      "confirmRest": "，以完成账户设置。",
+      "expiry": "此链接将在 24 小时后失效。如果你没有创建此账户，请忽略本邮件。"
+    },
+    "reset": {
+      "subject": "重置你的 LeanAcademy 密码",
+      "text": "重置你的密码：{url}\n\n此链接将在 1 小时后失效。如果这不是你本人的操作，请忽略本邮件。",
+      "intro": "我们收到了重置你 LeanAcademy 密码的请求。",
+      "link": "设置新密码",
+      "expiry": "此链接将在 1 小时后失效，且只能使用一次。如果这不是你本人的操作，请忽略本邮件——你的密码不会改变。"
+    }
+  },
+  "domains": {
+    "WORKING_MEMORY": "工作记忆",
+    "READING": "阅读",
+    "SPATIAL": "空间记忆",
+    "VERBAL": "言语",
+    "COGNITIVE_CONTROL": "认知控制",
+    "MEMORY_STRATEGY": "记忆策略"
+  },
+  "nav": {
+    "main": "主导航",
+    "home": "首页",
+    "progress": "进度",
+    "science": "科学依据",
+    "achievements": "成就",
+    "challenges": "任务与挑战",
+    "customize": "自定义练习"
+  },
+  "home": {
+    "todaysTraining": "今日训练",
+    "startTraining": "开始训练",
+    "thisWeek": "本周",
+    "weekdayLetters": "一,二,三,四,五,六,日",
+    "dayTrained": "已训练",
+    "dayTodayNotYet": "今天——尚未训练",
+    "dayNoSession": "未训练",
+    "recentAchievement": "最新成就",
+    "earnedOn": "获得于 {date}",
+    "noAchievements": "还没有成就——查看完整列表 →",
+    "quickLinks": "快速入口",
+    "registryReviewed": "证据库最近审阅时间",
+    "approvedModules": "已批准的训练模块",
+    "signedIn": "已登录",
+    "signedInNo": "否",
+    "streak": "{days, plural, other {连续 # 天}}",
+    "streakNudge": "——准备好继续训练了吗？",
+    "trainingLevel": "训练等级 {level}",
+    "links": {
+      "progress": "查看进度 →",
+      "science": "了解科学依据 →",
+      "achievements": "查看成就 →",
+      "challenges": "查看任务与挑战 →",
+      "customize": "自定义练习 →",
+      "nBack": "试试 N-Back 练习 →",
+      "complexSpan": "试试复杂广度练习 →",
+      "diceSum": "试试骰子求和练习 →",
+      "spatial": "试试空间序列练习 →",
+      "reading": "试试节奏阅读练习 →"
+    },
+    "loginOrSignup": "登录或注册 →",
+    "greetingNamed": "欢迎回来，{name}",
+    "greeting": "欢迎回来",
+    "onboardingPrompt": "完成入门引导，获取围绕你的目标制定的训练计划。",
+    "startOnboarding": "开始入门引导"
+  },
+  "methods": {
+    "adaptive-nback-v0": "自适应 N-Back",
+    "complex-span-v0": "复杂广度",
+    "dice-sum-v0": "骰子求和",
+    "visuospatial-sequence-recall-v0": "空间序列回忆",
+    "reading-paced-adaptive-v0": "节奏 / 自适应阅读"
+  },
+  "achievements": {
+    "title": "成就",
+    "earnedCount": "已获得 {earned}/{total}",
+    "earnedOn": "获得于 {date}",
+    "progress": "{current}/{target}",
+    "notYet": "尚未获得",
+    "catalog": {
+      "first-session": { "title": "首次训练" },
+      "first-week": { "title": "第一周" },
+      "sessions-10": { "title": "10 次训练" },
+      "sessions-30": { "title": "30 次训练" },
+      "sessions-100": { "title": "100 次训练" },
+      "working-memory-level-5": { "title": "工作记忆 5 级" },
+      "reading-efficiency-milestone": { "title": "阅读效率里程碑" },
+      "reading-comprehension-at-new-pace": { "title": "在新速度下保持 90% 理解率" },
+      "weekly-sessions-complete": { "title": "完成本周全部训练" },
+      "personal-best": { "title": "个人最佳" },
+      "first-assessment": { "title": "完成首次评估" }
+    }
+  },
+  "challenges": {
+    "title": "任务与挑战",
+    "daily": "每日任务",
+    "weekly": "每周挑战",
+    "completeCount": "已完成 {done}/{total}",
+    "resets": "——{when} 重置",
+    "complete": "已完成",
+    "progress": "{current}/{target}",
+    "items": {
+      "daily-complete-session": {
+        "title": "完成一次训练",
+        "description": "今天完成 1 次训练。"
+      },
+      "daily-earn-xp": {
+        "title": "获得 {amount} XP",
+        "description": "今天获得 {amount} XP。"
+      },
+      "daily-accuracy": {
+        "title": "取得较高准确率",
+        "description": "完成一次准确率不低于 {pct}% 的训练。"
+      },
+      "complete-sessions": {
+        "title": "完成 {count} 次训练",
+        "description": "本周完成 {count} 次训练。"
+      },
+      "train-domains": {
+        "title": "训练 {count} 个不同领域",
+        "description": "本周在 {count} 个不同的认知领域各完成一次训练。"
+      },
+      "reading-comprehension": {
+        "title": "高理解率阅读",
+        "description": "完成一次理解率不低于 {pct}% 的阅读训练。"
+      },
+      "beat-personal-record": {
+        "title": "打破个人纪录",
+        "description": "打破你自己的一项训练纪录。"
+      },
+      "complete-assessment": {
+        "title": "完成一次评估",
+        "description": "完成一次训练评估。"
+      }
+    }
+  },
+  "evidence": {
+    "strong": "充分",
+    "moderate": "中等",
+    "limited": "有限",
+    "experimental": "实验性",
+    "unsupported": "缺乏支持"
+  },
+  "assessmentNames": {
+    "backwardDigitSpan": "倒序数字广度",
+    "backwardSpatialSpan": "倒序空间广度"
+  },
+  "premium": {
+    "title": "{feature}是高级版功能",
+    "body": "订阅功能尚未开放，敬请期待。无论如何，你训练过的练习、进度以及背后的全部科学依据都将保持免费。",
+    "back": "返回进度",
+    "features": {
+      "backwardDigitSpan": "倒序数字广度评估",
+      "backwardSpatialSpan": "倒序空间广度评估",
+      "trends": "长期趋势"
+    }
+  },
+  "science": {
+    "title": "科学依据",
+    "intro": "这里的每项练习都有引用的研究支持——看看哪些已被证实、哪些证据仍然有限，以及我们选择不纳入的内容。",
+    "englishNote": "研究名称和研究摘要以英文原文显示，以免翻译改变其含义。",
+    "statReviewed": "已审阅",
+    "statImplemented": "已纳入你的训练",
+    "statExcluded": "已排除",
+    "excludedNote": "{count, plural, other {我们审阅后未纳入的 # 种方法}}——{names}——未达到我们的证据标准。"
+  },
+  "progress": {
+    "title": "进度",
+    "empty": "还没有训练记录。完成一次训练后，这里就会显示你的真实进度。",
+    "backHome": "返回首页",
+    "readingAllTime": "阅读——全部记录",
+    "readingLast30": "阅读——最近 30 天",
+    "pace": "速度",
+    "wpm": "词/分钟",
+    "comprehension": "理解率",
+    "personalBest": "个人最佳",
+    "atComprehension": "理解率 {pct}%",
+    "trendsCta": "📈 查看你的长期趋势 →",
+    "trendsCtaLocked": "🔒 长期趋势（高级版）→",
+    "tabs": {
+      "trained": "已训练",
+      "similar": "相似任务",
+      "broader": "广泛迁移"
+    },
+    "noOtherTasks": "暂无其他已训练的任务。",
+    "noNearTransfer": "暂无近迁移评估",
+    "noNearTransferBody": "完成后，这里会显示一项简短的定期评估：它使用你未直接练习过的任务，但与你的某项训练任务具有相同的底层机制。",
+    "nearTransferPremium": "近迁移评估是高级版功能。",
+    "measuredPeriodically": "定期测量而非每次训练都测，以避免单纯的练习效应。",
+    "notYetMeasured": "尚未测量",
+    "broaderBody": "广泛迁移——即对一般智力、日常记忆或无关任务的影响——在目前的研究中尚未被证实适用于这些练习。在有真实证据之前，我们不会在这里显示任何数字。",
+    "seeResearch": "查看研究 →",
+    "retakeAssessment": "重新进行{name}评估",
+    "takeAssessment": "进行{name}评估",
+    "assessmentLocked": "🔒 {name}（高级版）",
+    "nearTransferRelated": {
+      "backwardDigitSpan": "与你的 N-Back / 复杂广度训练相关的近迁移测量",
+      "backwardSpatialSpan": "与你的空间序列训练相关的近迁移测量"
+    },
+    "backwardSpan": "倒序广度",
+    "atThatLength": "该长度下",
+    "confidenceInterval": "{level}% 置信区间：该长度下的准确率为 {lower}%–{upper}%——少量试次存在真实的不确定性，因此不以单一数字呈现。",
+    "spanTrend": "最佳广度：{start} → {end} 项",
+    "levelTrend": "{sessions, plural, other {# 次训练中}}从 {start} 级 → {end} 级",
+    "noRecentSessions": "最近 30 天没有训练——高级版可解锁完整历史",
+    "calibratedAt": "已校准为 {level} 级——尚无训练记录",
+    "bestSpan": "{value} 项广度",
+    "bestLevel": "{value} 级",
+    "personalBestLine": "🏆 个人最佳：{value}",
+    "historyLimited": "仅显示最近 30 天——高级版可解锁完整历史。"
+  },
+  "trends": {
+    "title": "长期趋势",
+    "subtitle": "你随时间变化的真实训练记录，每项任务一张图——而不只是前后对比。",
+    "empty": "还没有训练记录。完成几次训练后，这里就会开始形成真实的趋势。",
+    "back": "返回进度",
+    "notEnoughData": "数据还不足以形成有意义的趋势——已完成 {sessionCount}/{minSessions} 次训练，时间跨度 {spanDays}/{minSpanDays} 天。几天内的少量训练会画出一条技术上真实却具有误导性的曲线，因此我们会等到训练记录分布得足够开。",
+    "difficultyOverTime": "{name}——难度变化",
+    "readingHeader": "阅读——速度与理解率变化",
+    "pace": "速度",
+    "comprehension": "理解率",
+    "wpmValue": "{value} 词/分钟",
+    "chart": {
+      "hideTable": "隐藏表格",
+      "viewTable": "以表格查看",
+      "summary": "{title}：从 {fromDate} 的 {from} 到 {toDate} 的 {to}",
+      "date": "日期",
+      "value": "数值"
+    }
+  },
+  "settings": {
+    "title": "自定义练习",
+    "intro": "仅适用于单独练习，不影响每日训练——每日训练保持研究所采用的节奏，让你的自适应难度进展在各次训练之间保持可比。",
+    "language": "语言",
+    "saving": "正在保存…",
+    "saved": "已保存",
+    "saveError": "保存失败，请重试",
+    "stimulusPace": "刺激节奏",
+    "dieSides": "骰子面数",
+    "dieStandard": "标准六面骰——骰子数量仍会根据你的难度自动调整。",
+    "dieCustom": "{sides} 面骰会让每轮的总和更大——骰子数量仍会根据你的难度单独调整。",
+    "gridSize": "网格大小",
+    "gridSizeHint": "更大的网格也能容纳更长的序列。",
+    "pace": {
+      "RELAXED": { "label": "轻松", "description": "每项有更多时间——节奏更容易。" },
+      "STANDARD": { "label": "标准", "description": "该练习相关研究所采用的默认节奏。" },
+      "QUICK": { "label": "快速", "description": "每项时间更少——节奏更难。" },
+      "NO_DELAY": { "label": "无间隔", "description": "项目之间的间隔尽可能短——最快、最难。" }
+    }
+  },
+  "exercise": {
+    "exit": "退出练习",
+    "trialOf": "第 {current}/{total} 题",
+    "roundOf": "第 {current}/{total} 轮",
+    "complete": "练习完成",
+    "accuracy": "准确率",
+    "level": "等级",
+    "done": "完成",
+    "levelSummary": "等级 {start} → {end}"
+  },
+  "nBack": {
+    "name": "自适应 N-Back",
+    "srTitle": "自适应 N-Back 练习",
+    "tag": "工作记忆 · N-BACK",
+    "memorize": "先记住——比对还没开始",
+    "instructionPending": "如果方块与 … 步之前的相同，请点击",
+    "instruction": "{n, plural, other {如果方块与 # 步之前的相同，请点击}}",
+    "gotIt": "答对了",
+    "missed": "错过了",
+    "match": "相同",
+    "correct": "正确——反应真快",
+    "notScored": "不计分——规律仍在建立中",
+    "noteUp": "难度提高的同时你保持了准确率——这说明应该继续练下去，而不只是追求更快。",
+    "noteDown": "难度降低了一级，让练习保持有挑战又可完成。这正是自适应引擎应有的作用，并非退步。",
+    "noteSteady": "你在 {trials} 个计分试次中稳定保持了这一等级。"
+  },
+  "complexSpan": {
+    "name": "复杂广度",
+    "srTitle": "复杂广度练习",
+    "tag": "工作记忆 · 复杂广度",
+    "summary": "广度 {start} → {end}",
+    "setOf": "第 {current}/{total} 组",
+    "holdLetters": "记住这些字母——稍后需要回忆",
+    "isTrue": "这个算式正确吗？",
+    "true": "正确",
+    "false": "错误",
+    "correct": "正确",
+    "notQuite": "不太对",
+    "perfectRecall": "完美回忆",
+    "rightSpot": "{total} 个中有 {correct} 个位置正确",
+    "tapLetters": "按顺序点击字母",
+    "undo": "撤销",
+    "submit": "提交",
+    "noteUp": "你完整回忆序列的准确度足以让广度提升——这说明应该继续练下去。",
+    "noteDown": "广度长度略微降低，让练习保持有挑战又可完成。这正是自适应引擎应有的作用，并非退步。",
+    "noteSteady": "你在 {sets} 组中稳定保持了这一广度长度。",
+    "perfectSets": "完美组数",
+    "span": "广度",
+    "processingAccuracy": "处理准确率（对/错判断）"
+  },
+  "diceSum": {
+    "name": "骰子求和",
+    "srTitle": "骰子求和练习",
+    "tag": "工作记忆 · 骰子求和",
+    "summary": "{start} → {end} 个骰子",
+    "dieShowing": "骰子点数 {face}",
+    "remember": "记住它们——稍后要把它们加起来",
+    "shownFor": "{count} 个骰子 · 显示 {seconds} 秒",
+    "shownForSided": "{count} 个 d{sides} 骰子 · 显示 {seconds} 秒",
+    "correct": "正确",
+    "notQuite": "不太对",
+    "whatsTotal": "总和是多少？",
+    "summedTo": "{count} 个骰子总和为 {sum}",
+    "totalWas": "正确总和是 {sum}",
+    "addUp": "把全部 {count} 个骰子相加",
+    "backspace": "删除最后一位数字",
+    "submit": "提交",
+    "noteUp": "你的求和足够准确，骰子数量因此增加了——这说明应该继续练下去。",
+    "noteDown": "骰子数量略微减少，让练习保持有挑战又可完成。这正是自适应引擎应有的作用，并非退步。",
+    "noteSteady": "你在 {rounds} 轮中稳定保持了这一骰子数量。",
+    "correctSums": "正确求和",
+    "diceCount": "骰子数量"
+  },
+  "spatial": {
+    "name": "空间序列回忆",
+    "srTitle": "空间序列回忆练习",
+    "tag": "空间记忆 · 序列回忆",
+    "sequenceOf": "第 {current}/{total} 个序列",
+    "watch": "观察方块依次亮起",
+    "perfectRecall": "完美回忆",
+    "rightOrder": "{total} 个中有 {correct} 个顺序正确",
+    "tapOrder": "按亮起的顺序点击方块",
+    "cell": "网格第 {n} 格",
+    "cellLit": "网格第 {n} 格，已亮起",
+    "undo": "撤销",
+    "submit": "提交序列",
+    "noteUp": "你完整回忆序列的准确度足以让序列变长——这说明应该继续练下去。",
+    "noteDown": "序列长度略微缩短，让练习保持有挑战又可完成。这正是自适应引擎应有的作用，并非退步。",
+    "noteSteady": "你在 {rounds} 轮中稳定保持了这一序列长度。",
+    "perfectSequences": "完美序列",
+    "sequenceLength": "序列长度"
+  },
+  "reading": {
+    "name": "节奏阅读",
+    "srTitle": "节奏阅读练习",
+    "tag": "阅读 · 节奏段落",
+    "summary": "{start} → {end} 词/分钟",
+    "passageOf": "第 {current}/{total} 篇",
+    "englishNote": "阅读材料为英文——阅读速度与理解评分均按英文文本校准。",
+    "textSize": "文字大小",
+    "textSizes": {
+      "normal": "正常字号",
+      "large": "大字号",
+      "xlarge": "特大字号"
+    },
+    "wide": "宽版",
+    "wpmValue": "{value} 词/分钟",
+    "finished": "我读完了",
+    "submitAnswer": "提交答案",
+    "correct": "正确",
+    "notQuite": "不太对",
+    "answerWas": "正确答案是：",
+    "noteUp": "在这个速度下你的理解率保持得不错，因此目标速度提高了——这是自适应引擎的响应，并不保证会一直提升。",
+    "noteDown": "为保护理解率，速度略微降低。这正是自适应引擎应有的作用，并非退步。",
+    "noteSteady": "你在 {passages} 篇文章中稳定保持了这一速度。",
+    "avgWpm": "平均词/分钟",
+    "comprehension": "理解率",
+    "targetPace": "目标速度",
+    "efficiencyScore": "阅读效率分",
+    "efficiencyExplainer": "每分钟词数 × 理解率；理解率低于 70% 时速度的权重会降低——始终与上方两个数字一同显示。"
+  },
+  "session": {
+    "niceWork": "干得好",
+    "nextUp": "下一项：{name}",
+    "unknownExercise": "未知练习：{method}",
+    "complete": "训练完成",
+    "stats": "{minutes, plural, other {# 分钟}} · {exercises, plural, other {# 项练习}}",
+    "newPersonalBest": "🏆 新的个人最佳",
+    "freezeUsed": "——连续记录保护卡保住了昨天",
+    "xpAwarded": "+{xp} XP",
+    "leveledUp": "——训练等级 {level}！"
+  },
+  "assessment": {
+    "exit": "退出评估",
+    "saveError": "保存结果时出了点问题，请重试。",
+    "spanLength": "广度长度 {span}",
+    "correct": "正确",
+    "notQuite": "不太对",
+    "submit": "提交",
+    "lastTaken": "上次评估：{date}。",
+    "due": "已经有一段时间了——建议重新测量。",
+    "nextDue": "定期测量而非每次训练都测——建议下次在 {date} 左右进行。",
+    "neverTaken": "你还没有做过这项评估。",
+    "anyTime": "你可以随时进行。",
+    "start": "开始",
+    "complete": "评估完成",
+    "backwardSpan": "倒序广度",
+    "atThatLength": "该长度下",
+    "done": "完成"
+  },
+  "digitSpan": {
+    "name": "倒序数字广度",
+    "srTitle": "倒序数字广度评估",
+    "tag": "工作记忆 · 倒序数字广度",
+    "watch": "观察这些数字",
+    "enterReverse": "按相反顺序输入数字",
+    "backspace": "删除最后一个数字",
+    "intro": "一项与你的训练练习形式不同的简短任务：你会看到一串数字，然后按<strong>相反</strong>顺序输入。答对时序列会变长，连续答错两次后结束。",
+    "disclaimer": "这项评估测量的是与你的训练任务结构相近的工作记忆近迁移结果——它不测量智商、一般智力或日常记忆。",
+    "resultNote": "整个过程中你正确回忆了 {total} 个序列中的 {correct} 个。这是一项近迁移测量——一项与你的训练练习确实不同、但共享工作记忆广度结构的任务。它不测量智商、一般智力或日常记忆，而且基于少量试次在单一长度下得出的结果存在真实的不确定性。"
+  },
+  "spatialSpan": {
+    "name": "倒序空间广度",
+    "srTitle": "倒序空间广度评估",
+    "tag": "空间记忆 · 倒序广度",
+    "tapReverse": "按相反顺序点击方块",
+    "intro": "一项与你的训练练习形式不同的简短任务：网格中的方块会依次亮起，然后你需要按<strong>相反</strong>顺序点击它们。答对时序列会变长，连续答错两次后结束。",
+    "disclaimer": "这项评估测量的是与你的空间序列练习结构相近的空间工作记忆近迁移结果——它不测量智商、一般智力或日常记忆。",
+    "resultNote": "整个过程中你正确回忆了 {total} 个序列中的 {correct} 个。这是一项近迁移测量——一项与你的空间序列练习确实不同（倒序而非正序回忆）、但共享其工作记忆广度结构的任务。它不测量智商、一般智力或日常记忆，而且基于少量试次在单一长度下得出的结果存在真实的不确定性。"
+  },
+  "onboarding": {
+    "submitError": "保存计划时出了点问题，你可以重试。",
+    "goalsTitle": "你想重点提升什么？",
+    "goalsSubtitle": "选择你最看重的一项，我们会围绕它制定计划——无论如何，你都可以训练所有内容。",
+    "goals": {
+      "working-memory": "提升工作记忆",
+      "concentration": "练习专注力",
+      "reading-efficiency": "读得更快，同时不丢失要点",
+      "memory-strategies": "学习更好的记忆策略",
+      "habit": "只是养成每日习惯",
+      "balanced": "各方面都练一点"
+    },
+    "timeTitle": "你每天能投入多少时间？",
+    "timeSubtitle": "我们会据此安排训练，你可以随时更改。",
+    "minutes": "{minutes} 分钟",
+    "timeNotes": {
+      "5": "每天快速练一下",
+      "10": "均衡，最受欢迎",
+      "15": "更有系统的训练",
+      "20": "适合专注的每日练习"
+    },
+    "custom": "自定义",
+    "customNote": "设定你自己的目标",
+    "minutesPerDay": "每天分钟数",
+    "experienceTitle": "你以前做过类似的训练吗？",
+    "experienceSubtitle": "没有错误答案——这只是为了让你最初几次训练更合适。接下来的简短校准会进一步微调。",
+    "experience": {
+      "new": { "label": "完全新手", "note": "从轻松开始，逐步提高" },
+      "some": { "label": "有一些经验", "note": "我试过记忆或脑力训练类应用" },
+      "experienced": { "label": "经验丰富", "note": "我想从一开始就接受真正的挑战" }
+    },
+    "continueToCalibration": "继续进行校准",
+    "continue": "继续",
+    "recommendTitle": "我们建议你从以下等级开始：",
+    "recommendLabel": "推荐难度等级",
+    "levels": {
+      "BEGINNER": { "label": "入门", "note": "从每项练习最简单的一端开始" },
+      "INTERMEDIATE": { "label": "中级", "note": "一个常见且舒适的起点" },
+      "ADVANCED": { "label": "高级", "note": "跳过前面，接近每项练习最难的一端" },
+      "EXPERT": { "label": "专家", "note": "从每项练习最难的一端开始" },
+      "AUTO": { "label": "自动（推荐）", "note": "完全采用你的校准测量结果" }
+    },
+    "saving": "正在保存你的计划...",
+    "startTraining": "开始训练",
+    "stepOf": "第 {step} 步，共 {total} 步",
+    "calibration": {
+      "title": "快速校准",
+      "spatial": "观察，然后重复图案",
+      "nBack": "这和上一次是同一个方块吗？",
+      "complexSpan": "按顺序记住这些字母",
+      "reading": "按你自己的节奏阅读",
+      "subtitle": "大约 90 秒，没有及格与否——只是帮助我们让你从合适的等级开始。",
+      "submit": "提交",
+      "different": "不同",
+      "same": "相同",
+      "finishedReading": "我读完了",
+      "questionOf": "第 {current}/{total} 题",
+      "bothCount": "记忆和理解都计入"
+    }
+  }
+}

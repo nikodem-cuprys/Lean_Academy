@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useFormatter, useTranslations } from "next-intl";
 import type { TrendPoint } from "@/lib/trend-data";
 
 /**
@@ -48,7 +49,9 @@ export function TrendChart({
   const [hovered, setHovered] = useState<number | null>(null);
   const [tableVisible, setTableVisible] = useState(false);
 
-  const dateFmt = formatDate ?? ((iso: string) => new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" }));
+  const t = useTranslations("trends.chart");
+  const format = useFormatter();
+  const dateFmt = formatDate ?? ((iso: string) => format.dateTime(new Date(iso), { month: "short", day: "numeric" }));
 
   const { positions, yMin, yMax } = useMemo(() => {
     const times = points.map((p) => new Date(p.date).getTime());
@@ -91,7 +94,7 @@ export function TrendChart({
           className="text-[11px] font-semibold text-text-3 underline decoration-dotted"
           data-testid={`${testId}-table-toggle`}
         >
-          {tableVisible ? "Hide table" : "View as table"}
+          {tableVisible ? t("hideTable") : t("viewTable")}
         </button>
       </div>
 
@@ -101,9 +104,13 @@ export function TrendChart({
             viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
             className="w-full"
             role="img"
-            aria-label={`${title}: from ${formatValue(points[0].value)} on ${dateFmt(points[0].date)} to ${formatValue(
-              points[points.length - 1].value
-            )} on ${dateFmt(points[points.length - 1].date)}`}
+            aria-label={t("summary", {
+              title,
+              from: formatValue(points[0].value),
+              fromDate: dateFmt(points[0].date),
+              to: formatValue(points[points.length - 1].value),
+              toDate: dateFmt(points[points.length - 1].date),
+            })}
           >
             {/* Recessive reference gridline at the midpoint value only — see marks-and-anatomy.md's "gridlines carry the values you didn't directly label" */}
             <line
@@ -182,8 +189,8 @@ export function TrendChart({
         <table className="w-full text-left text-[11px]" data-testid={`${testId}-table`}>
           <thead>
             <tr className="text-text-3">
-              <th className="pb-1 font-semibold">Date</th>
-              <th className="pb-1 font-semibold">Value</th>
+              <th className="pb-1 font-semibold">{t("date")}</th>
+              <th className="pb-1 font-semibold">{t("value")}</th>
             </tr>
           </thead>
           <tbody>

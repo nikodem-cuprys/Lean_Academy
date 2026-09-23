@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import { getTranslations } from "next-intl/server";
+import { DEFAULT_LOCALE, isLocale } from "@/i18n/config";
 
 // Real SMTP delivery — never a console.log stand-in (see docs/kanban.md's
 // "nothing here should be faked" acceptance criterion). Locally this
@@ -36,34 +38,42 @@ async function sendMail(options: {
   await transport.sendMail({ from, ...options });
 }
 
-export async function sendVerificationEmail(email: string, rawToken: string) {
+// `locale` is the recipient's own language (their saved User.locale),
+// not necessarily the language of whatever request triggered the send.
+function emailLocale(locale: string | null | undefined) {
+  return isLocale(locale) ? locale : DEFAULT_LOCALE;
+}
+
+export async function sendVerificationEmail(email: string, rawToken: string, locale?: string | null) {
   const base = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
   const url = `${base}/verify-email?email=${encodeURIComponent(email)}&token=${rawToken}`;
+  const t = await getTranslations({ locale: emailLocale(locale), namespace: "emails.verify" });
 
   await sendMail({
     to: email,
-    subject: "Verify your LeanAcademy email",
-    text: `Confirm your email address: ${url}\n\nThis link expires in 24 hours.`,
+    subject: t("subject"),
+    text: t("text", { url }),
     html: `
-      <p>Welcome to LeanAcademy.</p>
-      <p><a href="${url}">Confirm your email address</a> to finish setting up your account.</p>
-      <p>This link expires in 24 hours. If you didn't create this account, you can ignore this email.</p>
+      <p>${t("welcome")}</p>
+      <p><a href="${url}">${t("confirmLink")}</a>${t("confirmRest")}</p>
+      <p>${t("expiry")}</p>
     `,
   });
 }
 
-export async function sendPasswordResetEmail(email: string, rawToken: string) {
+export async function sendPasswordResetEmail(email: string, rawToken: string, locale?: string | null) {
   const base = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
   const url = `${base}/reset-password?email=${encodeURIComponent(email)}&token=${rawToken}`;
+  const t = await getTranslations({ locale: emailLocale(locale), namespace: "emails.reset" });
 
   await sendMail({
     to: email,
-    subject: "Reset your LeanAcademy password",
-    text: `Reset your password: ${url}\n\nThis link expires in 1 hour. If you didn't request this, you can ignore this email.`,
+    subject: t("subject"),
+    text: t("text", { url }),
     html: `
-      <p>We received a request to reset your LeanAcademy password.</p>
-      <p><a href="${url}">Choose a new password</a>.</p>
-      <p>This link expires in 1 hour and can only be used once. If you didn't request this, you can ignore this email — your password won't change.</p>
+      <p>${t("intro")}</p>
+      <p><a href="${url}">${t("link")}</a></p>
+      <p>${t("expiry")}</p>
     `,
   });
 }

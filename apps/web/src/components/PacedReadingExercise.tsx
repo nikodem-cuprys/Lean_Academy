@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import {
   PacedReadingTask,
   calculateReadingEfficiencyScore,
@@ -42,6 +43,14 @@ import {
 // — never blocking the exercise on it. See docs/kanban.md's "Expand
 // and rotate the reading-passage bank" card and
 // apps/web/src/lib/reading-passage-rotation.ts.
+//
+// Passages and their comprehension questions are English-only in every
+// UI language: the WPM ladder and the 70% comprehension floor are
+// calibrated on English text (docs/evidence-review.md §8), and WPM isn't
+// comparable across languages (Chinese isn't even space-delimited), so
+// translating them would quietly change what's measured. The exercise
+// chrome is translated; the passage text is marked lang="en", and a
+// non-English UI shows a one-line note saying so.
 
 const TOTAL_PASSAGES = 5;
 const CHUNK_SIZE = 4; // words per pacer highlight step
@@ -113,6 +122,9 @@ interface Results {
 }
 
 export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionModeProps = {}) {
+  const t = useTranslations("reading");
+  const tx = useTranslations("exercise");
+  const locale = useLocale();
   const [phase, setPhase] = useState<Phase>("reading");
   const [passageNumber, setPassageNumber] = useState(0);
   const [passage, setPassage] = useState<Passage | null>(null);
@@ -259,7 +271,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
           startDifficulty,
           endDifficulty,
           trials,
-          summaryLabel: `${startDifficultyWpm} → ${endDifficultyWpm} WPM`,
+          summaryLabel: t("summary", { start: startDifficultyWpm, end: endDifficultyWpm }),
         });
         return;
       }
@@ -302,7 +314,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
       className={`flex w-full flex-1 flex-col px-5 py-5 transition-[max-width] ${wideText ? "max-w-[640px]" : "max-w-[390px]"}`}
     >
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label="Exit exercise">
+        <Link href="/" aria-label={tx("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
@@ -316,31 +328,35 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
         <div className="w-[18px]" />
       </div>
       <div className="mb-4 text-center text-xs text-text-3">
-        Passage {passageNumber} of {TOTAL_PASSAGES}
+        {t("passageOf", { current: passageNumber, total: TOTAL_PASSAGES })}
       </div>
 
-      <h1 className="sr-only">Paced Reading exercise</h1>
+      <h1 className="sr-only">{t("srTitle")}</h1>
       <div className="mb-4 flex items-center justify-center gap-1.5">
         <div className="h-[7px] w-[7px] rounded-full bg-reading" />
         <div className="text-[12.5px] font-bold tracking-wide text-reading">
-          READING · PACED PASSAGE
+          {t("tag")}
         </div>
       </div>
+
+      {locale !== "en" && (
+        <div className="mb-3 rounded-md bg-surface-2 px-3 py-2 text-center text-[11.5px] leading-snug text-text-3" data-testid="reading-english-note">
+          {t("englishNote")}
+        </div>
+      )}
 
       {passage && phase === "reading" && (
         <div className="flex flex-1 flex-col">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <div role="group" aria-label="Text size" className="flex items-center gap-1 rounded-full border border-border p-0.5">
+              <div role="group" aria-label={t("textSize")} className="flex items-center gap-1 rounded-full border border-border p-0.5">
                 {TEXT_SIZES.map((size) => (
                   <button
                     key={size}
                     type="button"
                     data-testid={`text-size-${size}`}
                     aria-pressed={textSize === size}
-                    aria-label={
-                      size === "normal" ? "Normal text size" : size === "large" ? "Large text size" : "Extra large text size"
-                    }
+                    aria-label={t(`textSizes.${size}`)}
                     onClick={() => handleSetTextSize(size)}
                     className="min-h-[24px] min-w-[24px] rounded-full px-2 py-1.5 font-body font-bold leading-none"
                     style={{
@@ -365,7 +381,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
                   color: wideText ? "var(--color-reading)" : "var(--color-text-3)",
                 }}
               >
-                Wide
+                {t("wide")}
               </button>
             </div>
             <div
@@ -373,10 +389,10 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
               className="rounded-full px-3 py-1 font-num text-[13px] font-bold text-reading"
               style={{ background: "var(--color-reading-soft)" }}
             >
-              {targetWpm} WPM
+              {t("wpmValue", { value: targetWpm })}
             </div>
           </div>
-          <div className={`flex-1 overflow-y-auto leading-relaxed text-text-2 ${TEXT_SIZE_CLASS[textSize]}`}>
+          <div lang="en" className={`flex-1 overflow-y-auto leading-relaxed text-text-2 ${TEXT_SIZE_CLASS[textSize]}`}>
             {chunkWords(passage.text).map((chunk, i) => (
               <span
                 key={i}
@@ -395,7 +411,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
             onClick={handleFinishReading}
             className="mt-4 w-full rounded-full bg-reading py-3.5 text-center font-body text-[14.5px] font-bold text-on-accent transition-transform duration-micro active:scale-95"
           >
-            I&rsquo;ve finished reading
+            {t("finished")}
           </button>
         </div>
       )}
@@ -404,10 +420,10 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
         <div className="flex flex-1 flex-col">
           {phase === "question" ? (
             <>
-              <div data-testid="question-prompt" className="mb-5 font-display text-lg font-bold leading-snug text-text">
+              <div data-testid="question-prompt" lang="en" className="mb-5 font-display text-lg font-bold leading-snug text-text">
                 {passage.question.prompt}
               </div>
-              <div role="radiogroup" aria-label={passage.question.prompt} className="flex flex-col gap-2.5">
+              <div role="radiogroup" aria-label={passage.question.prompt} lang="en" className="flex flex-col gap-2.5">
                 {passage.question.choices.map((choice, i) => {
                   const isSelected = selectedChoice === i;
                   return (
@@ -440,17 +456,17 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
                 disabled={selectedChoice === null}
                 className="w-full rounded-full bg-reading py-3.5 text-center font-body text-[15px] font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
               >
-                Submit answer
+                {t("submitAnswer")}
               </button>
             </>
           ) : (
             <div className="flex flex-1 flex-col items-center justify-center text-center">
               <div className="font-display text-lg font-bold text-text">
-                {feedback?.correct ? "Correct" : "Not quite"}
+                {feedback?.correct ? t("correct") : t("notQuite")}
               </div>
               {!feedback?.correct && (
                 <div className="mt-2 text-[13.5px] text-text-2">
-                  The answer was: {feedback?.correctText}
+                  {t("answerWas")} <span lang="en">{feedback?.correctText}</span>
                 </div>
               )}
             </div>
@@ -462,6 +478,8 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
 }
 
 function PacedReadingResults({ results }: { results: Results }) {
+  const t = useTranslations("reading");
+  const tx = useTranslations("exercise");
   const { startDifficultyWpm, endDifficultyWpm, passages, averageWpm, comprehensionAccuracy } = results;
   const comprehensionPct =
     comprehensionAccuracy.total > 0
@@ -476,11 +494,11 @@ function PacedReadingResults({ results }: { results: Results }) {
 
   let note: string;
   if (endDifficultyWpm > startDifficultyWpm) {
-    note = `Comprehension held up well enough at this pace that the target speed increased — that's the adaptive engine responding, not a guarantee it'll keep climbing.`;
+    note = t("noteUp");
   } else if (endDifficultyWpm < startDifficultyWpm) {
-    note = `Pace eased back a notch to protect comprehension. That's the adaptive engine working as intended, not a setback.`;
+    note = t("noteDown");
   } else {
-    note = `You held steady at this pace across ${passages.length} passages.`;
+    note = t("noteSteady", { passages: passages.length });
   }
 
   const paceIncreased = endDifficultyWpm > startDifficultyWpm;
@@ -493,34 +511,34 @@ function PacedReadingResults({ results }: { results: Results }) {
             <path d="M5 13l4 4L19 7" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <h1 className="font-display text-[23px] font-bold text-text">Exercise complete</h1>
-        <div className="mt-1.5 text-[13.5px] text-text-2">Paced Reading</div>
+        <h1 className="font-display text-[23px] font-bold text-text">{tx("complete")}</h1>
+        <div className="mt-1.5 text-[13.5px] text-text-2">{t("name")}</div>
       </div>
 
       <div className="mb-4 flex justify-around rounded-lg border border-border bg-surface p-5 shadow-sm">
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">AVG WPM</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{t("avgWpm")}</div>
           <div className="font-num text-2xl font-bold text-text">{Math.round(averageWpm)}</div>
         </div>
         <div className="w-px bg-border" />
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">COMPREHENSION</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{t("comprehension")}</div>
           <div className="font-num text-2xl font-bold text-text">{comprehensionPct}%</div>
         </div>
       </div>
 
       <div className="mb-4 rounded-lg border border-border bg-surface p-4.5">
-        <div className="mb-1 text-[11.5px] text-text-3">TARGET PACE</div>
+        <div className="mb-1 text-[11.5px] text-text-3">{t("targetPace")}</div>
         <div className={`font-num text-xl font-bold text-text ${paceIncreased ? "animate-celebration-pop" : ""}`}>
-          {startDifficultyWpm} → {endDifficultyWpm} WPM
+          {t("summary", { start: startDifficultyWpm, end: endDifficultyWpm })}
         </div>
       </div>
 
       <div className="mb-4 rounded-lg border border-border bg-surface p-4.5">
-        <div className="mb-1 text-[11.5px] text-text-3">READING EFFICIENCY SCORE</div>
+        <div className="mb-1 text-[11.5px] text-text-3">{t("efficiencyScore")}</div>
         <div className="font-num text-xl font-bold text-text">{efficiencyScore}</div>
         <p className="mt-1 text-[12px] leading-relaxed text-text-3">
-          WPM × comprehension, with speed counting for less below a 70% comprehension floor — never shown without both numbers above.
+          {t("efficiencyExplainer")}
         </p>
       </div>
 
@@ -532,7 +550,7 @@ function PacedReadingResults({ results }: { results: Results }) {
         href="/"
         className="mt-6 block w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent"
       >
-        Done
+        {tx("done")}
       </Link>
     </div>
   );

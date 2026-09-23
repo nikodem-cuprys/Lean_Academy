@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { useFormatter, useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { parseEvidenceRegistry, getApprovedModules } from "@lean-academy/evidence";
 import { auth } from "@/lib/auth";
 import { getTodaysTraining } from "@/lib/todays-training";
@@ -7,24 +9,17 @@ import { getStreakStatus, getWeeklyActivity, type WeeklyActivityDay } from "@/li
 import { getTrainingLevelStatus } from "@/lib/xp";
 import { getLatestEarnedAchievement, type LatestAchievement } from "@/lib/achievements-data";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 // Imported (not read via fs) because Next's server bundle virtualizes
 // __dirname, which breaks the fs-based loadEvidenceRegistry — see the
 // comment on parseEvidenceRegistry in packages/evidence.
 import registryJson from "../../../../data/evidence-registry.json";
-
-const DOMAIN_LABELS: Record<string, string> = {
-  WORKING_MEMORY: "Working Memory",
-  READING: "Reading",
-  SPATIAL: "Spatial Memory",
-};
 
 const DOMAIN_COLOR_CLASS: Record<string, string> = {
   WORKING_MEMORY: "wm",
   READING: "reading",
   SPATIAL: "spatial",
 };
-
-const WEEKDAY_LETTERS = ["M", "T", "W", "T", "F", "S", "S"];
 
 // Small inline-SVG glyphs, styled to match prototype/Home.dc.html's
 // icon treatment (currentColor strokes/fills sized ~14-16px). Kept
@@ -119,9 +114,11 @@ type TodaysExercise = { method: string; domain: string; displayName: string };
 // todays-training.ts) — an invented number would violate this
 // project's real-data-only rule, so it's honestly omitted.
 function TodaysTrainingCard({ exercises }: { exercises: TodaysExercise[] }) {
+  const t = useTranslations("home");
+  const td = useTranslations("domains");
   return (
     <div className="rounded-lg border border-border bg-surface p-6 shadow-sm lg:p-8">
-      <div className="mb-4 text-[12px] font-bold tracking-wide text-text-3">TODAY&rsquo;S TRAINING</div>
+      <div className="mb-4 text-[12px] font-bold tracking-wide text-text-3">{t("todaysTraining")}</div>
       <div className="mb-5 flex flex-col gap-3 md:flex-row md:flex-wrap">
         {exercises.map((e) => (
           <div
@@ -138,7 +135,7 @@ function TodaysTrainingCard({ exercises }: { exercises: TodaysExercise[] }) {
               <DomainIcon domain={e.domain} />
             </div>
             <div className="flex-1 text-sm font-semibold text-text">
-              {DOMAIN_LABELS[e.domain] ?? e.displayName}
+              {td.has(e.domain as never) ? td(e.domain as never) : e.displayName}
             </div>
           </div>
         ))}
@@ -147,7 +144,7 @@ function TodaysTrainingCard({ exercises }: { exercises: TodaysExercise[] }) {
         href="/train/session"
         className="block w-full rounded-full bg-accent py-3 text-center font-body text-[15px] font-bold text-on-accent transition-transform active:scale-[0.98] lg:w-auto lg:px-8"
       >
-        Start Training
+        {t("startTraining")}
       </Link>
     </div>
   );
@@ -160,9 +157,11 @@ function TodaysTrainingCard({ exercises }: { exercises: TodaysExercise[] }) {
 // docs/kanban.md for why it was left out originally — it's real now,
 // not faked, but still not squeezed onto the smallest layout).
 function WeeklyActivityStrip({ days }: { days: WeeklyActivityDay[] }) {
+  const t = useTranslations("home");
+  const weekdayLetters = t("weekdayLetters").split(",");
   return (
     <div className="rounded-lg border border-border bg-surface p-6 shadow-sm" data-testid="weekly-activity-strip">
-      <div className="mb-3.5 text-[12px] font-bold tracking-wide text-text-3">THIS WEEK</div>
+      <div className="mb-3.5 text-[12px] font-bold tracking-wide text-text-3">{t("thisWeek")}</div>
       <div className="flex gap-1.5">
         {days.map((d) => (
           <div key={d.dayOfWeek} className="flex flex-1 flex-col items-center gap-1.5">
@@ -173,9 +172,9 @@ function WeeklyActivityStrip({ days }: { days: WeeklyActivityDay[] }) {
                   ? { background: "var(--color-accent)" }
                   : { background: "var(--color-surface-2)", border: "1px solid var(--color-border)" }
               }
-              title={d.trained ? "Trained" : d.isToday ? "Today — not yet" : "No session"}
+              title={d.trained ? t("dayTrained") : d.isToday ? t("dayTodayNotYet") : t("dayNoSession")}
             />
-            <span className="text-[10.5px] font-semibold text-text-3">{WEEKDAY_LETTERS[d.dayOfWeek]}</span>
+            <span className="text-[10.5px] font-semibold text-text-3">{weekdayLetters[d.dayOfWeek]}</span>
           </div>
         ))}
       </div>
@@ -184,9 +183,12 @@ function WeeklyActivityStrip({ days }: { days: WeeklyActivityDay[] }) {
 }
 
 function LatestAchievementCard({ achievement }: { achievement: LatestAchievement | null }) {
+  const t = useTranslations("home");
+  const ta = useTranslations("achievements.catalog");
+  const format = useFormatter();
   return (
     <div className="rounded-lg border border-border bg-surface p-6 shadow-sm">
-      <div className="mb-3.5 text-[12px] font-bold tracking-wide text-text-3">RECENT ACHIEVEMENT</div>
+      <div className="mb-3.5 text-[12px] font-bold tracking-wide text-text-3">{t("recentAchievement")}</div>
       {achievement ? (
         <div className="flex items-center gap-3">
           <div
@@ -196,15 +198,17 @@ function LatestAchievementCard({ achievement }: { achievement: LatestAchievement
             {TROPHY_ICON}
           </div>
           <div>
-            <div className="text-[13px] font-bold text-text">{achievement.title}</div>
+            <div className="text-[13px] font-bold text-text">
+              {ta.has(`${achievement.key}.title` as never) ? ta(`${achievement.key}.title` as never) : achievement.title}
+            </div>
             <div className="text-[11.5px] text-text-3">
-              Earned {new Date(achievement.earnedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              {t("earnedOn", { date: format.dateTime(new Date(achievement.earnedAt), { month: "short", day: "numeric" }) })}
             </div>
           </div>
         </div>
       ) : (
         <Link href="/achievements" className="text-[13px] font-semibold text-accent">
-          No achievements yet — view the full list →
+          {t("noAchievements")}
         </Link>
       )}
     </div>
@@ -212,9 +216,10 @@ function LatestAchievementCard({ achievement }: { achievement: LatestAchievement
 }
 
 function QuickLinksGrid({ links }: { links: QuickLink[] }) {
+  const t = useTranslations("home");
   return (
     <div>
-      <div className="mb-2.5 text-[12px] font-bold tracking-wide text-text-3">QUICK LINKS</div>
+      <div className="mb-2.5 text-[12px] font-bold tracking-wide text-text-3">{t("quickLinks")}</div>
       <div className="grid grid-cols-2 gap-2.5 md:grid-cols-3 lg:grid-cols-4">
         {links.map((q) => (
           <Link
@@ -252,14 +257,15 @@ function EvidenceStatsFooter({
   approvedCount: number;
   signedInAs: string | null;
 }) {
+  const t = useTranslations("home");
   return (
     <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-lg border border-border bg-surface p-4 text-[12px] text-text-3">
-      <dt>Evidence registry last reviewed</dt>
+      <dt>{t("registryReviewed")}</dt>
       <dd className="text-right text-text-2">{lastReviewed}</dd>
-      <dt>Approved training modules</dt>
+      <dt>{t("approvedModules")}</dt>
       <dd className="text-right text-text-2">{approvedCount}</dd>
-      <dt>Signed in</dt>
-      <dd className="text-right text-text-2">{signedInAs ?? "no"}</dd>
+      <dt>{t("signedIn")}</dt>
+      <dd className="text-right text-text-2">{signedInAs ?? t("signedInNo")}</dd>
     </dl>
   );
 }
@@ -271,6 +277,7 @@ function StreakLevelPills({
   streak: { currentStreakDays: number; trainedToday: boolean } | null;
   trainingLevel: { level: number } | null;
 }) {
+  const t = useTranslations("home");
   if (!((streak && streak.currentStreakDays > 0) || trainingLevel)) return null;
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -282,8 +289,8 @@ function StreakLevelPills({
         >
           <span aria-hidden="true">🔥</span>
           <span>
-            {streak.currentStreakDays}-day streak
-            {!streak.trainedToday ? " — ready to continue your training?" : ""}
+            {t("streak", { days: streak.currentStreakDays })}
+            {!streak.trainedToday ? t("streakNudge") : ""}
           </span>
         </div>
       ) : null}
@@ -292,7 +299,7 @@ function StreakLevelPills({
           className="rounded-full px-3 py-1.5 text-[12.5px] font-bold"
           style={{ background: "var(--color-accent-soft)", color: "var(--color-accent-strong)" }}
         >
-          <span data-testid="training-level-indicator">Training Level {trainingLevel.level}</span>
+          <span data-testid="training-level-indicator">{t("trainingLevel", { level: trainingLevel.level })}</span>
         </div>
       ) : null}
     </div>
@@ -347,30 +354,34 @@ export default async function HomePage() {
       ])
     : [null, null, null, null, null];
   const firstName = session?.user?.name?.split(" ")[0];
+  const t = await getTranslations("home");
 
   const quickLinks: QuickLink[] = [
-    { href: "/progress", label: "View progress →", icon: CHART_ICON },
-    { href: "/science", label: "See the science →", icon: FLASK_ICON },
-    { href: "/achievements", label: "View achievements →", icon: TROPHY_ICON },
-    { href: "/challenges", label: "View quests & challenges →", icon: TARGET_ICON },
-    { href: "/settings/exercises", label: "Customize exercises →", icon: SETTINGS_ICON },
-    { href: "/train/n-back", label: "Try the N-Back exercise →", domain: "WORKING_MEMORY" },
-    { href: "/train/complex-span", label: "Try the Complex Span exercise →", domain: "WORKING_MEMORY" },
-    { href: "/train/dice-sum", label: "Try the Dice Sum exercise →", domain: "WORKING_MEMORY" },
-    { href: "/train/spatial-sequence", label: "Try the Spatial Sequence exercise →", domain: "SPATIAL" },
-    { href: "/train/reading", label: "Try the Paced Reading exercise →", domain: "READING" },
+    { href: "/progress", label: t("links.progress"), icon: CHART_ICON },
+    { href: "/science", label: t("links.science"), icon: FLASK_ICON },
+    { href: "/achievements", label: t("links.achievements"), icon: TROPHY_ICON },
+    { href: "/challenges", label: t("links.challenges"), icon: TARGET_ICON },
+    { href: "/settings/exercises", label: t("links.customize"), icon: SETTINGS_ICON },
+    { href: "/train/n-back", label: t("links.nBack"), domain: "WORKING_MEMORY" },
+    { href: "/train/complex-span", label: t("links.complexSpan"), domain: "WORKING_MEMORY" },
+    { href: "/train/dice-sum", label: t("links.diceSum"), domain: "WORKING_MEMORY" },
+    { href: "/train/spatial-sequence", label: t("links.spatial"), domain: "SPATIAL" },
+    { href: "/train/reading", label: t("links.reading"), domain: "READING" },
   ];
 
   if (!session?.user) {
     return (
       <main className="flex flex-1 flex-col items-center p-6">
         <div className="flex w-full max-w-[390px] flex-col gap-5">
-          <h1 className="font-display text-[21px] font-bold text-text">LeanAcademy</h1>
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="font-display text-[21px] font-bold text-text">LeanAcademy</h1>
+            <LanguageSwitcher />
+          </div>
           <Link
             href="/login"
             className="block w-full rounded-full bg-accent py-3 text-center font-body text-[15px] font-bold text-on-accent"
           >
-            Log in or sign up →
+            {t("loginOrSignup")}
           </Link>
           <EvidenceStatsFooter lastReviewed={registry.lastReviewed} approvedCount={approved.length} signedInAs={null} />
         </div>
@@ -378,7 +389,7 @@ export default async function HomePage() {
     );
   }
 
-  const greeting = firstName ? `Welcome back, ${firstName}` : "Welcome back";
+  const greeting = firstName ? t("greetingNamed", { name: firstName }) : t("greeting");
   const hasWeeklyExtras = Boolean(weeklyActivity && weeklyActivity.length > 0);
 
   return (
@@ -391,7 +402,11 @@ export default async function HomePage() {
         <div className="flex w-full max-w-[390px] flex-col gap-5 md:max-w-[640px] lg:max-w-none lg:gap-6">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <h1 className="font-display text-[21px] font-bold text-text lg:text-[28px]">{greeting}</h1>
-            <StreakLevelPills streak={streak} trainingLevel={trainingLevel} />
+            <div className="flex flex-wrap items-center gap-2">
+              <StreakLevelPills streak={streak} trainingLevel={trainingLevel} />
+              {/* The sidebar carries the switcher from desktop width up. */}
+              <LanguageSwitcher className="lg:hidden" />
+            </div>
           </div>
 
           {exercises && exercises.length > 0 ? (
@@ -407,13 +422,13 @@ export default async function HomePage() {
           ) : (
             <div className="rounded-lg border border-border bg-surface p-6 text-center shadow-sm lg:p-8">
               <div className="mb-3 text-sm text-text-2">
-                Complete onboarding to get a training plan built around your goals.
+                {t("onboardingPrompt")}
               </div>
               <Link
                 href="/onboarding"
                 className="block w-full rounded-full bg-accent py-3 text-center font-body text-[15px] font-bold text-on-accent transition-transform active:scale-[0.98] lg:inline-block lg:w-auto lg:px-8"
               >
-                Start onboarding
+                {t("startOnboarding")}
               </Link>
             </div>
           )}

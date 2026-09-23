@@ -1,3 +1,4 @@
+import { useFormatter, useTranslations } from "next-intl";
 import type { AchievementStatus } from "@/lib/achievements-data";
 
 // Built against prototype/Achievements.dc.html. No client-side state
@@ -17,18 +18,25 @@ const ICON_EMOJI: Record<string, string> = {
   check: "✅",
 };
 
-function formatEarnedDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
 export function AchievementsView({ achievements }: { achievements: AchievementStatus[] }) {
+  const t = useTranslations("achievements");
+  const format = useFormatter();
   const earnedCount = achievements.filter((a) => a.earned).length;
+  // Titles/descriptions are translated by catalog key; the English copy
+  // on the Achievement row is only a fallback for an untranslated key.
+  const tm = useTranslations("methods");
+  const title = (a: AchievementStatus) => {
+    const key = `catalog.${a.key}.title` as never;
+    return t.has(key) ? t(key) : a.title;
+  };
+  const context = (a: AchievementStatus) =>
+    a.contextMethod && tm.has(a.contextMethod as never) ? tm(a.contextMethod as never) : a.contextLabel;
 
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
-      <h1 className="font-display text-[23px] font-bold text-text">Achievements</h1>
+      <h1 className="font-display text-[23px] font-bold text-text">{t("title")}</h1>
       <div className="mb-3 text-[13px] text-text-2">
-        {earnedCount} of {achievements.length} earned
+        {t("earnedCount", { earned: earnedCount, total: achievements.length })}
       </div>
 
       <div className="rounded-lg border border-border bg-surface px-4.5 shadow-sm">
@@ -51,16 +59,18 @@ export function AchievementsView({ achievements }: { achievements: AchievementSt
               {ICON_EMOJI[a.iconKey] ?? "⭐"}
             </div>
             <div className="flex-1">
-              <div className="text-[14px] font-bold text-text">{a.title}</div>
+              <div className="text-[14px] font-bold text-text">{title(a)}</div>
               {a.earned ? (
                 <div className="text-xs text-text-3">
-                  Earned {a.earnedAt ? formatEarnedDate(a.earnedAt) : ""}
-                  {a.contextLabel ? ` — ${a.contextLabel}` : ""}
+                  {t("earnedOn", {
+                    date: a.earnedAt ? format.dateTime(new Date(a.earnedAt), { month: "short", day: "numeric" }) : "",
+                  })}
+                  {context(a) ? ` — ${context(a)}` : ""}
                 </div>
               ) : a.progressCurrent !== null && a.progressTarget !== null ? (
                 <>
                   <div className="text-xs text-text-3">
-                    {a.progressCurrent} of {a.progressTarget}
+                    {t("progress", { current: a.progressCurrent, target: a.progressTarget })}
                   </div>
                   <div className="mt-1 h-[5px] overflow-hidden rounded-full bg-surface-2">
                     <div
@@ -70,7 +80,7 @@ export function AchievementsView({ achievements }: { achievements: AchievementSt
                   </div>
                 </>
               ) : (
-                <div className="text-xs text-text-3">Not yet earned</div>
+                <div className="text-xs text-text-3">{t("notYet")}</div>
               )}
             </div>
           </div>

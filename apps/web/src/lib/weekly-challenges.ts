@@ -225,8 +225,11 @@ export async function syncWeeklyChallengeProgress(
 
 export interface WeeklyChallengeStatus {
   slug: string;
+  /** English copy as stored on the Challenge row — the fallback if the slug has no translation. */
   title: string;
   description: string;
+  /** Values the translated title/description interpolate (messages challenges.items.<slug>). */
+  messageParams: Record<string, number>;
   progressCurrent: number;
   progressTarget: number;
   completed: boolean;
@@ -251,6 +254,7 @@ export async function getWeeklyChallengesStatus(userId: string, now: Date = new 
         slug: challenge.slug,
         title: challenge.title,
         description: challenge.description,
+        messageParams: { count: target, pct: Math.round(COMPREHENSION_FLOOR * 100) },
         progressCurrent: Math.min(progress?.progressValue ?? 0, target),
         progressTarget: target,
         completed: progress?.completedAt != null,

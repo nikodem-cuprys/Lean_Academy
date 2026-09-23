@@ -1,0 +1,615 @@
+{
+  "meta": {
+    "description": "Evidenzbasiertes Training für Arbeitsgedächtnis und Leseeffizienz."
+  },
+  "languageSwitcher": {
+    "label": "Sprache"
+  },
+  "common": {
+    "somethingWentWrong": "Etwas ist schiefgelaufen — bitte versuche es erneut.",
+    "email": "E-Mail",
+    "pleaseWait": "Bitte warten…",
+    "goToLogin": "Zur Anmeldung",
+    "backHome": "← Zurück zur Startseite"
+  },
+  "auth": {
+    "logIn": "Anmelden",
+    "signUp": "Registrieren",
+    "createTitle": "Konto erstellen",
+    "welcomeBack": "Willkommen zurück",
+    "createSubtitle": "Starte mit einer kostenlosen 6-Minuten-Einheit.",
+    "loginSubtitle": "Melde dich an, um dein Training fortzusetzen.",
+    "continueGoogle": "Weiter mit Google",
+    "continueFacebook": "Weiter mit Facebook",
+    "or": "oder",
+    "name": "Name",
+    "password": "Passwort",
+    "createAccount": "Konto erstellen",
+    "forgotPassword": "Passwort vergessen?",
+    "terms": "Mit dem Fortfahren stimmst du unseren Nutzungsbedingungen und unserer Datenschutzerklärung zu.",
+    "autoSignInFailed": "Konto erstellt, aber die automatische Anmeldung ist fehlgeschlagen — bitte melde dich an.",
+    "incorrectCredentials": "E-Mail oder Passwort ist falsch.",
+    "forgot": {
+      "checkEmail": "Sieh in dein Postfach",
+      "sentBody": "Falls ein Konto für <strong>{email}</strong> existiert, haben wir dir einen Link zum Zurücksetzen deines Passworts geschickt. Er läuft in 1 Stunde ab.",
+      "title": "Passwort zurücksetzen",
+      "subtitle": "Gib deine E-Mail-Adresse ein, und wir schicken dir einen Link zum Zurücksetzen.",
+      "sending": "Wird gesendet…",
+      "send": "Link senden"
+    },
+    "reset": {
+      "mismatch": "Die Passwörter stimmen nicht überein.",
+      "updated": "Passwort geändert",
+      "redirecting": "Du wirst zur Anmeldung weitergeleitet…",
+      "title": "Neues Passwort wählen",
+      "forEmail": "Für {email}",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Neues Passwort bestätigen",
+      "saving": "Wird gespeichert…",
+      "save": "Neues Passwort speichern",
+      "invalidTitle": "Dieser Link ist ungültig",
+      "invalidBody": "Fordere einen neuen Link zum Zurücksetzen an und versuche es erneut.",
+      "requestNew": "Passwort zurücksetzen"
+    },
+    "verify": {
+      "verified": "E-Mail bestätigt",
+      "verifiedBody": "Deine E-Mail-Adresse ist bestätigt. Alles erledigt.",
+      "expiredTitle": "Dieser Link ist abgelaufen",
+      "invalidTitle": "Dieser Link ist ungültig",
+      "expiredBody": "Bestätigungslinks laufen nach 24 Stunden ab. Melde dich an, dann schicken wir dir einen neuen.",
+      "invalidBody": "Er wurde möglicherweise schon verwendet oder falsch kopiert."
+    }
+  },
+  "apiErrors": {
+    "invalidEmail": "Ungültige E-Mail-Adresse.",
+    "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
+    "tooManyAttempts": "Zu viele Versuche. Bitte versuche es später erneut.",
+    "accountExists": "Mit dieser E-Mail-Adresse existiert bereits ein Konto.",
+    "resetGeneric": "Falls ein Konto für diese E-Mail-Adresse existiert, haben wir einen Link zum Zurücksetzen geschickt.",
+    "resetExpired": "Dieser Link zum Zurücksetzen ist abgelaufen. Fordere einen neuen an.",
+    "resetInvalid": "Dieser Link zum Zurücksetzen ist ungültig."
+  },
+  "emails": {
+    "verify": {
+      "subject": "Bestätige deine E-Mail-Adresse für LeanAcademy",
+      "text": "Bestätige deine E-Mail-Adresse: {url}\n\nDieser Link läuft in 24 Stunden ab.",
+      "welcome": "Willkommen bei LeanAcademy.",
+      "confirmLink": "Bestätige deine E-Mail-Adresse",
+      "confirmRest": ", um die Einrichtung deines Kontos abzuschließen.",
+      "expiry": "Dieser Link läuft in 24 Stunden ab. Falls du dieses Konto nicht erstellt hast, kannst du diese E-Mail ignorieren."
+    },
+    "reset": {
+      "subject": "Setze dein LeanAcademy-Passwort zurück",
+      "text": "Setze dein Passwort zurück: {url}\n\nDieser Link läuft in 1 Stunde ab. Falls du das nicht angefordert hast, kannst du diese E-Mail ignorieren.",
+      "intro": "Wir haben eine Anfrage erhalten, dein LeanAcademy-Passwort zurückzusetzen.",
+      "link": "Neues Passwort wählen",
+      "expiry": "Dieser Link läuft in 1 Stunde ab und kann nur einmal verwendet werden. Falls du das nicht angefordert hast, kannst du diese E-Mail ignorieren — dein Passwort bleibt unverändert."
+    }
+  },
+  "domains": {
+    "WORKING_MEMORY": "Arbeitsgedächtnis",
+    "READING": "Lesen",
+    "SPATIAL": "Räumliches Gedächtnis",
+    "VERBAL": "Verbal",
+    "COGNITIVE_CONTROL": "Kognitive Kontrolle",
+    "MEMORY_STRATEGY": "Gedächtnisstrategien"
+  },
+  "nav": {
+    "main": "Hauptnavigation",
+    "home": "Start",
+    "progress": "Fortschritt",
+    "science": "Wissenschaft",
+    "achievements": "Erfolge",
+    "challenges": "Quests & Challenges",
+    "customize": "Übungen anpassen"
+  },
+  "home": {
+    "todaysTraining": "HEUTIGES TRAINING",
+    "startTraining": "Training starten",
+    "thisWeek": "DIESE WOCHE",
+    "weekdayLetters": "M,D,M,D,F,S,S",
+    "dayTrained": "Trainiert",
+    "dayTodayNotYet": "Heute — noch nicht",
+    "dayNoSession": "Keine Einheit",
+    "recentAchievement": "LETZTER ERFOLG",
+    "earnedOn": "Erreicht am {date}",
+    "noAchievements": "Noch keine Erfolge — zur vollständigen Liste →",
+    "quickLinks": "SCHNELLZUGRIFF",
+    "registryReviewed": "Evidenzregister zuletzt geprüft",
+    "approvedModules": "Freigegebene Trainingsmodule",
+    "signedIn": "Angemeldet",
+    "signedInNo": "nein",
+    "streak": "{days, plural, one {# Tag in Folge} other {# Tage in Folge}}",
+    "streakNudge": " — bereit, weiterzutrainieren?",
+    "trainingLevel": "Trainingsstufe {level}",
+    "links": {
+      "progress": "Fortschritt ansehen →",
+      "science": "Zur Wissenschaft →",
+      "achievements": "Erfolge ansehen →",
+      "challenges": "Quests & Challenges ansehen →",
+      "customize": "Übungen anpassen →",
+      "nBack": "N-Back-Übung ausprobieren →",
+      "complexSpan": "Complex-Span-Übung ausprobieren →",
+      "diceSum": "Würfelsummen-Übung ausprobieren →",
+      "spatial": "Räumliche-Sequenz-Übung ausprobieren →",
+      "reading": "Übung „Getaktetes Lesen“ ausprobieren →"
+    },
+    "loginOrSignup": "Anmelden oder registrieren →",
+    "greetingNamed": "Willkommen zurück, {name}",
+    "greeting": "Willkommen zurück",
+    "onboardingPrompt": "Schließe die Einführung ab, um einen Trainingsplan zu erhalten, der auf deine Ziele zugeschnitten ist.",
+    "startOnboarding": "Einführung starten"
+  },
+  "methods": {
+    "adaptive-nback-v0": "Adaptives N-Back",
+    "complex-span-v0": "Complex Span",
+    "dice-sum-v0": "Würfelsumme",
+    "visuospatial-sequence-recall-v0": "Räumliche Sequenzen merken",
+    "reading-paced-adaptive-v0": "Getaktetes / adaptives Lesen"
+  },
+  "achievements": {
+    "title": "Erfolge",
+    "earnedCount": "{earned} von {total} erreicht",
+    "earnedOn": "Erreicht am {date}",
+    "progress": "{current} von {target}",
+    "notYet": "Noch nicht erreicht",
+    "catalog": {
+      "first-session": {
+        "title": "Erste Einheit"
+      },
+      "first-week": {
+        "title": "Erste Woche"
+      },
+      "sessions-10": {
+        "title": "10 Einheiten"
+      },
+      "sessions-30": {
+        "title": "30 Einheiten"
+      },
+      "sessions-100": {
+        "title": "100 Einheiten"
+      },
+      "working-memory-level-5": {
+        "title": "Arbeitsgedächtnis Stufe 5"
+      },
+      "reading-efficiency-milestone": {
+        "title": "Meilenstein Leseeffizienz"
+      },
+      "reading-comprehension-at-new-pace": {
+        "title": "90 % Verständnis bei neuem Tempo gehalten"
+      },
+      "weekly-sessions-complete": {
+        "title": "Alle Wocheneinheiten abgeschlossen"
+      },
+      "personal-best": {
+        "title": "Persönliche Bestleistung"
+      },
+      "first-assessment": {
+        "title": "Erste Messung abgeschlossen"
+      }
+    }
+  },
+  "challenges": {
+    "title": "Quests & Challenges",
+    "daily": "Tägliche Quests",
+    "weekly": "Wöchentliche Challenges",
+    "completeCount": "{done} von {total} abgeschlossen",
+    "resets": " — wird zurückgesetzt: {when}",
+    "complete": "Abgeschlossen",
+    "progress": "{current} von {target}",
+    "items": {
+      "daily-complete-session": {
+        "title": "Schließe eine Einheit ab",
+        "description": "Beende heute 1 Trainingseinheit."
+      },
+      "daily-earn-xp": {
+        "title": "Sammle {amount} XP",
+        "description": "Sammle heute {amount} XP."
+      },
+      "daily-accuracy": {
+        "title": "Erziele eine hohe Genauigkeit",
+        "description": "Schließe eine Einheit mit mindestens {pct} % Genauigkeit ab."
+      },
+      "complete-sessions": {
+        "title": "Schließe {count} Einheiten ab",
+        "description": "Beende diese Woche {count} Trainingseinheiten."
+      },
+      "train-domains": {
+        "title": "Trainiere {count} verschiedene Bereiche",
+        "description": "Schließe diese Woche eine Einheit in {count} verschiedenen kognitiven Bereichen ab."
+      },
+      "reading-comprehension": {
+        "title": "Lies mit gutem Verständnis",
+        "description": "Schließe eine Leseeinheit mit mindestens {pct} % Verständnis ab."
+      },
+      "beat-personal-record": {
+        "title": "Übertriff eine Bestleistung",
+        "description": "Übertriff eine deiner eigenen Trainingsbestleistungen."
+      },
+      "complete-assessment": {
+        "title": "Schließe eine Messung ab",
+        "description": "Schließe eine Trainingsmessung ab."
+      }
+    }
+  },
+  "evidence": {
+    "strong": "Stark",
+    "moderate": "Moderat",
+    "limited": "Begrenzt",
+    "experimental": "Experimentell",
+    "unsupported": "Nicht belegt"
+  },
+  "assessmentNames": {
+    "backwardDigitSpan": "Rückwärts-Zahlenspanne",
+    "backwardSpatialSpan": "Rückwärts-Raumspanne"
+  },
+  "premium": {
+    "title": "{feature} ist eine Premium-Funktion",
+    "body": "Abonnements sind noch nicht verfügbar — schau bald wieder vorbei. Deine trainierten Übungen, dein Fortschritt und die komplette Wissenschaft dahinter bleiben in jedem Fall kostenlos.",
+    "back": "Zurück zum Fortschritt",
+    "features": {
+      "backwardDigitSpan": "Die Messung „Rückwärts-Zahlenspanne“",
+      "backwardSpatialSpan": "Die Messung „Rückwärts-Raumspanne“",
+      "trends": "Langzeittrends"
+    }
+  },
+  "science": {
+    "title": "Die Wissenschaft",
+    "intro": "Jede Übung hier stützt sich auf zitierte Forschung — sieh dir an, was belegt ist, was noch begrenzt ist und was wir bewusst weggelassen haben.",
+    "englishNote": "Studiennamen und Forschungszusammenfassungen werden im englischen Original angezeigt, damit eine Übersetzung ihre Bedeutung nicht verändert.",
+    "statReviewed": "geprüft",
+    "statImplemented": "in deinem Training",
+    "statExcluded": "ausgeschlossen",
+    "excludedNote": "{count, plural, one {# Methode, die wir geprüft und nicht aufgenommen haben} other {# Methoden, die wir geprüft und nicht aufgenommen haben}} — {names} — erfüllten unsere Evidenzanforderungen nicht."
+  },
+  "progress": {
+    "title": "Fortschritt",
+    "empty": "Noch nichts trainiert. Schließe eine Trainingseinheit ab, um hier echten Fortschritt zu sehen.",
+    "backHome": "Zurück zur Startseite",
+    "readingAllTime": "LESEN — GESAMTER ZEITRAUM",
+    "readingLast30": "LESEN — LETZTE 30 TAGE",
+    "pace": "TEMPO",
+    "wpm": "WpM",
+    "comprehension": "VERSTÄNDNIS",
+    "personalBest": "BESTLEISTUNG",
+    "atComprehension": "bei {pct} % Verständnis",
+    "trendsCta": "📈 Deine Langzeittrends ansehen →",
+    "trendsCtaLocked": "🔒 Langzeittrends (Premium) →",
+    "tabs": {
+      "trained": "Trainiert",
+      "similar": "Ähnliche Aufgaben",
+      "broader": "Breiterer Transfer"
+    },
+    "noOtherTasks": "Noch keine weiteren trainierten Aufgaben.",
+    "noNearTransfer": "Noch keine Messung des nahen Transfers",
+    "noNearTransferBody": "Sobald du sie gemacht hast, erscheint hier eine kurze, regelmäßige Messung mit einer Aufgabe, die du nicht direkt geübt hast, die aber denselben zugrunde liegenden Mechanismus wie eine deiner trainierten Aufgaben teilt.",
+    "nearTransferPremium": "Messungen des nahen Transfers sind eine Premium-Funktion.",
+    "measuredPeriodically": "Wird regelmäßig gemessen, nicht in jeder Einheit, um reine Übungseffekte zu vermeiden.",
+    "notYetMeasured": "Noch nicht gemessen",
+    "broaderBody": "Breiterer Transfer — auf allgemeine Intelligenz, das Gedächtnis im Alltag oder fremde Aufgaben — ist in der aktuellen Forschung für diese Übungen nicht belegt. Wir zeigen hier keine Zahl, solange keine echte Evidenz dahintersteht.",
+    "seeResearch": "Zur Forschung →",
+    "retakeAssessment": "Messung wiederholen: {name}",
+    "takeAssessment": "Messung machen: {name}",
+    "assessmentLocked": "🔒 {name} (Premium)",
+    "nearTransferRelated": {
+      "backwardDigitSpan": "Maß für nahen Transfer, bezogen auf dein N-Back- / Complex-Span-Training",
+      "backwardSpatialSpan": "Maß für nahen Transfer, bezogen auf dein Training „Räumliche Sequenzen“"
+    },
+    "backwardSpan": "RÜCKWÄRTSSPANNE",
+    "atThatLength": "BEI DIESER LÄNGE",
+    "confidenceInterval": "{level}-%-Konfidenzintervall: {lower} %–{upper} % Treffer bei dieser Länge — wenige Durchgänge bergen echte Unsicherheit, deshalb zeigen wir das nicht als bloße Zahl.",
+    "spanTrend": "Beste Spanne: {start} → {end} Elemente",
+    "levelTrend": "Stufe {start} → Stufe {end} in {sessions, plural, one {# Einheit} other {# Einheiten}}",
+    "noRecentSessions": "Keine Einheiten in den letzten 30 Tagen — Premium schaltet den gesamten Verlauf frei",
+    "calibratedAt": "Auf Stufe {level} kalibriert — noch keine Trainingseinheiten",
+    "bestSpan": "Spanne von {value} Elementen",
+    "bestLevel": "Stufe {value}",
+    "personalBestLine": "🏆 Bestleistung: {value}",
+    "historyLimited": "Angezeigt werden die letzten 30 Tage — Premium schaltet deinen gesamten Verlauf frei."
+  },
+  "trends": {
+    "title": "Langzeittrends",
+    "subtitle": "Dein echter Trainingsverlauf über die Zeit, ein Diagramm pro Aufgabe — nicht nur ein Vorher-nachher-Vergleich.",
+    "empty": "Noch nichts trainiert. Schließe ein paar Einheiten ab, um hier einen echten Trend aufzubauen.",
+    "back": "Zurück zum Fortschritt",
+    "notEnoughData": "Noch nicht genug Daten für einen aussagekräftigen Trend — {sessionCount} von {minSessions} Einheiten, verteilt über {spanDays} der {minSpanDays} Tage, die ein echter Trend braucht. Ein paar Einheiten innerhalb weniger Tage würden eine technisch echte, aber irreführende Linie zeichnen — deshalb warten wir, bis der Verlauf breit genug gestreut ist.",
+    "difficultyOverTime": "{name} — Schwierigkeit im Zeitverlauf",
+    "readingHeader": "LESEN — TEMPO UND VERSTÄNDNIS IM ZEITVERLAUF",
+    "pace": "Tempo",
+    "comprehension": "Verständnis",
+    "wpmValue": "{value} WpM",
+    "chart": {
+      "hideTable": "Tabelle ausblenden",
+      "viewTable": "Als Tabelle anzeigen",
+      "summary": "{title}: von {from} am {fromDate} bis {to} am {toDate}",
+      "date": "Datum",
+      "value": "Wert"
+    }
+  },
+  "settings": {
+    "title": "Übungen anpassen",
+    "intro": "Gilt nur für das freie Üben, nicht für deine tägliche Trainingseinheit — die bleibt bei dem Tempo, mit dem sie erforscht wurde, damit dein adaptiver Schwierigkeitsverlauf von Einheit zu Einheit vergleichbar bleibt.",
+    "language": "Sprache",
+    "saving": "Wird gespeichert…",
+    "saved": "Gespeichert",
+    "saveError": "Speichern fehlgeschlagen — bitte erneut versuchen",
+    "stimulusPace": "Reiztempo",
+    "dieSides": "Würfelseiten",
+    "dieStandard": "Der normale sechsseitige Würfel — die Anzahl der Würfel passt sich weiterhin deiner Schwierigkeit an.",
+    "dieCustom": "Ein {sides}-seitiger Würfel macht die Summen jeder Runde größer — die Anzahl der Würfel passt sich weiterhin separat deiner Schwierigkeit an.",
+    "gridSize": "Rastergröße",
+    "gridSizeHint": "Größere Raster können auch längere Sequenzen aufnehmen.",
+    "pace": {
+      "RELAXED": {
+        "label": "Entspannt",
+        "description": "Mehr Zeit pro Element — leichteres Tempo."
+      },
+      "STANDARD": {
+        "label": "Standard",
+        "description": "Das Standardtempo, mit dem die Evidenz für diese Übung erforscht wurde."
+      },
+      "QUICK": {
+        "label": "Schnell",
+        "description": "Weniger Zeit pro Element — schwereres Tempo."
+      },
+      "NO_DELAY": {
+        "label": "Ohne Pause",
+        "description": "Minimaler Abstand zwischen den Elementen — am schnellsten und schwersten."
+      }
+    }
+  },
+  "exercise": {
+    "exit": "Übung beenden",
+    "trialOf": "Durchgang {current} von {total}",
+    "roundOf": "Runde {current} von {total}",
+    "complete": "Übung abgeschlossen",
+    "accuracy": "GENAUIGKEIT",
+    "level": "STUFE",
+    "done": "Fertig",
+    "levelSummary": "Stufe {start} → {end}"
+  },
+  "nBack": {
+    "name": "Adaptives N-Back",
+    "srTitle": "Übung Adaptives N-Back",
+    "tag": "ARBEITSGEDÄCHTNIS · N-BACK",
+    "memorize": "Merk dir das — der Vergleich hat noch nicht begonnen",
+    "instructionPending": "Tippe, wenn das Feld dem von vor … Schritten entspricht",
+    "instruction": "{n, plural, one {Tippe, wenn das Feld dem von vor # Schritt entspricht} other {Tippe, wenn das Feld dem von vor # Schritten entspricht}}",
+    "gotIt": "Erkannt",
+    "missed": "Verpasst",
+    "match": "Treffer",
+    "correct": "Richtig — gut erkannt",
+    "notScored": "Nicht gewertet — das Muster baut sich noch auf",
+    "noteUp": "Deine Genauigkeit hat gehalten, während die Schwierigkeit gestiegen ist — das ist das Zeichen, dranzubleiben, nicht nur schneller zu werden.",
+    "noteDown": "Die Schwierigkeit ist um eine Stufe gesunken, damit es fordernd, aber machbar bleibt. So soll die adaptive Steuerung funktionieren — kein Rückschlag.",
+    "noteSteady": "Du hast diese Stufe über {trials} gewertete Durchgänge gehalten."
+  },
+  "complexSpan": {
+    "name": "Complex Span",
+    "srTitle": "Übung Complex Span",
+    "tag": "ARBEITSGEDÄCHTNIS · COMPLEX SPAN",
+    "summary": "Spanne {start} → {end}",
+    "setOf": "Satz {current} von {total}",
+    "holdLetters": "Behalte die Buchstaben — du rufst sie danach ab",
+    "isTrue": "Stimmt das?",
+    "true": "Richtig",
+    "false": "Falsch",
+    "correct": "Richtig",
+    "notQuite": "Nicht ganz",
+    "perfectRecall": "Perfekt erinnert",
+    "rightSpot": "{correct} von {total} an der richtigen Stelle",
+    "tapLetters": "Tippe die Buchstaben in der richtigen Reihenfolge",
+    "undo": "Rückgängig",
+    "submit": "Absenden",
+    "noteUp": "Du hast ganze Sequenzen so genau erinnert, dass die Spanne gestiegen ist — das ist das Zeichen, dranzubleiben.",
+    "noteDown": "Die Spannenlänge ist etwas gesunken, damit es fordernd, aber machbar bleibt. So soll die adaptive Steuerung funktionieren — kein Rückschlag.",
+    "noteSteady": "Du hast diese Spannenlänge über {sets} Sätze gehalten.",
+    "perfectSets": "PERFEKTE SÄTZE",
+    "span": "SPANNE",
+    "processingAccuracy": "VERARBEITUNGSGENAUIGKEIT (die Richtig/Falsch-Prüfungen)"
+  },
+  "diceSum": {
+    "name": "Würfelsumme",
+    "srTitle": "Übung Würfelsumme",
+    "tag": "ARBEITSGEDÄCHTNIS · WÜRFELSUMME",
+    "summary": "{start} → {end} Würfel",
+    "dieShowing": "Würfel zeigt {face}",
+    "remember": "Merk sie dir — du addierst sie gleich",
+    "shownFor": "{count} Würfel · {seconds} Sekunden sichtbar",
+    "shownForSided": "{count} W{sides}-Würfel · {seconds} Sekunden sichtbar",
+    "correct": "Richtig",
+    "notQuite": "Nicht ganz",
+    "whatsTotal": "Wie lautet die Summe?",
+    "summedTo": "{count} Würfel ergaben {sum}",
+    "totalWas": "Die Summe war {sum}",
+    "addUp": "Addiere alle {count} Würfel",
+    "backspace": "Letzte Ziffer löschen",
+    "submit": "Absenden",
+    "noteUp": "Du hast so genau addiert, dass die Anzahl der Würfel gestiegen ist — das ist das Zeichen, dranzubleiben.",
+    "noteDown": "Die Anzahl der Würfel ist etwas gesunken, damit es fordernd, aber machbar bleibt. So soll die adaptive Steuerung funktionieren — kein Rückschlag.",
+    "noteSteady": "Du hast diese Würfelanzahl über {rounds} Runden gehalten.",
+    "correctSums": "RICHTIGE SUMMEN",
+    "diceCount": "WÜRFELANZAHL"
+  },
+  "spatial": {
+    "name": "Räumliche Sequenzen merken",
+    "srTitle": "Übung Räumliche Sequenzen merken",
+    "tag": "RÄUMLICHES GEDÄCHTNIS · SEQUENZEN MERKEN",
+    "sequenceOf": "Sequenz {current} von {total}",
+    "watch": "Beobachte, wie die Felder aufleuchten",
+    "perfectRecall": "Perfekt erinnert",
+    "rightOrder": "{correct} von {total} in der richtigen Reihenfolge",
+    "tapOrder": "Tippe die Felder in der Reihenfolge an, in der sie aufgeleuchtet sind",
+    "cell": "Rasterfeld {n}",
+    "cellLit": "Rasterfeld {n}, leuchtet",
+    "undo": "Rückgängig",
+    "submit": "Sequenz absenden",
+    "noteUp": "Du hast ganze Sequenzen so genau erinnert, dass die Sequenzlänge gestiegen ist — das ist das Zeichen, dranzubleiben.",
+    "noteDown": "Die Sequenzlänge ist etwas gesunken, damit es fordernd, aber machbar bleibt. So soll die adaptive Steuerung funktionieren — kein Rückschlag.",
+    "noteSteady": "Du hast diese Sequenzlänge über {rounds} Runden gehalten.",
+    "perfectSequences": "PERFEKTE SEQUENZEN",
+    "sequenceLength": "SEQUENZLÄNGE"
+  },
+  "reading": {
+    "name": "Getaktetes Lesen",
+    "srTitle": "Übung Getaktetes Lesen",
+    "tag": "LESEN · GETAKTETER TEXT",
+    "summary": "{start} → {end} WpM",
+    "passageOf": "Text {current} von {total}",
+    "englishNote": "Die Texte sind auf Englisch — Lesetempo und Verständnisbewertung sind auf englische Texte kalibriert.",
+    "textSize": "Textgröße",
+    "textSizes": {
+      "normal": "Normale Textgröße",
+      "large": "Große Textgröße",
+      "xlarge": "Sehr große Textgröße"
+    },
+    "wide": "Breit",
+    "wpmValue": "{value} WpM",
+    "finished": "Ich bin fertig mit Lesen",
+    "submitAnswer": "Antwort absenden",
+    "correct": "Richtig",
+    "notQuite": "Nicht ganz",
+    "answerWas": "Die Antwort war:",
+    "noteUp": "Dein Verständnis hat bei diesem Tempo so gut gehalten, dass das Zieltempo gestiegen ist — das ist die adaptive Steuerung, die reagiert, keine Garantie, dass es weiter steigt.",
+    "noteDown": "Das Tempo ist etwas gesunken, um das Verständnis zu schützen. So soll die adaptive Steuerung funktionieren — kein Rückschlag.",
+    "noteSteady": "Du hast dieses Tempo über {passages} Texte gehalten.",
+    "avgWpm": "Ø WpM",
+    "comprehension": "VERSTÄNDNIS",
+    "targetPace": "ZIELTEMPO",
+    "efficiencyScore": "LESEEFFIZIENZ-WERT",
+    "efficiencyExplainer": "Wörter pro Minute × Verständnis, wobei Tempo unterhalb einer Verständnisschwelle von 70 % weniger zählt — wird nie ohne beide Zahlen oben angezeigt."
+  },
+  "session": {
+    "niceWork": "Gut gemacht",
+    "nextUp": "Als Nächstes: {name}",
+    "unknownExercise": "Unbekannte Übung: {method}",
+    "complete": "Einheit abgeschlossen",
+    "stats": "{minutes, plural, one {# Minute} other {# Minuten}} · {exercises, plural, one {# Übung} other {# Übungen}}",
+    "newPersonalBest": "🏆 Neue Bestleistung",
+    "freezeUsed": " — ein Serienschutz hat gestern abgedeckt",
+    "xpAwarded": "+{xp} XP",
+    "leveledUp": " — Trainingsstufe {level}!"
+  },
+  "assessment": {
+    "exit": "Messung beenden",
+    "saveError": "Beim Speichern deines Ergebnisses ist etwas schiefgelaufen. Bitte versuche es erneut.",
+    "spanLength": "Spannenlänge {span}",
+    "correct": "Richtig",
+    "notQuite": "Nicht ganz",
+    "submit": "Absenden",
+    "lastTaken": "Zuletzt gemacht am {date}.",
+    "due": "Es ist eine Weile her — eine neue Messung ist fällig.",
+    "nextDue": "Wird regelmäßig gemessen, nicht in jeder Einheit — die nächste wird um den {date} empfohlen.",
+    "neverTaken": "Du hast diese Messung noch nicht gemacht.",
+    "anyTime": "Du kannst sie jederzeit machen.",
+    "start": "Starten",
+    "complete": "Messung abgeschlossen",
+    "backwardSpan": "RÜCKWÄRTSSPANNE",
+    "atThatLength": "BEI DIESER LÄNGE",
+    "done": "Fertig"
+  },
+  "digitSpan": {
+    "name": "Rückwärts-Zahlenspanne",
+    "srTitle": "Messung Rückwärts-Zahlenspanne",
+    "tag": "ARBEITSGEDÄCHTNIS · RÜCKWÄRTS-ZAHLENSPANNE",
+    "watch": "Beobachte die Zahlen",
+    "enterReverse": "Gib die Zahlen in umgekehrter Reihenfolge ein",
+    "backspace": "Letzte Zahl löschen",
+    "intro": "Eine kurze, anders aufgebaute Aufgabe als deine trainierten Übungen: Du siehst eine Ziffernfolge und gibst sie danach in <strong>umgekehrter</strong> Reihenfolge ein. Die Folge wird länger, solange du richtig liegst, und endet nach zwei Fehlern in Folge.",
+    "disclaimer": "Dies misst ein Ergebnis des nahen Transfers im Arbeitsgedächtnis, das strukturell mit deinen trainierten Aufgaben verwandt ist — es misst weder IQ noch allgemeine Intelligenz oder das Gedächtnis im Alltag.",
+    "resultNote": "Im gesamten Durchlauf hast du {correct} von {total} Folgen richtig wiedergegeben. Das ist ein Maß für nahen Transfer — eine tatsächlich andere Aufgabe als deine trainierten Übungen, die deren Spannenstruktur des Arbeitsgedächtnisses teilt. Es misst weder IQ noch allgemeine Intelligenz oder das Gedächtnis im Alltag, und Ergebnisse bei einer einzigen Länge aus wenigen Durchgängen bergen echte Unsicherheit."
+  },
+  "spatialSpan": {
+    "name": "Rückwärts-Raumspanne",
+    "srTitle": "Messung Rückwärts-Raumspanne",
+    "tag": "RÄUMLICHES GEDÄCHTNIS · RÜCKWÄRTSSPANNE",
+    "tapReverse": "Tippe die Felder in umgekehrter Reihenfolge an",
+    "intro": "Eine kurze, anders aufgebaute Aufgabe als deine trainierten Übungen: Felder im Raster leuchten nacheinander auf, danach tippst du sie in <strong>umgekehrter</strong> Reihenfolge an. Die Folge wird länger, solange du richtig liegst, und endet nach zwei Fehlern in Folge.",
+    "disclaimer": "Dies misst ein Ergebnis des nahen Transfers im räumlichen Arbeitsgedächtnis, das strukturell mit deiner Übung „Räumliche Sequenzen“ verwandt ist — es misst weder IQ noch allgemeine Intelligenz oder das Gedächtnis im Alltag.",
+    "resultNote": "Im gesamten Durchlauf hast du {correct} von {total} Folgen richtig wiedergegeben. Das ist ein Maß für nahen Transfer — eine tatsächlich andere Aufgabe als deine Übung „Räumliche Sequenzen“ (Rückwärts- statt Vorwärtsabruf), die deren Spannenstruktur des Arbeitsgedächtnisses teilt. Es misst weder IQ noch allgemeine Intelligenz oder das Gedächtnis im Alltag, und Ergebnisse bei einer einzigen Länge aus wenigen Durchgängen bergen echte Unsicherheit."
+  },
+  "onboarding": {
+    "submitError": "Beim Speichern deines Plans ist etwas schiefgelaufen. Du kannst es erneut versuchen.",
+    "goalsTitle": "Worauf möchtest du dich konzentrieren?",
+    "goalsSubtitle": "Wähle, was dir am wichtigsten ist. Wir bauen deinen Plan darum herum — trainieren kannst du ohnehin alles.",
+    "goals": {
+      "working-memory": "Arbeitsgedächtnis verbessern",
+      "concentration": "Konzentration üben",
+      "reading-efficiency": "Schneller lesen, ohne den Faden zu verlieren",
+      "memory-strategies": "Bessere Gedächtnisstrategien lernen",
+      "habit": "Einfach eine tägliche Gewohnheit aufbauen",
+      "balanced": "Von allem etwas"
+    },
+    "timeTitle": "Wie viel Zeit kannst du täglich investieren?",
+    "timeSubtitle": "Wir passen die Einheiten daran an. Du kannst das jederzeit ändern.",
+    "minutes": "{minutes} Minuten",
+    "timeNotes": {
+      "5": "Ein kurzer täglicher Impuls",
+      "10": "Ausgewogen, am beliebtesten",
+      "15": "Strukturierteres Training",
+      "20": "Für konzentriertes tägliches Üben"
+    },
+    "custom": "Eigene",
+    "customNote": "Lege dein eigenes Ziel fest",
+    "minutesPerDay": "Minuten pro Tag",
+    "experienceTitle": "Hast du so etwas schon einmal gemacht?",
+    "experienceSubtitle": "Es gibt keine falsche Antwort — das hilft nur, deine ersten Einheiten passend zu gestalten. Eine kurze Kalibrierung im nächsten Schritt stimmt es weiter ab.",
+    "experience": {
+      "new": {
+        "label": "Ganz neu dabei",
+        "note": "Bequem starten und langsam steigern"
+      },
+      "some": {
+        "label": "Etwas Erfahrung",
+        "note": "Ich habe schon Gedächtnis- oder Gehirntrainings-Apps ausprobiert"
+      },
+      "experienced": {
+        "label": "Sehr erfahren",
+        "note": "Ich will von Anfang an eine echte Herausforderung"
+      }
+    },
+    "continueToCalibration": "Weiter zur Kalibrierung",
+    "continue": "Weiter",
+    "recommendTitle": "Wir empfehlen dir den Start auf:",
+    "recommendLabel": "Empfohlene Schwierigkeitsstufe",
+    "levels": {
+      "BEGINNER": {
+        "label": "Einsteiger",
+        "note": "Am leichtesten Ende jeder Übung starten"
+      },
+      "INTERMEDIATE": {
+        "label": "Mittelstufe",
+        "note": "Ein typischer, angenehmer Startpunkt"
+      },
+      "ADVANCED": {
+        "label": "Fortgeschritten",
+        "note": "Weiter vorne einsteigen, nahe am schwersten Ende jeder Übung"
+      },
+      "EXPERT": {
+        "label": "Experte",
+        "note": "Am schwersten Ende jeder Übung starten"
+      },
+      "AUTO": {
+        "label": "Automatisch (empfohlen)",
+        "note": "Genau das verwenden, was deine Kalibrierung gemessen hat"
+      }
+    },
+    "saving": "Plan wird gespeichert...",
+    "startTraining": "Training starten",
+    "stepOf": "SCHRITT {step} VON {total}",
+    "calibration": {
+      "title": "KURZE KALIBRIERUNG",
+      "spatial": "Beobachte das Muster und wiederhole es",
+      "nBack": "War das dasselbe Feld wie beim letzten Mal?",
+      "complexSpan": "Merk dir die Buchstaben in der richtigen Reihenfolge",
+      "reading": "Lies in deinem eigenen Tempo",
+      "subtitle": "Etwa 90 Sekunden, kein Bestehen oder Durchfallen — das hilft uns nur, dich auf der richtigen Stufe starten zu lassen.",
+      "submit": "Absenden",
+      "different": "Anders",
+      "same": "Gleich",
+      "finishedReading": "Ich bin fertig mit Lesen",
+      "questionOf": "Frage {current} von {total}",
+      "bothCount": "Gedächtnis & Verständnis zählen beide"
+    }
+  }
+}

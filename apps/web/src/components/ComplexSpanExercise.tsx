@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   ComplexSpanTask,
   type ProcessingItem,
@@ -79,6 +80,8 @@ interface ComplexSpanExerciseProps extends SessionModeProps {
 }
 
 export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: ComplexSpanExerciseProps = {}) {
+  const t = useTranslations("complexSpan");
+  const tx = useTranslations("exercise");
   const memoryDisplayMs = MEMORY_DISPLAY_MS_BY_PACE[pace ?? "STANDARD"];
   const [phase, setPhase] = useState<Phase>("processing");
   const [setNumber, setSetNumber] = useState(0);
@@ -217,7 +220,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
           startDifficulty,
           endDifficulty,
           trials,
-          summaryLabel: `Span ${startDifficulty} → ${endDifficulty}`,
+          summaryLabel: t("summary", { start: startDifficulty, end: endDifficulty }),
         });
         return;
       }
@@ -261,7 +264,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5" data-testid="complex-span-exercise" data-pace={pace ?? "STANDARD"}>
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label="Exit exercise">
+        <Link href="/" aria-label={tx("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
@@ -275,14 +278,14 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
         <div className="w-[18px]" />
       </div>
       <div className="mb-4 text-center text-xs text-text-3">
-        Set {setNumber} of {TOTAL_SETS}
+        {t("setOf", { current: setNumber, total: TOTAL_SETS })}
       </div>
 
-      <h1 className="sr-only">Complex Span exercise</h1>
+      <h1 className="sr-only">{t("srTitle")}</h1>
       <div className="mb-2 flex items-center justify-center gap-1.5">
         <div className="h-[7px] w-[7px] rounded-full bg-wm" />
         <div className="text-[12.5px] font-bold tracking-wide text-wm">
-          WORKING MEMORY · COMPLEX SPAN
+          {t("tag")}
         </div>
       </div>
 
@@ -300,7 +303,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
       {(phase === "processing" || phase === "memory") && (
         <>
           <div className="mb-1.5 text-center text-[12.5px] text-text-3">
-            Hold onto the letters — you&rsquo;ll recall them after
+            {t("holdLetters")}
           </div>
           <div className="mb-8 flex justify-center gap-2.5">
             {Array.from({ length: setSize ?? 0 }, (_, i) => {
@@ -331,7 +334,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
       <div className="flex flex-1 flex-col items-center justify-center">
         {phase === "processing" && processingItem && (
           <>
-            <div className="mb-2.5 text-[13px] text-text-3">Is this true?</div>
+            <div className="mb-2.5 text-[13px] text-text-3">{t("isTrue")}</div>
             <div className="mb-5 font-num text-4xl font-bold text-text">
               {processingItem.a} {processingItem.operator} {processingItem.b} ={" "}
               {processingItem.displayedResult}
@@ -369,7 +372,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
                     : { borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" }
                 }
               >
-                True
+                {t("true")}
               </button>
               <button
                 data-testid="false-button"
@@ -386,14 +389,14 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
                     : { borderColor: "var(--color-border)", background: "var(--color-surface)", color: "var(--color-text)" }
                 }
               >
-                False
+                {t("false")}
               </button>
             </div>
             <div className="mt-2.5 h-[18px] text-center text-[12.5px] font-bold">
               {processingFeedback === true ? (
-                <span className="text-success">Correct</span>
+                <span className="text-success">{t("correct")}</span>
               ) : processingFeedback === false ? (
-                <span style={{ color: "var(--color-caution)" }}>Not quite</span>
+                <span style={{ color: "var(--color-caution)" }}>{t("notQuite")}</span>
               ) : null}
             </div>
           </>
@@ -413,9 +416,9 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
             <div className="mb-4 text-center font-display text-lg font-bold text-text">
               {phase === "feedback"
                 ? setFeedback?.fullyCorrect
-                  ? "Perfect recall"
-                  : `${setFeedback?.correctPositions ?? 0} of ${setFeedback?.setSize ?? setSize} in the right spot`
-                : "Tap the letters, in order"}
+                  ? t("perfectRecall")
+                  : t("rightSpot", { correct: setFeedback?.correctPositions ?? 0, total: setFeedback?.setSize ?? setSize })
+                : t("tapLetters")}
             </div>
             <div className="mb-5 flex justify-center gap-2">
               {Array.from({ length: setSize }, (_, i) => (
@@ -454,7 +457,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
                     disabled={recalled.length === 0}
                     className="flex-1 rounded-full border-[1.5px] border-border py-3 font-body text-sm font-bold text-text-2 transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
                   >
-                    Undo
+                    {t("undo")}
                   </button>
                   <button
                     data-testid="recall-submit"
@@ -462,7 +465,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
                     disabled={recalled.length !== setSize}
                     className="flex-1 rounded-full bg-accent py-3 font-body text-sm font-bold text-on-accent transition-transform duration-micro active:scale-95 disabled:opacity-40 disabled:active:scale-100"
                   >
-                    Submit
+                    {t("submit")}
                   </button>
                 </div>
               </>
@@ -475,6 +478,8 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
 }
 
 function ComplexSpanResults({ results }: { results: Results }) {
+  const t = useTranslations("complexSpan");
+  const tx = useTranslations("exercise");
   const { startDifficulty, endDifficulty, sets, processingAccuracy } = results;
   const perfectSets = sets.filter((s) => s.fullyCorrect).length;
   const processingPct =
@@ -484,11 +489,11 @@ function ComplexSpanResults({ results }: { results: Results }) {
 
   let note: string;
   if (endDifficulty > startDifficulty) {
-    note = `You recalled full sequences accurately enough that the span increased — that's the sign to keep going.`;
+    note = t("noteUp");
   } else if (endDifficulty < startDifficulty) {
-    note = `Span length eased back a notch to keep this challenging but doable. That's the adaptive engine working as intended, not a setback.`;
+    note = t("noteDown");
   } else {
-    note = `You held steady at this span length across ${sets.length} sets.`;
+    note = t("noteSteady", { sets: sets.length });
   }
 
   const spanIncreased = endDifficulty > startDifficulty;
@@ -501,20 +506,20 @@ function ComplexSpanResults({ results }: { results: Results }) {
             <path d="M5 13l4 4L19 7" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <h1 className="font-display text-[23px] font-bold text-text">Exercise complete</h1>
-        <div className="mt-1.5 text-[13.5px] text-text-2">Complex Span</div>
+        <h1 className="font-display text-[23px] font-bold text-text">{tx("complete")}</h1>
+        <div className="mt-1.5 text-[13.5px] text-text-2">{t("name")}</div>
       </div>
 
       <div className="mb-4 flex justify-around rounded-lg border border-border bg-surface p-5 shadow-sm">
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">PERFECT SETS</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{t("perfectSets")}</div>
           <div className="font-num text-2xl font-bold text-text">
             {perfectSets}/{sets.length}
           </div>
         </div>
         <div className="w-px bg-border" />
         <div className="text-center">
-          <div className="mb-1 text-[11.5px] text-text-3">SPAN</div>
+          <div className="mb-1 text-[11.5px] text-text-3">{t("span")}</div>
           <div className={`font-num text-2xl font-bold text-text ${spanIncreased ? "animate-celebration-pop" : ""}`}>
             {startDifficulty} → {endDifficulty}
           </div>
@@ -523,7 +528,7 @@ function ComplexSpanResults({ results }: { results: Results }) {
 
       <div className="mb-4 rounded-lg border border-border bg-surface p-4.5">
         <div className="mb-1 text-[11.5px] text-text-3">
-          PROCESSING ACCURACY (the true/false checks)
+          {t("processingAccuracy")}
         </div>
         <div className="font-num text-xl font-bold text-text">{processingPct}%</div>
       </div>
@@ -536,7 +541,7 @@ function ComplexSpanResults({ results }: { results: Results }) {
         href="/"
         className="mt-6 block w-full rounded-full bg-accent py-3.5 text-center font-body text-[15px] font-bold text-on-accent"
       >
-        Done
+        {tx("done")}
       </Link>
     </div>
   );

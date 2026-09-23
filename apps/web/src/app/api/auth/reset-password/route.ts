@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@lean-academy/db";
 import { consumePasswordResetToken } from "@/lib/tokens";
 import { isRateLimited } from "@/lib/rate-limit";
 
-const schema = z.object({
-  email: z.string().email(),
-  token: z.string().min(1),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
 export async function POST(request: Request) {
+  const t = await getTranslations("apiErrors");
+  const schema = z.object({
+    email: z.string().email(t("invalidEmail")),
+    token: z.string().min(1),
+    password: z.string().min(8, t("passwordTooShort")),
+  });
+
   const body = await request.json().catch(() => null);
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
@@ -26,7 +28,7 @@ export async function POST(request: Request) {
   // request-a-link endpoint's limiter.
   if (isRateLimited(`reset-password:${email}`, { max: 10, windowMs: 15 * 60 * 1000 })) {
     return NextResponse.json(
-      { error: "Too many attempts. Try again later." },
+      { error: t("tooManyAttempts") },
       { status: 429 }
     );
   }
@@ -37,8 +39,8 @@ export async function POST(request: Request) {
       {
         error:
           result.reason === "expired"
-            ? "This reset link has expired. Request a new one."
-            : "This reset link isn't valid.",
+            ? t("resetExpired")
+            : t("resetInvalid"),
       },
       { status: 400 }
     );

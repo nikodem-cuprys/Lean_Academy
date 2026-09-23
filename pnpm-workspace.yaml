@@ -4,10 +4,14 @@ packages:
 # These packages have postinstall scripts pnpm blocks by default (supply-
 # chain hardening). All are needed to function: Prisma fetches its
 # query-engine binaries, esbuild/unrs-resolver fetch native platform
-# binaries (used by vitest/eslint tooling).
+# binaries (used by vitest/eslint tooling). @parcel/watcher and @swc/core
+# come in via next-intl's optional message-extractor CLI, which this
+# project doesn't use — its runtime needs neither, so they stay blocked.
 allowBuilds:
+  '@parcel/watcher': false
   '@prisma/client': true
   '@prisma/engines': true
+  '@swc/core': false
   esbuild: true
   prisma: true
   unrs-resolver: true

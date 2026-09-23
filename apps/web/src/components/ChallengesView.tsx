@@ -1,3 +1,4 @@
+import { useFormatter, useTranslations } from "next-intl";
 import type { WeeklyChallengeStatus } from "@/lib/weekly-challenges";
 import type { DailyQuestStatus } from "@/lib/daily-quests";
 
@@ -13,13 +14,6 @@ import type { DailyQuestStatus } from "@/lib/daily-quests";
 
 type QuestLikeStatus = WeeklyChallengeStatus | DailyQuestStatus;
 
-function formatEndsAt(iso: string, style: "date" | "time"): string {
-  const d = new Date(iso);
-  return style === "date"
-    ? d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-    : d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-}
-
 function QuestSection({
   title,
   icon,
@@ -31,13 +25,19 @@ function QuestSection({
   items: QuestLikeStatus[];
   resetLabel: string | null;
 }) {
+  const t = useTranslations("challenges");
   const completedCount = items.filter((c) => c.completed).length;
+  const itemText = (c: QuestLikeStatus, field: "title" | "description") => {
+    const key = `items.${c.slug}.${field}` as never;
+    return t.has(key) ? t(key, c.messageParams as never) : c[field];
+  };
 
   return (
     <div className="mb-6">
       <h2 className="font-display text-[17px] font-bold text-text">{title}</h2>
       <div className="mb-3 text-[13px] text-text-2">
-        {completedCount} of {items.length} complete{resetLabel ? ` — resets ${resetLabel}` : ""}
+        {t("completeCount", { done: completedCount, total: items.length })}
+        {resetLabel ? t("resets", { when: resetLabel }) : ""}
       </div>
 
       <div className="rounded-lg border border-border bg-surface px-4.5 shadow-sm">
@@ -60,14 +60,14 @@ function QuestSection({
               {c.completed ? "✅" : icon}
             </div>
             <div className="flex-1">
-              <div className="text-[14px] font-bold text-text">{c.title}</div>
-              <div className="text-xs text-text-3">{c.description}</div>
+              <div className="text-[14px] font-bold text-text">{itemText(c, "title")}</div>
+              <div className="text-xs text-text-3">{itemText(c, "description")}</div>
               {c.completed ? (
-                <div className="mt-1 text-xs text-text-3">Complete</div>
+                <div className="mt-1 text-xs text-text-3">{t("complete")}</div>
               ) : (
                 <>
                   <div className="mt-1 text-xs text-text-3">
-                    {c.progressCurrent} of {c.progressTarget}
+                    {t("progress", { current: c.progressCurrent, target: c.progressTarget })}
                   </div>
                   <div className="mt-1 h-[5px] overflow-hidden rounded-full bg-surface-2">
                     <div
@@ -92,24 +92,26 @@ export function ChallengesView({
   dailyQuests: DailyQuestStatus[];
   weeklyChallenges: WeeklyChallengeStatus[];
 }) {
+  const t = useTranslations("challenges");
+  const format = useFormatter();
   const dailyEndsAt = dailyQuests[0]?.endsAt;
   const weeklyEndsAt = weeklyChallenges[0]?.endsAt;
 
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
-      <h1 className="mb-4 font-display text-[23px] font-bold text-text">Quests & Challenges</h1>
+      <h1 className="mb-4 font-display text-[23px] font-bold text-text">{t("title")}</h1>
 
       <QuestSection
-        title="Daily Quests"
+        title={t("daily")}
         icon="🎯"
         items={dailyQuests}
-        resetLabel={dailyEndsAt ? formatEndsAt(dailyEndsAt, "time") : null}
+        resetLabel={dailyEndsAt ? format.dateTime(new Date(dailyEndsAt), { hour: "numeric", minute: "2-digit" }) : null}
       />
       <QuestSection
-        title="Weekly Challenges"
+        title={t("weekly")}
         icon="🏆"
         items={weeklyChallenges}
-        resetLabel={weeklyEndsAt ? formatEndsAt(weeklyEndsAt, "date") : null}
+        resetLabel={weeklyEndsAt ? format.dateTime(new Date(weeklyEndsAt), { month: "short", day: "numeric" }) : null}
       />
     </div>
   );

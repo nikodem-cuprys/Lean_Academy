@@ -1,0 +1,615 @@
+{
+  "meta": {
+    "description": "Evidence-based working-memory and reading-efficiency training."
+  },
+  "languageSwitcher": {
+    "label": "Language"
+  },
+  "common": {
+    "somethingWentWrong": "Something went wrong — please try again.",
+    "email": "Email",
+    "pleaseWait": "Please wait…",
+    "goToLogin": "Go to login",
+    "backHome": "← Back home"
+  },
+  "auth": {
+    "logIn": "Log in",
+    "signUp": "Sign up",
+    "createTitle": "Create your account",
+    "welcomeBack": "Welcome back",
+    "createSubtitle": "Start with a free 6-minute session.",
+    "loginSubtitle": "Log in to continue your training.",
+    "continueGoogle": "Continue with Google",
+    "continueFacebook": "Continue with Facebook",
+    "or": "or",
+    "name": "Name",
+    "password": "Password",
+    "createAccount": "Create account",
+    "forgotPassword": "Forgot your password?",
+    "terms": "By continuing you agree to our Terms and Privacy Policy.",
+    "autoSignInFailed": "Account created, but automatic sign-in failed — try logging in.",
+    "incorrectCredentials": "Incorrect email or password.",
+    "forgot": {
+      "checkEmail": "Check your email",
+      "sentBody": "If an account exists for <strong>{email}</strong>, we’ve sent a link to reset your password. It expires in 1 hour.",
+      "title": "Reset your password",
+      "subtitle": "Enter your email and we’ll send you a link to reset it.",
+      "sending": "Sending…",
+      "send": "Send reset link"
+    },
+    "reset": {
+      "mismatch": "Passwords don't match.",
+      "updated": "Password updated",
+      "redirecting": "Taking you to login…",
+      "title": "Choose a new password",
+      "forEmail": "For {email}",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "saving": "Saving…",
+      "save": "Save new password",
+      "invalidTitle": "This link isn’t valid",
+      "invalidBody": "Request a new password reset link and try again.",
+      "requestNew": "Reset password"
+    },
+    "verify": {
+      "verified": "Email verified",
+      "verifiedBody": "Your email address is confirmed. You’re all set.",
+      "expiredTitle": "This link has expired",
+      "invalidTitle": "This link isn't valid",
+      "expiredBody": "Verification links expire after 24 hours. Log in and we'll send a new one.",
+      "invalidBody": "It may have already been used, or the link was copied incorrectly."
+    }
+  },
+  "apiErrors": {
+    "invalidEmail": "Invalid email.",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "tooManyAttempts": "Too many attempts. Try again later.",
+    "accountExists": "An account with this email already exists.",
+    "resetGeneric": "If an account exists for that email, we've sent a reset link.",
+    "resetExpired": "This reset link has expired. Request a new one.",
+    "resetInvalid": "This reset link isn't valid."
+  },
+  "emails": {
+    "verify": {
+      "subject": "Verify your LeanAcademy email",
+      "text": "Confirm your email address: {url}\n\nThis link expires in 24 hours.",
+      "welcome": "Welcome to LeanAcademy.",
+      "confirmLink": "Confirm your email address",
+      "confirmRest": " to finish setting up your account.",
+      "expiry": "This link expires in 24 hours. If you didn't create this account, you can ignore this email."
+    },
+    "reset": {
+      "subject": "Reset your LeanAcademy password",
+      "text": "Reset your password: {url}\n\nThis link expires in 1 hour. If you didn't request this, you can ignore this email.",
+      "intro": "We received a request to reset your LeanAcademy password.",
+      "link": "Choose a new password",
+      "expiry": "This link expires in 1 hour and can only be used once. If you didn't request this, you can ignore this email — your password won't change."
+    }
+  },
+  "domains": {
+    "WORKING_MEMORY": "Working Memory",
+    "READING": "Reading",
+    "SPATIAL": "Spatial Memory",
+    "VERBAL": "Verbal",
+    "COGNITIVE_CONTROL": "Cognitive Control",
+    "MEMORY_STRATEGY": "Memory Strategy"
+  },
+  "nav": {
+    "main": "Main",
+    "home": "Home",
+    "progress": "Progress",
+    "science": "Science",
+    "achievements": "Achievements",
+    "challenges": "Quests & Challenges",
+    "customize": "Customize exercises"
+  },
+  "home": {
+    "todaysTraining": "TODAY’S TRAINING",
+    "startTraining": "Start Training",
+    "thisWeek": "THIS WEEK",
+    "weekdayLetters": "M,T,W,T,F,S,S",
+    "dayTrained": "Trained",
+    "dayTodayNotYet": "Today — not yet",
+    "dayNoSession": "No session",
+    "recentAchievement": "RECENT ACHIEVEMENT",
+    "earnedOn": "Earned {date}",
+    "noAchievements": "No achievements yet — view the full list →",
+    "quickLinks": "QUICK LINKS",
+    "registryReviewed": "Evidence registry last reviewed",
+    "approvedModules": "Approved training modules",
+    "signedIn": "Signed in",
+    "signedInNo": "no",
+    "streak": "{days, plural, other {#-day streak}}",
+    "streakNudge": " — ready to continue your training?",
+    "trainingLevel": "Training Level {level}",
+    "links": {
+      "progress": "View progress →",
+      "science": "See the science →",
+      "achievements": "View achievements →",
+      "challenges": "View quests & challenges →",
+      "customize": "Customize exercises →",
+      "nBack": "Try the N-Back exercise →",
+      "complexSpan": "Try the Complex Span exercise →",
+      "diceSum": "Try the Dice Sum exercise →",
+      "spatial": "Try the Spatial Sequence exercise →",
+      "reading": "Try the Paced Reading exercise →"
+    },
+    "loginOrSignup": "Log in or sign up →",
+    "greetingNamed": "Welcome back, {name}",
+    "greeting": "Welcome back",
+    "onboardingPrompt": "Complete onboarding to get a training plan built around your goals.",
+    "startOnboarding": "Start onboarding"
+  },
+  "methods": {
+    "adaptive-nback-v0": "Adaptive N-Back",
+    "complex-span-v0": "Complex Span",
+    "dice-sum-v0": "Dice Sum",
+    "visuospatial-sequence-recall-v0": "Spatial Sequence Recall",
+    "reading-paced-adaptive-v0": "Paced / Adaptive Reading"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "earnedCount": "{earned} of {total} earned",
+    "earnedOn": "Earned {date}",
+    "progress": "{current} of {target}",
+    "notYet": "Not yet earned",
+    "catalog": {
+      "first-session": {
+        "title": "First Session"
+      },
+      "first-week": {
+        "title": "First Week"
+      },
+      "sessions-10": {
+        "title": "10 Sessions"
+      },
+      "sessions-30": {
+        "title": "30 Sessions"
+      },
+      "sessions-100": {
+        "title": "100 Sessions"
+      },
+      "working-memory-level-5": {
+        "title": "Working Memory Level 5"
+      },
+      "reading-efficiency-milestone": {
+        "title": "Reading Efficiency Milestone"
+      },
+      "reading-comprehension-at-new-pace": {
+        "title": "Maintained 90% comprehension at a new pace"
+      },
+      "weekly-sessions-complete": {
+        "title": "Completed all weekly sessions"
+      },
+      "personal-best": {
+        "title": "Personal Best"
+      },
+      "first-assessment": {
+        "title": "Completed first assessment"
+      }
+    }
+  },
+  "challenges": {
+    "title": "Quests & Challenges",
+    "daily": "Daily Quests",
+    "weekly": "Weekly Challenges",
+    "completeCount": "{done} of {total} complete",
+    "resets": " — resets {when}",
+    "complete": "Complete",
+    "progress": "{current} of {target}",
+    "items": {
+      "daily-complete-session": {
+        "title": "Complete a session",
+        "description": "Finish 1 training session today."
+      },
+      "daily-earn-xp": {
+        "title": "Earn {amount} XP",
+        "description": "Earn {amount} XP today."
+      },
+      "daily-accuracy": {
+        "title": "Score strong accuracy",
+        "description": "Complete a session at or above {pct}% accuracy."
+      },
+      "complete-sessions": {
+        "title": "Complete {count} sessions",
+        "description": "Finish {count} training sessions this week."
+      },
+      "train-domains": {
+        "title": "Train {count} different domains",
+        "description": "Complete a session in {count} different cognitive domains this week."
+      },
+      "reading-comprehension": {
+        "title": "Read with strong comprehension",
+        "description": "Complete a reading session at or above {pct}% comprehension."
+      },
+      "beat-personal-record": {
+        "title": "Beat a personal record",
+        "description": "Beat one of your own personal training records."
+      },
+      "complete-assessment": {
+        "title": "Complete an assessment",
+        "description": "Complete one training assessment."
+      }
+    }
+  },
+  "evidence": {
+    "strong": "Strong",
+    "moderate": "Moderate",
+    "limited": "Limited",
+    "experimental": "Experimental",
+    "unsupported": "Unsupported"
+  },
+  "assessmentNames": {
+    "backwardDigitSpan": "Backward Digit Span",
+    "backwardSpatialSpan": "Backward Spatial Span"
+  },
+  "premium": {
+    "title": "{feature} is a premium feature",
+    "body": "Subscriptions aren’t available yet — check back soon. Your trained exercises, progress, and the full science behind them stay free either way.",
+    "back": "Back to Progress",
+    "features": {
+      "backwardDigitSpan": "The Backward Digit Span assessment",
+      "backwardSpatialSpan": "The Backward Spatial Span assessment",
+      "trends": "Long-term trends"
+    }
+  },
+  "science": {
+    "title": "The Science",
+    "intro": "Every exercise here is backed by cited research — see what’s proven, what’s still limited, and what we chose not to include.",
+    "englishNote": "Study names and research summaries are shown in their original English, so their meaning isn’t changed by translation.",
+    "statReviewed": "reviewed",
+    "statImplemented": "in your training",
+    "statExcluded": "excluded",
+    "excludedNote": "{count, plural, one {# method we reviewed and did not include} other {# methods we reviewed and did not include}} — {names} — didn’t meet our evidence bar."
+  },
+  "progress": {
+    "title": "Progress",
+    "empty": "Nothing trained yet. Complete a training session to start seeing real progress here.",
+    "backHome": "Back home",
+    "readingAllTime": "READING — ALL TIME",
+    "readingLast30": "READING — LAST 30 DAYS",
+    "pace": "PACE",
+    "wpm": "WPM",
+    "comprehension": "COMPREHENSION",
+    "personalBest": "PERSONAL BEST",
+    "atComprehension": "at {pct}% comprehension",
+    "trendsCta": "📈 View your long-term trends →",
+    "trendsCtaLocked": "🔒 Long-term trends (Premium) →",
+    "tabs": {
+      "trained": "Trained",
+      "similar": "Similar tasks",
+      "broader": "Broader transfer"
+    },
+    "noOtherTasks": "No other trained tasks yet.",
+    "noNearTransfer": "No near-transfer assessment yet",
+    "noNearTransferBody": "A short periodic assessment using a task you haven’t practiced directly, sharing the same underlying mechanism as one of your trained tasks, will appear here once you’ve taken one.",
+    "nearTransferPremium": "Near-transfer assessments are a premium feature.",
+    "measuredPeriodically": "Measured periodically, not every session, to avoid pure practice effects.",
+    "notYetMeasured": "Not yet measured",
+    "broaderBody": "Broader transfer — to general intelligence, memory in daily life, or unrelated tasks — isn’t established in current research for these exercises. We won’t show a number here until there’s real evidence behind it.",
+    "seeResearch": "See the research →",
+    "retakeAssessment": "Retake the {name} assessment",
+    "takeAssessment": "Take the {name} assessment",
+    "assessmentLocked": "🔒 {name} (Premium)",
+    "nearTransferRelated": {
+      "backwardDigitSpan": "Near-transfer measure related to your N-Back / Complex Span training",
+      "backwardSpatialSpan": "Near-transfer measure related to your Spatial Sequence training"
+    },
+    "backwardSpan": "BACKWARD SPAN",
+    "atThatLength": "AT THAT LENGTH",
+    "confidenceInterval": "{level}% confidence interval: {lower}%–{upper}% accuracy at this length — a handful of trials carries real uncertainty, which is why this isn’t shown as a bare number.",
+    "spanTrend": "{start}-item → {end}-item best span",
+    "levelTrend": "Level {start} → Level {end} over {sessions, plural, one {# session} other {# sessions}}",
+    "noRecentSessions": "No sessions in the last 30 days — Premium unlocks full history",
+    "calibratedAt": "Calibrated at Level {level} — no training sessions yet",
+    "bestSpan": "{value}-item span",
+    "bestLevel": "Level {value}",
+    "personalBestLine": "🏆 Personal best: {value}",
+    "historyLimited": "Showing the last 30 days — Premium unlocks your full history."
+  },
+  "trends": {
+    "title": "Long-term trends",
+    "subtitle": "Your real training history over time, one chart per task — not just a before/after snapshot.",
+    "empty": "Nothing trained yet. Complete a few training sessions to start building a real trend here.",
+    "back": "Back to Progress",
+    "notEnoughData": "Not enough data for a meaningful trend yet — {sessionCount} of {minSessions} sessions, spanning {spanDays} of the {minSpanDays} days a real trend needs. A handful of sessions in a couple of days would draw a technically-real but misleading line, so this waits until there’s enough spread-out history.",
+    "difficultyOverTime": "{name} — difficulty over time",
+    "readingHeader": "READING — PACE AND COMPREHENSION OVER TIME",
+    "pace": "Pace",
+    "comprehension": "Comprehension",
+    "wpmValue": "{value} WPM",
+    "chart": {
+      "hideTable": "Hide table",
+      "viewTable": "View as table",
+      "summary": "{title}: from {from} on {fromDate} to {to} on {toDate}",
+      "date": "Date",
+      "value": "Value"
+    }
+  },
+  "settings": {
+    "title": "Customize exercises",
+    "intro": "Applies to standalone practice only, not your daily training session — which stays at the pace its research was studied at so your adaptive difficulty progression stays comparable session to session.",
+    "language": "Language",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "saveError": "Couldn’t save — try again",
+    "stimulusPace": "Stimulus pace",
+    "dieSides": "Die sides",
+    "dieStandard": "The standard 6-sided die — dice count still adapts to your difficulty.",
+    "dieCustom": "A {sides}-sided die makes each round's sums bigger — dice count still adapts to your difficulty separately.",
+    "gridSize": "Grid size",
+    "gridSizeHint": "Bigger grids can also hold longer sequences.",
+    "pace": {
+      "RELAXED": {
+        "label": "Relaxed",
+        "description": "More time per item — easier pacing."
+      },
+      "STANDARD": {
+        "label": "Standard",
+        "description": "The default pacing this exercise's evidence base was studied at."
+      },
+      "QUICK": {
+        "label": "Quick",
+        "description": "Less time per item — harder pacing."
+      },
+      "NO_DELAY": {
+        "label": "No delay",
+        "description": "Minimum possible pacing between items — fastest, hardest."
+      }
+    }
+  },
+  "exercise": {
+    "exit": "Exit exercise",
+    "trialOf": "Trial {current} of {total}",
+    "roundOf": "Round {current} of {total}",
+    "complete": "Exercise complete",
+    "accuracy": "ACCURACY",
+    "level": "LEVEL",
+    "done": "Done",
+    "levelSummary": "Level {start} → {end}"
+  },
+  "nBack": {
+    "name": "Adaptive N-Back",
+    "srTitle": "Adaptive N-Back exercise",
+    "tag": "WORKING MEMORY · N-BACK",
+    "memorize": "Memorize this — matching hasn't started yet",
+    "instructionPending": "Tap the square if it matches … steps back",
+    "instruction": "{n, plural, one {Tap the square if it matches # step back} other {Tap the square if it matches # steps back}}",
+    "gotIt": "Got it",
+    "missed": "Missed",
+    "match": "Match",
+    "correct": "Correct — nice catch",
+    "notScored": "Not scored — still building the pattern",
+    "noteUp": "Your accuracy held up while the difficulty increased — that's the sign to keep going, not just a faster pace.",
+    "noteDown": "Difficulty eased back a level to keep this challenging but doable. That's the adaptive engine working as intended, not a setback.",
+    "noteSteady": "You held steady at this level across {trials} scored trials."
+  },
+  "complexSpan": {
+    "name": "Complex Span",
+    "srTitle": "Complex Span exercise",
+    "tag": "WORKING MEMORY · COMPLEX SPAN",
+    "summary": "Span {start} → {end}",
+    "setOf": "Set {current} of {total}",
+    "holdLetters": "Hold onto the letters — you’ll recall them after",
+    "isTrue": "Is this true?",
+    "true": "True",
+    "false": "False",
+    "correct": "Correct",
+    "notQuite": "Not quite",
+    "perfectRecall": "Perfect recall",
+    "rightSpot": "{correct} of {total} in the right spot",
+    "tapLetters": "Tap the letters, in order",
+    "undo": "Undo",
+    "submit": "Submit",
+    "noteUp": "You recalled full sequences accurately enough that the span increased — that's the sign to keep going.",
+    "noteDown": "Span length eased back a notch to keep this challenging but doable. That's the adaptive engine working as intended, not a setback.",
+    "noteSteady": "You held steady at this span length across {sets} sets.",
+    "perfectSets": "PERFECT SETS",
+    "span": "SPAN",
+    "processingAccuracy": "PROCESSING ACCURACY (the true/false checks)"
+  },
+  "diceSum": {
+    "name": "Dice Sum",
+    "srTitle": "Dice Sum exercise",
+    "tag": "WORKING MEMORY · DICE SUM",
+    "summary": "{start} → {end} dice",
+    "dieShowing": "Die showing {face}",
+    "remember": "Remember these — you’ll add them up",
+    "shownFor": "{count} dice · shown for {seconds} seconds",
+    "shownForSided": "{count} d{sides} dice · shown for {seconds} seconds",
+    "correct": "Correct",
+    "notQuite": "Not quite",
+    "whatsTotal": "What's the total?",
+    "summedTo": "{count} dice summed to {sum}",
+    "totalWas": "The total was {sum}",
+    "addUp": "Add up all {count} dice",
+    "backspace": "Delete last digit",
+    "submit": "Submit",
+    "noteUp": "You summed correctly enough that the dice count increased — that's the sign to keep going.",
+    "noteDown": "Dice count eased back a notch to keep this challenging but doable. That's the adaptive engine working as intended, not a setback.",
+    "noteSteady": "You held steady at this dice count across {rounds} rounds.",
+    "correctSums": "CORRECT SUMS",
+    "diceCount": "DICE COUNT"
+  },
+  "spatial": {
+    "name": "Spatial Sequence Recall",
+    "srTitle": "Spatial Sequence Recall exercise",
+    "tag": "SPATIAL MEMORY · SEQUENCE RECALL",
+    "sequenceOf": "Sequence {current} of {total}",
+    "watch": "Watch the squares light up",
+    "perfectRecall": "Perfect recall",
+    "rightOrder": "{correct} of {total} in the right order",
+    "tapOrder": "Tap the squares in the order they lit up",
+    "cell": "Grid cell {n}",
+    "cellLit": "Grid cell {n}, lit up",
+    "undo": "Undo",
+    "submit": "Submit sequence",
+    "noteUp": "You recalled full sequences accurately enough that the sequence length increased — that's the sign to keep going.",
+    "noteDown": "Sequence length eased back a notch to keep this challenging but doable. That's the adaptive engine working as intended, not a setback.",
+    "noteSteady": "You held steady at this sequence length across {rounds} rounds.",
+    "perfectSequences": "PERFECT SEQUENCES",
+    "sequenceLength": "SEQUENCE LENGTH"
+  },
+  "reading": {
+    "name": "Paced Reading",
+    "srTitle": "Paced Reading exercise",
+    "tag": "READING · PACED PASSAGE",
+    "summary": "{start} → {end} WPM",
+    "passageOf": "Passage {current} of {total}",
+    "englishNote": "Passages are in English — reading pace and comprehension scoring are calibrated for English text.",
+    "textSize": "Text size",
+    "textSizes": {
+      "normal": "Normal text size",
+      "large": "Large text size",
+      "xlarge": "Extra large text size"
+    },
+    "wide": "Wide",
+    "wpmValue": "{value} WPM",
+    "finished": "I’ve finished reading",
+    "submitAnswer": "Submit answer",
+    "correct": "Correct",
+    "notQuite": "Not quite",
+    "answerWas": "The answer was:",
+    "noteUp": "Comprehension held up well enough at this pace that the target speed increased — that's the adaptive engine responding, not a guarantee it'll keep climbing.",
+    "noteDown": "Pace eased back a notch to protect comprehension. That's the adaptive engine working as intended, not a setback.",
+    "noteSteady": "You held steady at this pace across {passages} passages.",
+    "avgWpm": "AVG WPM",
+    "comprehension": "COMPREHENSION",
+    "targetPace": "TARGET PACE",
+    "efficiencyScore": "READING EFFICIENCY SCORE",
+    "efficiencyExplainer": "WPM × comprehension, with speed counting for less below a 70% comprehension floor — never shown without both numbers above."
+  },
+  "session": {
+    "niceWork": "Nice work",
+    "nextUp": "Next up: {name}",
+    "unknownExercise": "Unknown exercise: {method}",
+    "complete": "Session complete",
+    "stats": "{minutes, plural, one {# minute} other {# minutes}} · {exercises, plural, one {# exercise} other {# exercises}}",
+    "newPersonalBest": "🏆 New personal best",
+    "freezeUsed": " — a streak freeze protected yesterday",
+    "xpAwarded": "+{xp} XP",
+    "leveledUp": " — Training Level {level}!"
+  },
+  "assessment": {
+    "exit": "Exit assessment",
+    "saveError": "Something went wrong saving your result. Please try again.",
+    "spanLength": "Span length {span}",
+    "correct": "Correct",
+    "notQuite": "Not quite",
+    "submit": "Submit",
+    "lastTaken": "Last taken {date}.",
+    "due": "It's been a while — a fresh measurement is due.",
+    "nextDue": "Measured periodically, not every session — next recommended around {date}.",
+    "neverTaken": "You haven't taken this assessment yet.",
+    "anyTime": "You can take it any time.",
+    "start": "Start",
+    "complete": "Assessment complete",
+    "backwardSpan": "BACKWARD SPAN",
+    "atThatLength": "AT THAT LENGTH",
+    "done": "Done"
+  },
+  "digitSpan": {
+    "name": "Backward Digit Span",
+    "srTitle": "Backward Digit Span assessment",
+    "tag": "WORKING MEMORY · BACKWARD DIGIT SPAN",
+    "watch": "Watch the numbers",
+    "enterReverse": "Enter the numbers, in reverse order",
+    "backspace": "Delete last number",
+    "intro": "A short, different-shaped task from your trained exercises: you’ll see a sequence of digits, then enter them back in <strong>reverse</strong> order. The sequence gets longer as you succeed and stops after two misses in a row.",
+    "disclaimer": "This measures a near-transfer working-memory outcome sharing structure with your trained tasks — it does not measure IQ, general intelligence, or everyday memory.",
+    "resultNote": "Across the whole run you recalled {correct} of {total} sequences correctly. This is a near-transfer measure — a genuinely different task from your trained exercises that shares their working-memory span structure. It doesn’t measure IQ, general intelligence, or everyday memory, and results at a single length from a handful of trials carry real uncertainty."
+  },
+  "spatialSpan": {
+    "name": "Backward Spatial Span",
+    "srTitle": "Backward Spatial Span assessment",
+    "tag": "SPATIAL MEMORY · BACKWARD SPAN",
+    "tapReverse": "Tap the squares back in reverse order",
+    "intro": "A short, different-shaped task from your trained exercises: squares will light up on the grid in a sequence, then you’ll tap them back in <strong>reverse</strong> order. The sequence gets longer as you succeed and stops after two misses in a row.",
+    "disclaimer": "This measures a near-transfer spatial working-memory outcome sharing structure with your trained Spatial Sequence exercise — it does not measure IQ, general intelligence, or everyday memory.",
+    "resultNote": "Across the whole run you recalled {correct} of {total} sequences correctly. This is a near-transfer measure — a genuinely different task from your trained Spatial Sequence exercise (backward instead of forward recall) that shares its working-memory span structure. It doesn’t measure IQ, general intelligence, or everyday memory, and results at a single length from a handful of trials carry real uncertainty."
+  },
+  "onboarding": {
+    "submitError": "Something went wrong saving your plan. You can try again.",
+    "goalsTitle": "What would you like to focus on?",
+    "goalsSubtitle": "Pick what matters most. We'll build your plan around it — you can always train everything either way.",
+    "goals": {
+      "working-memory": "Improve working memory",
+      "concentration": "Practice concentration",
+      "reading-efficiency": "Read faster, without losing the plot",
+      "memory-strategies": "Learn better memory strategies",
+      "habit": "Just build a daily habit",
+      "balanced": "A bit of everything"
+    },
+    "timeTitle": "How much time can you give each day?",
+    "timeSubtitle": "We'll build sessions to fit. You can change this anytime.",
+    "minutes": "{minutes} minutes",
+    "timeNotes": {
+      "5": "A quick daily touch",
+      "10": "Balanced, most popular",
+      "15": "More structured training",
+      "20": "For focused daily practice"
+    },
+    "custom": "Custom",
+    "customNote": "Set your own goal",
+    "minutesPerDay": "Minutes per day",
+    "experienceTitle": "Have you done anything like this before?",
+    "experienceSubtitle": "No wrong answer — this just helps your first sessions feel right. A short calibration next will fine-tune it further.",
+    "experience": {
+      "new": {
+        "label": "New to this",
+        "note": "Start comfortable and build up"
+      },
+      "some": {
+        "label": "Some experience",
+        "note": "I've tried memory or brain-training apps"
+      },
+      "experienced": {
+        "label": "Very experienced",
+        "note": "I want a real challenge from the start"
+      }
+    },
+    "continueToCalibration": "Continue to calibration",
+    "continue": "Continue",
+    "recommendTitle": "We recommend starting at:",
+    "recommendLabel": "Recommended difficulty level",
+    "levels": {
+      "BEGINNER": {
+        "label": "Beginner",
+        "note": "Start at the easiest end of each exercise"
+      },
+      "INTERMEDIATE": {
+        "label": "Intermediate",
+        "note": "A typical comfortable starting point"
+      },
+      "ADVANCED": {
+        "label": "Advanced",
+        "note": "Skip ahead, closer to each exercise's hardest end"
+      },
+      "EXPERT": {
+        "label": "Expert",
+        "note": "Start at the hardest end of each exercise"
+      },
+      "AUTO": {
+        "label": "Auto (recommended)",
+        "note": "Use exactly what your calibration measured"
+      }
+    },
+    "saving": "Saving your plan...",
+    "startTraining": "Start training",
+    "stepOf": "STEP {step} OF {total}",
+    "calibration": {
+      "title": "QUICK CALIBRATION",
+      "spatial": "Watch, then repeat the pattern",
+      "nBack": "Was this the same square as last time?",
+      "complexSpan": "Remember the letters, in order",
+      "reading": "Read at your own pace",
+      "subtitle": "About 90 seconds, no pass or fail — this just helps us start you at the right level.",
+      "submit": "Submit",
+      "different": "Different",
+      "same": "Same",
+      "finishedReading": "I’ve finished reading",
+      "questionOf": "Question {current} of {total}",
+      "bothCount": "Memory & comprehension both count"
+    }
+  }
+}

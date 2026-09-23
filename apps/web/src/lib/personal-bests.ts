@@ -130,7 +130,10 @@ export async function checkNewPersonalBest(
 export interface PersonalBestStatus {
   method: string;
   displayName: string;
+  /** English label (formatPersonalBestLabel) — kept for callers/tests; the UI formats `value` in the viewer's language instead. */
   label: string | null;
+  /** The raw best difficulty (level / span length) behind `label`. Null for reading, which uses wpm/comprehensionPct. */
+  value: number | null;
   achievedAt: string | null;
   wpm?: number;
   comprehensionPct?: number;
@@ -152,6 +155,7 @@ export async function getPersonalBestsStatus(userId: string): Promise<PersonalBe
         method,
         displayName,
         label: null,
+        value: null,
         achievedAt: best ? best.achievedAt.toISOString() : null,
         wpm: best?.wpm,
         comprehensionPct: best?.comprehensionPct,
@@ -162,6 +166,7 @@ export async function getPersonalBestsStatus(userId: string): Promise<PersonalBe
         method,
         displayName,
         label: best ? formatPersonalBestLabel(method, best.value) : null,
+        value: best?.value ?? null,
         achievedAt: best ? best.achievedAt.toISOString() : null,
       });
     }

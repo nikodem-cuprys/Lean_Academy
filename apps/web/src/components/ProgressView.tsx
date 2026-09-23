@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useFormatter, useTranslations } from "next-intl";
 import type { ProgressData, TrainedTaskProgress } from "@/lib/progress-data";
 import type { NearTransferAssessmentSummary } from "@/lib/near-transfer-assessment";
 
@@ -22,22 +23,23 @@ import type { NearTransferAssessmentSummary } from "@/lib/near-transfer-assessme
 type Tab = "trained" | "similar" | "broader";
 
 export function ProgressView({ data }: { data: ProgressData }) {
+  const t = useTranslations("progress");
   const [tab, setTab] = useState<Tab>("trained");
 
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
-      <h1 className="mb-5 font-display text-[22px] font-bold text-text">Progress</h1>
+      <h1 className="mb-5 font-display text-[22px] font-bold text-text">{t("title")}</h1>
 
       {!data.hasAnyData ? (
         <div className="rounded-lg border border-border bg-surface p-6 text-center shadow-sm">
           <div className="mb-3 text-sm text-text-2">
-            Nothing trained yet. Complete a training session to start seeing real progress here.
+            {t("empty")}
           </div>
           <Link
             href="/"
             className="block w-full rounded-full bg-accent py-3 text-center font-body text-[15px] font-bold text-on-accent"
           >
-            Back home
+            {t("backHome")}
           </Link>
         </div>
       ) : (
@@ -47,18 +49,18 @@ export function ProgressView({ data }: { data: ProgressData }) {
               {data.reading.hasComparison && (
                 <>
                   <div className="mb-3.5 text-[12px] font-bold tracking-wide text-text-3">
-                    READING — {data.reading.isAllTimeTrend ? "ALL TIME" : "LAST 30 DAYS"}
+                    {data.reading.isAllTimeTrend ? t("readingAllTime") : t("readingLast30")}
                   </div>
                   <div className="flex gap-7">
                     <div>
-                      <div className="mb-0.5 text-[11px] text-text-3">PACE</div>
+                      <div className="mb-0.5 text-[11px] text-text-3">{t("pace")}</div>
                       <div className="font-num text-2xl font-bold text-text">
                         {data.reading.startWpm} → {data.reading.endWpm}{" "}
-                        <span className="font-body text-xs font-normal text-text-2">WPM</span>
+                        <span className="font-body text-xs font-normal text-text-2">{t("wpm")}</span>
                       </div>
                     </div>
                     <div>
-                      <div className="mb-0.5 text-[11px] text-text-3">COMPREHENSION</div>
+                      <div className="mb-0.5 text-[11px] text-text-3">{t("comprehension")}</div>
                       <div className="font-num text-2xl font-bold text-success">
                         {data.reading.startComprehensionPct}% → {data.reading.endComprehensionPct}%
                       </div>
@@ -68,11 +70,11 @@ export function ProgressView({ data }: { data: ProgressData }) {
               )}
               {data.reading.bestWpm != null && data.reading.bestComprehensionPct != null && (
                 <div className={data.reading.hasComparison ? "mt-4 border-t border-border pt-3.5" : ""} data-testid="reading-personal-best">
-                  <div className="mb-0.5 text-[11px] text-text-3">PERSONAL BEST</div>
+                  <div className="mb-0.5 text-[11px] text-text-3">{t("personalBest")}</div>
                   <div className="font-num text-base font-bold text-text">
-                    {data.reading.bestWpm} WPM{" "}
+                    {data.reading.bestWpm} {t("wpm")}{" "}
                     <span className="font-body text-xs font-normal text-text-2">
-                      at {data.reading.bestComprehensionPct}% comprehension
+                      {t("atComprehension", { pct: data.reading.bestComprehensionPct })}
                     </span>
                   </div>
                 </div>
@@ -85,23 +87,23 @@ export function ProgressView({ data }: { data: ProgressData }) {
             className="mb-4 block rounded-lg border border-border bg-surface p-4 text-[12.5px] font-bold shadow-sm"
             data-testid="trends-cta"
           >
-            {data.isPremium ? "📈 View your long-term trends →" : "🔒 Long-term trends (Premium) →"}
+            {data.isPremium ? t("trendsCta") : t("trendsCtaLocked")}
           </Link>
 
           <div className="mb-4 flex gap-1 rounded-full bg-surface-2 p-1">
-            {(["trained", "similar", "broader"] as const).map((t) => (
+            {(["trained", "similar", "broader"] as const).map((key) => (
               <button
-                key={t}
-                data-testid={`progress-tab-${t}`}
-                onClick={() => setTab(t)}
+                key={key}
+                data-testid={`progress-tab-${key}`}
+                onClick={() => setTab(key)}
                 className="flex-1 rounded-full py-2.5 text-center text-[12.5px] font-bold transition-transform duration-micro active:scale-95"
                 style={
-                  tab === t
+                  tab === key
                     ? { background: "var(--color-surface)", color: "var(--color-text)" }
                     : { color: "var(--color-text-2)" }
                 }
               >
-                {t === "trained" ? "Trained" : t === "similar" ? "Similar tasks" : "Broader transfer"}
+                {t(`tabs.${key}`)}
               </button>
             ))}
           </div>
@@ -109,7 +111,7 @@ export function ProgressView({ data }: { data: ProgressData }) {
           {tab === "trained" &&
             (data.trainedTasks.length === 0 ? (
               <div className="rounded-lg border border-border bg-surface p-5 text-sm text-text-2 shadow-sm">
-                No other trained tasks yet.
+                {t("noOtherTasks")}
               </div>
             ) : (
               <div className="flex flex-col gap-3">
@@ -123,10 +125,9 @@ export function ProgressView({ data }: { data: ProgressData }) {
             <>
               {data.nearTransferAssessments.length === 0 ? (
                 <div className="mb-3 rounded-lg border border-border bg-surface p-5 shadow-sm">
-                  <div className="mb-1.5 text-[13.5px] font-bold text-text">No near-transfer assessment yet</div>
+                  <div className="mb-1.5 text-[13.5px] font-bold text-text">{t("noNearTransfer")}</div>
                   <div className="text-[12.5px] leading-relaxed text-text-2">
-                    A short periodic assessment using a task you haven&rsquo;t practiced directly, sharing the same
-                    underlying mechanism as one of your trained tasks, will appear here once you&rsquo;ve taken one.
+                    {t("noNearTransferBody")}
                   </div>
                   <NearTransferCtaLinks taken={[]} isPremium={data.isPremium} />
                 </div>
@@ -143,25 +144,23 @@ export function ProgressView({ data }: { data: ProgressData }) {
               )}
               {!data.isPremium && (
                 <div className="mb-3 px-1 text-xs leading-relaxed text-text-3" data-testid="near-transfer-premium-note">
-                  Near-transfer assessments are a premium feature.
+                  {t("nearTransferPremium")}
                 </div>
               )}
               <div className="px-1 text-xs leading-relaxed text-text-3">
-                Measured periodically, not every session, to avoid pure practice effects.
+                {t("measuredPeriodically")}
               </div>
             </>
           )}
 
           {tab === "broader" && (
             <div className="rounded-lg border border-border bg-surface p-5 shadow-sm">
-              <div className="mb-2 text-[13.5px] font-bold text-text">Not yet measured</div>
+              <div className="mb-2 text-[13.5px] font-bold text-text">{t("notYetMeasured")}</div>
               <div className="text-[12.5px] leading-relaxed text-text-2">
-                Broader transfer — to general intelligence, memory in daily life, or unrelated tasks — isn&rsquo;t
-                established in current research for these exercises. We won&rsquo;t show a number here until
-                there&rsquo;s real evidence behind it.
+                {t("broaderBody")}
               </div>
               <Link href="/train/n-back" className="mt-3.5 block text-[12.5px] font-bold text-accent">
-                See the research →
+                {t("seeResearch")}
               </Link>
             </div>
           )}
@@ -177,11 +176,19 @@ export function ProgressView({ data }: { data: ProgressData }) {
 // it in would bundle server code into the client. Just display labels;
 // the real per-domain science lives in docs/evidence-review.md §11/§12.
 const ALL_NEAR_TRANSFER_ASSESSMENTS = [
-  { name: "Backward Digit Span", route: "/assessments/backward-digit-span", color: "var(--color-wm)" },
-  { name: "Backward Spatial Span", route: "/assessments/backward-spatial-span", color: "var(--color-spatial)" },
+  { name: "Backward Digit Span", key: "backwardDigitSpan", route: "/assessments/backward-digit-span", color: "var(--color-wm)" },
+  { name: "Backward Spatial Span", key: "backwardSpatialSpan", route: "/assessments/backward-spatial-span", color: "var(--color-spatial)" },
 ] as const;
 
+// Assessment.name (English, the DB identity) -> its messages key.
+const ASSESSMENT_KEY_BY_NAME: Record<string, "backwardDigitSpan" | "backwardSpatialSpan"> = {
+  "Backward Digit Span": "backwardDigitSpan",
+  "Backward Spatial Span": "backwardSpatialSpan",
+};
+
 function NearTransferCtaLinks({ taken, isPremium }: { taken: string[]; isPremium: boolean }) {
+  const t = useTranslations("progress");
+  const ta = useTranslations("assessmentNames");
   return (
     <div className="mt-3.5 flex flex-wrap gap-2">
       {ALL_NEAR_TRANSFER_ASSESSMENTS.map((a) => (
@@ -193,9 +200,9 @@ function NearTransferCtaLinks({ taken, isPremium }: { taken: string[]; isPremium
         >
           {isPremium
             ? taken.includes(a.name)
-              ? `Retake the ${a.name} assessment`
-              : `Take the ${a.name} assessment`
-            : `🔒 ${a.name} (Premium)`}
+              ? t("retakeAssessment", { name: ta(a.key) })
+              : t("takeAssessment", { name: ta(a.key) })
+            : t("assessmentLocked", { name: ta(a.key) })}
         </Link>
       ))}
     </div>
@@ -203,62 +210,92 @@ function NearTransferCtaLinks({ taken, isPremium }: { taken: string[]; isPremium
 }
 
 function NearTransferCard({ assessment }: { assessment: NearTransferAssessmentSummary }) {
+  const t = useTranslations("progress");
+  const ta = useTranslations("assessmentNames");
+  const format = useFormatter();
   const takenAt = new Date(assessment.takenAt);
+  const key = ASSESSMENT_KEY_BY_NAME[assessment.assessmentName];
   return (
     <div
       className="rounded-lg border border-border bg-surface p-5 shadow-sm"
       data-testid={`near-transfer-card-${assessment.route.split("/").pop()}`}
     >
       <div className="mb-1 flex items-center justify-between">
-        <div className="text-[13.5px] font-bold text-text">{assessment.assessmentName}</div>
-        <span className="text-[11px] text-text-3">{takenAt.toLocaleDateString()}</span>
+        <div className="text-[13.5px] font-bold text-text">{key ? ta(key) : assessment.assessmentName}</div>
+        <span className="text-[11px] text-text-3">{format.dateTime(takenAt, { dateStyle: "short" })}</span>
       </div>
-      <div className="mb-3 text-xs text-text-2">Near-transfer measure related to {assessment.trainedTaskLabel}</div>
+      <div className="mb-3 text-xs text-text-2">
+        {key ? t(`nearTransferRelated.${key}`) : assessment.trainedTaskLabel}
+      </div>
       <div className="flex gap-7">
         <div>
-          <div className="mb-0.5 text-[11px] text-text-3">BACKWARD SPAN</div>
+          <div className="mb-0.5 text-[11px] text-text-3">{t("backwardSpan")}</div>
           <div className="font-num text-xl font-bold text-text">{assessment.finalSpan}</div>
         </div>
         <div>
-          <div className="mb-0.5 text-[11px] text-text-3">AT THAT LENGTH</div>
+          <div className="mb-0.5 text-[11px] text-text-3">{t("atThatLength")}</div>
           <div className="font-num text-xl font-bold text-text">
             {assessment.finalSpanCorrect}/{assessment.finalSpanTrials}
           </div>
         </div>
       </div>
       <div className="mt-2.5 text-[11px] leading-relaxed text-text-3">
-        {assessment.confidenceLevelPct}% confidence interval: {assessment.confidenceIntervalLowerPct}%–
-        {assessment.confidenceIntervalUpperPct}% accuracy at this length — a handful of trials carries real
-        uncertainty, which is why this isn&rsquo;t shown as a bare number.
+        {t("confidenceInterval", {
+          level: assessment.confidenceLevelPct,
+          lower: assessment.confidenceIntervalLowerPct,
+          upper: assessment.confidenceIntervalUpperPct,
+        })}
       </div>
     </div>
   );
 }
 
 function TrainedTaskCard({ task }: { task: TrainedTaskProgress }) {
+  const t = useTranslations("progress");
+  const tm = useTranslations("methods");
+  const te = useTranslations("evidence");
+  const isSpan = task.method === "complex-span-v0";
+  const p = task.progress;
+  const progressLine =
+    p.kind === "trend"
+      ? isSpan
+        ? t("spanTrend", { start: p.start, end: p.end })
+        : t("levelTrend", { start: p.start, end: p.end, sessions: p.sessions })
+      : p.kind === "noRecentSessions"
+        ? t("noRecentSessions")
+        : t("calibratedAt", { level: p.level });
+  const bestLine =
+    task.personalBestValue == null
+      ? task.personalBestLabel
+      : isSpan
+        ? t("bestSpan", { value: task.personalBestValue })
+        : t("bestLevel", { value: task.personalBestValue });
+  const evidenceKey = task.evidenceBadge.toLowerCase();
   return (
     <div className="rounded-lg border border-border bg-surface p-5 shadow-sm">
       <div className="mb-2 flex items-center justify-between">
-        <div className="text-[13.5px] font-bold text-text">{task.displayName}</div>
+        <div className="text-[13.5px] font-bold text-text">
+          {tm.has(task.method as never) ? tm(task.method as never) : task.displayName}
+        </div>
         <span
           className="rounded-full px-2.5 py-1 text-[11px] font-bold"
           style={{ background: "var(--color-accent-soft)", color: "var(--color-accent-strong)" }}
         >
-          {task.evidenceBadge}
+          {te.has(evidenceKey as never) ? te(evidenceKey as never) : task.evidenceBadge}
         </span>
       </div>
-      <div className="mb-2.5 text-xs text-text-2">{task.progressLabel}</div>
+      <div className="mb-2.5 text-xs text-text-2">{progressLine}</div>
       <div className="h-2 overflow-hidden rounded-full bg-surface-2">
         <div className="h-full rounded-full bg-accent" style={{ width: `${Math.round(task.progressFraction * 100)}%` }} />
       </div>
       {task.personalBestLabel ? (
         <div className="mt-2.5 text-[11px] font-semibold text-text-3" data-testid={`personal-best-${task.method}`}>
-          🏆 Personal best: {task.personalBestLabel}
+          {t("personalBestLine", { value: bestLine ?? "" })}
         </div>
       ) : null}
       {task.historyLimitedToLast30Days ? (
         <div className="mt-2 text-[11px] text-text-3" data-testid={`history-limited-${task.method}`}>
-          Showing the last 30 days — Premium unlocks your full history.
+          {t("historyLimited")}
         </div>
       ) : null}
     </div>

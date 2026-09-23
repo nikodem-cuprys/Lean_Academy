@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@lean-academy/db";
 import { createPasswordResetToken } from "@/lib/tokens";
 import { sendPasswordResetEmail } from "@/lib/email";
@@ -12,15 +13,14 @@ const schema = z.object({ email: z.string().email() });
 // send succeeds — an attacker must not be able to use this endpoint to
 // discover which emails have accounts. Real failures are logged, not
 // surfaced to the caller.
-const GENERIC_RESPONSE = {
-  message: "If an account exists for that email, we've sent a reset link.",
-};
-
 export async function POST(request: Request) {
+  const t = await getTranslations("apiErrors");
+  const GENERIC_RESPONSE = { message: t("resetGeneric") };
+
   const body = await request.json().catch(() => null);
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid email." }, { status: 400 });
+    return NextResponse.json({ error: t("invalidEmail") }, { status: 400 });
   }
   const { email } = parsed.data;
 
@@ -34,7 +34,9 @@ export async function POST(request: Request) {
   if (user?.hashedPassword) {
     try {
       const token = await createPasswordResetToken(email);
-      await sendPasswordResetEmail(email, token);
+      // In the account's own saved language, not the requester's —
+      // same generic response either way, so this leaks nothing.
+      await sendPasswordResetEmail(email, token, user.locale);
     } catch (err) {
       console.error("Failed to send password reset email:", err);
     }

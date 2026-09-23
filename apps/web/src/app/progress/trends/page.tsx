@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/lib/auth";
 import { isPremiumUser } from "@/lib/entitlements";
 import { getTrendData, TREND_MIN_SESSIONS, TREND_MIN_SPAN_DAYS } from "@/lib/trend-data";
@@ -12,9 +13,10 @@ export default async function TrendsPage() {
   }
 
   if (!(await isPremiumUser(session.user.id))) {
+    const t = await getTranslations("premium.features");
     return (
       <main className="flex flex-1 flex-col items-center">
-        <PremiumRequired featureName="Long-term trends" />
+        <PremiumRequired featureName={t("trends")} />
       </main>
     );
   }

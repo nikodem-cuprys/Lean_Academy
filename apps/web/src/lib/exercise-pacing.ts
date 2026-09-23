@@ -11,19 +11,8 @@
 export const PACE_PRESETS = ["RELAXED", "STANDARD", "QUICK", "NO_DELAY"] as const;
 export type PacePreset = (typeof PACE_PRESETS)[number];
 
-export const PACE_PRESET_LABELS: Record<PacePreset, string> = {
-  RELAXED: "Relaxed",
-  STANDARD: "Standard",
-  QUICK: "Quick",
-  NO_DELAY: "No delay",
-};
-
-export const PACE_PRESET_DESCRIPTIONS: Record<PacePreset, string> = {
-  RELAXED: "More time per item — easier pacing.",
-  STANDARD: "The default pacing this exercise's evidence base was studied at.",
-  QUICK: "Less time per item — harder pacing.",
-  NO_DELAY: "Minimum possible pacing between items — fastest, hardest.",
-};
+// Each preset's user-facing name and description live in the messages
+// files (settings.pace.<PRESET>), not here — see src/i18n.
 
 export const DEFAULT_PACE: PacePreset = "STANDARD";
 

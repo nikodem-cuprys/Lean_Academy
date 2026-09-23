@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@lean-academy/db";
 import { isRateLimited } from "@/lib/rate-limit";
+import { detectBrowserLocale } from "@/i18n/detect";
 
 // Auth.js config. See docs/security.md: official OAuth/PKCE for Google
 // and Facebook (never ask users for their provider password), password
@@ -82,14 +83,30 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.name,
           image: user.image,
+          locale: user.locale,
         };
       },
     }),
   ],
+  events: {
+    // A brand-new OAuth user (Google/Facebook) is created by the adapter,
+    // not by /api/auth/register, so this is where they get the language
+    // they were already browsing in — the same cookie-then-header choice
+    // register uses for email+password signups.
+    async createUser({ user }) {
+      if (!user.id) return;
+      const { cookie, header } = await detectBrowserLocale();
+      const locale = cookie ?? header;
+      if (locale) {
+        await prisma.user.update({ where: { id: user.id }, data: { locale } });
+      }
+    },
+  },
   callbacks: {
     async session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;
+        session.user.locale = typeof token.locale === "string" ? token.locale : null;
       }
       return session;
     },
@@ -104,8 +121,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // @auth/core's "session" action) reads the real current value, so a
     // stale session is cleared on its very next request after a reset, not
     // merely on its next expiry.
-    async jwt({ token, trigger }) {
-      if (trigger === "signIn" || trigger === "signUp") return token;
+    async jwt({ token, trigger, user: signedInUser }) {
+      if (trigger === "signIn" || trigger === "signUp") {
+        // The saved UI language rides along in the token (see
+        // src/i18n/locale.ts). A just-created OAuth user's row may not
+        // have had createUser's locale stamp applied yet when `user` was
+        // read, so fall back to what the browser is asking for.
+        const { cookie, header } = await detectBrowserLocale();
+        token.locale = signedInUser?.locale ?? cookie ?? header ?? null;
+        return token;
+      }
       if (!token.sub || typeof token.iat !== "number") return token;
 
       const user = await prisma.user.findUnique({

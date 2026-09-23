@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import type { ScienceData } from "@/lib/science-data";
 
 // Built against prototype/Science.dc.html. No client-side state needed
@@ -11,19 +12,33 @@ import type { ScienceData } from "@/lib/science-data";
 // data-driven (real displayNames from data/evidence-registry.json),
 // not the mockup's specific hand-typed example.
 
+// Module names and target constructs come straight from
+// data/evidence-registry.json — reviewed scientific content that stays in
+// English rather than being machine-translated (see the i18n entry in
+// docs/kanban.md), with a note saying so for non-English readers (and
+// lang="en" on those nodes, so screen readers pronounce them correctly).
+// The page chrome and evidence-level badges are translated.
 export function ScienceView({ data }: { data: ScienceData }) {
+  const t = useTranslations("science");
+  const te = useTranslations("evidence");
+  const tc = useTranslations("common");
+  const locale = useLocale();
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-6 py-6">
-      <h1 className="mb-1.5 font-display text-[23px] font-bold text-text">The Science</h1>
+      <h1 className="mb-1.5 font-display text-[23px] font-bold text-text">{t("title")}</h1>
       <div className="mb-4.5 text-[13px] leading-relaxed text-text-2">
-        Every exercise here is backed by cited research — see what&rsquo;s proven, what&rsquo;s still limited, and
-        what we chose not to include.
+        {t("intro")}
       </div>
+      {locale !== "en" && (
+        <div className="mb-4.5 rounded-md bg-surface-2 px-3.5 py-2.5 text-[12px] leading-relaxed text-text-2" lang={locale}>
+          {t("englishNote")}
+        </div>
+      )}
 
       <div className="mb-4.5 flex gap-6 rounded-lg border border-border bg-surface p-4">
-        <StatCell value={data.reviewedCount} label="reviewed" testId="stat-reviewed" />
-        <StatCell value={data.implementedCount} label="in your training" testId="stat-implemented" />
-        <StatCell value={data.excludedCount} label="excluded" testId="stat-excluded" />
+        <StatCell value={data.reviewedCount} label={t("statReviewed")} testId="stat-reviewed" />
+        <StatCell value={data.implementedCount} label={t("statImplemented")} testId="stat-implemented" />
+        <StatCell value={data.excludedCount} label={t("statExcluded")} testId="stat-excluded" />
       </div>
 
       <div className="rounded-lg border border-border bg-surface px-4.5 py-1 shadow-sm">
@@ -42,8 +57,8 @@ export function ScienceView({ data }: { data: ScienceData }) {
           >
             <div className="h-[32px] w-[32px] flex-shrink-0 rounded-md bg-accent-soft" />
             <div className="flex-1">
-              <div className="text-[13.5px] font-bold text-text">{module.displayName}</div>
-              <div className="text-[11.5px] text-text-3">{module.targetConstruct}</div>
+              <div className="text-[13.5px] font-bold text-text" lang="en">{module.displayName}</div>
+              <div className="text-[11.5px] text-text-3" lang="en">{module.targetConstruct}</div>
             </div>
             <span
               className="flex-shrink-0 rounded-full px-2.5 py-1 text-[10.5px] font-bold"
@@ -53,7 +68,7 @@ export function ScienceView({ data }: { data: ScienceData }) {
                   : { background: "var(--color-accent-soft)", color: "var(--color-accent-strong)" }
               }
             >
-              {module.evidenceBadge}
+              {te.has(module.evidenceLevel as never) ? te(module.evidenceLevel as never) : module.evidenceBadge}
             </span>
           </div>
         ))}
@@ -62,14 +77,13 @@ export function ScienceView({ data }: { data: ScienceData }) {
       {data.excludedCount > 0 && (
         <div className="mt-4 flex items-start gap-2.5 px-0.5 text-xs leading-relaxed text-text-3">
           <span>
-            {data.excludedCount} method{data.excludedCount === 1 ? "" : "s"} we reviewed and did not include —{" "}
-            {data.excludedDisplayNames.join(" and ")} — didn&rsquo;t meet our evidence bar.
+            {t("excludedNote", { count: data.excludedCount, names: data.excludedDisplayNames.join(" / ") })}
           </span>
         </div>
       )}
 
       <Link href="/" className="mt-6 text-center text-sm font-semibold text-accent underline">
-        ← Back home
+        {tc("backHome")}
       </Link>
     </div>
   );

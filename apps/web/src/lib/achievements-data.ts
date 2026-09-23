@@ -18,6 +18,8 @@ export interface AchievementStatus {
   earned: boolean;
   earnedAt: string | null;
   contextLabel: string | null;
+  /** The method id behind contextLabel, so the UI can show the exercise's translated name. */
+  contextMethod: string | null;
   progressCurrent: number | null;
   progressTarget: number | null;
 }
@@ -65,6 +67,7 @@ export async function getAchievementsStatus(userId: string, now: Date = new Date
       earned: !!earned,
       earnedAt: earned ? earned.earnedAt.toISOString() : null,
       contextLabel,
+      contextMethod: metadata?.method ?? null,
       progressCurrent,
       progressTarget,
     };
@@ -72,6 +75,9 @@ export async function getAchievementsStatus(userId: string, now: Date = new Date
 }
 
 export interface LatestAchievement {
+  /** Catalog key — the UI translates the title by it (messages achievements.catalog.<key>). */
+  key: string;
+  /** The catalog's English title, the fallback if a key has no translation. */
   title: string;
   earnedAt: string;
 }
@@ -88,5 +94,5 @@ export async function getLatestEarnedAchievement(userId: string): Promise<Latest
     include: { achievement: true },
   });
   if (!latest) return null;
-  return { title: latest.achievement.title, earnedAt: latest.earnedAt.toISOString() };
+  return { key: latest.achievement.key, title: latest.achievement.title, earnedAt: latest.earnedAt.toISOString() };
 }

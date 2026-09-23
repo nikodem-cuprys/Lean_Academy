@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@lean-academy/db";
 import { consumeVerificationToken } from "@/lib/tokens";
 
@@ -14,6 +15,8 @@ export default async function VerifyEmailPage({
     token?: string;
   };
 
+  const t = await getTranslations("auth.verify");
+  const tc = await getTranslations("common");
   const result = !email || !token
     ? ({ ok: false, reason: "invalid" } as const)
     : await consumeVerificationToken(email, token);
@@ -34,23 +37,23 @@ export default async function VerifyEmailPage({
       {result.ok ? (
         <>
           <div className="mb-2 font-display text-[22px] font-bold text-text">
-            Email verified
+            {t("verified")}
           </div>
           <p className="mb-7 text-[14px] text-text-2">
-            Your email address is confirmed. You&rsquo;re all set.
+            {t("verifiedBody")}
           </p>
         </>
       ) : (
         <>
           <div className="mb-2 font-display text-[22px] font-bold text-text">
             {result.reason === "expired"
-              ? "This link has expired"
-              : "This link isn't valid"}
+              ? t("expiredTitle")
+              : t("invalidTitle")}
           </div>
           <p className="mb-7 text-[14px] text-text-2">
             {result.reason === "expired"
-              ? "Verification links expire after 24 hours. Log in and we'll send a new one."
-              : "It may have already been used, or the link was copied incorrectly."}
+              ? t("expiredBody")
+              : t("invalidBody")}
           </p>
         </>
       )}
@@ -59,7 +62,7 @@ export default async function VerifyEmailPage({
         href="/login"
         className="rounded-full bg-accent px-8 py-3.5 font-body text-[15px] font-bold text-on-accent"
       >
-        Go to login
+        {tc("goToLogin")}
       </Link>
     </main>
   );
