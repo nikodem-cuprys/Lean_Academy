@@ -9,8 +9,10 @@ import {
   perfToEpochMs,
   type SessionModeProps,
   type TrialInput,
+  advancedDifficultyBounds,
 } from "@/lib/session-types";
 import type { PacePreset } from "@/lib/exercise-preferences";
+import type { SpatialAdvanced } from "@/lib/advanced-settings";
 
 // Adapted from prototype/ExerciseSpatial.dc.html (a 3x3 grid, cells light
 // up in sequence, then the player taps them back in the same order).
@@ -81,14 +83,18 @@ interface SpatialSequenceExerciseProps extends SessionModeProps {
   pace?: PacePreset;
   /** Free customization — defaults to the standard 3x3 (9-cell) grid when omitted, same as session mode always gets. */
   gridSize?: SpatialGridSize;
+  /** Advanced-tab lesson parameters (see apps/web/src/lib/advanced-settings.ts) — each overrides the matching constant/preset above. */
+  advanced?: SpatialAdvanced;
 }
 
-export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, gridSize }: SpatialSequenceExerciseProps = {}) {
+export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, gridSize, advanced, exitHref = "/" }: SpatialSequenceExerciseProps = {}) {
   const t = useTranslations("spatial");
   const tx = useTranslations("exercise");
-  const itemDisplayMs = ITEM_DISPLAY_MS_BY_PACE[pace ?? "STANDARD"];
-  const itemGapMs = ITEM_GAP_MS_BY_PACE[pace ?? "STANDARD"];
-  const effectiveGridSize: SpatialGridSize = gridSize ?? 9;
+  const itemDisplayMs = advanced?.itemDisplayMs ?? ITEM_DISPLAY_MS_BY_PACE[pace ?? "STANDARD"];
+  const itemGapMs = advanced?.itemGapMs ?? ITEM_GAP_MS_BY_PACE[pace ?? "STANDARD"];
+  const effectiveGridSize: SpatialGridSize = advanced?.gridSize ?? gridSize ?? 9;
+  const totalSequences = advanced?.sequences ?? TOTAL_SEQUENCES;
+  const feedbackMs = advanced?.feedbackMs ?? FEEDBACK_MS;
   const gridColumns = Math.sqrt(effectiveGridSize);
   const [phase, setPhase] = useState<Phase>("study");
   const [sequenceNumber, setSequenceNumber] = useState(0);
@@ -105,6 +111,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
     const controller = new AbortController();
     const task = new SpatialSequenceTask({
       ...(initialDifficulty !== undefined ? { initialDifficulty } : {}),
+      ...advancedDifficultyBounds(advanced),
       gridSize: effectiveGridSize,
     });
     const startDifficulty = task.getCurrentDifficulty();
@@ -119,7 +126,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
     }
 
     async function run() {
-      for (let s = 0; s < TOTAL_SEQUENCES; s++) {
+      for (let s = 0; s < totalSequences; s++) {
         if (controller.signal.aborted) return;
 
         const sequenceStartedAt = performance.now();
@@ -166,7 +173,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
         });
         setSequenceFeedback(summary);
         setPhase("feedback");
-        await sleep(FEEDBACK_MS, controller.signal);
+        await sleep(feedbackMs, controller.signal);
         if (controller.signal.aborted) return;
       }
 
@@ -230,7 +237,7 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
       data-grid-size={effectiveGridSize}
     >
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label={tx("exit")}>
+        <Link href={exitHref} aria-label={tx("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
@@ -238,13 +245,13 @@ export function SpatialSequenceExercise({ initialDifficulty, onComplete, pace, g
         <div className="mx-4 h-1 flex-1 rounded-full bg-surface-2">
           <div
             className="h-full rounded-full bg-spatial transition-all"
-            style={{ width: `${(sequenceNumber / TOTAL_SEQUENCES) * 100}%` }}
+            style={{ width: `${(sequenceNumber / totalSequences) * 100}%` }}
           />
         </div>
         <div className="w-[18px]" />
       </div>
       <div className="mb-4 text-center text-xs text-text-3">
-        {t("sequenceOf", { current: sequenceNumber, total: TOTAL_SEQUENCES })}
+        {t("sequenceOf", { current: sequenceNumber, total: totalSequences })}
       </div>
 
       <h1 className="sr-only">{t("srTitle")}</h1>

@@ -101,7 +101,8 @@
     "science": "科学依据",
     "achievements": "成就",
     "challenges": "任务与挑战",
-    "customize": "自定义练习"
+    "customize": "自定义练习",
+    "advanced": "高级"
   },
   "home": {
     "todaysTraining": "今日训练",
@@ -128,6 +129,7 @@
       "achievements": "查看成就 →",
       "challenges": "查看任务与挑战 →",
       "customize": "自定义练习 →",
+      "advanced": "高级训练 →",
       "nBack": "试试 N-Back 练习 →",
       "complexSpan": "试试复杂广度练习 →",
       "diceSum": "试试骰子求和练习 →",
@@ -552,6 +554,122 @@
       "finishedReading": "我读完了",
       "questionOf": "第 {current}/{total} 题",
       "bothCount": "记忆和理解都计入"
+    }
+  },
+  "advanced": {
+    "title": "高级训练",
+    "backHome": "← 首页",
+    "back": "← 高级",
+    "intro": "自行设置延迟、网格大小、阅读速度、课程长度等参数，按你想要的方式练习。",
+    "separateNote": "高级课程与主要训练和每日训练完全分开。它们不会改变你保存的难度，不获得经验值，不计入连续天数或任务，也不会显示在进度页面上。",
+    "lessons": "课程",
+    "recentRuns": "最近的高级课程",
+    "noRuns": "还没有高级课程——选择一个练习开始吧。",
+    "noRunsForExercise": "该练习还没有高级课程。",
+    "custom": "自定义",
+    "defaults": "默认",
+    "tag": "高级课程",
+    "notStudied": "默认值与标准课程一致。其他任何取值都超出了该练习相关研究的范围——适合个人练习，但不能用来衡量进步。",
+    "parameters": "参数",
+    "resetDefaults": "恢复默认值",
+    "start": "开始高级课程",
+    "lessonComplete": "高级课程完成",
+    "notCounted": "仅保存在高级课程记录中——不计入每日训练、经验值、连续天数或进度。",
+    "resultNotSaved": "无法将此结果保存到记录中。",
+    "runAgain": "再来一次",
+    "changeSettings": "修改设置",
+    "backToAdvanced": "返回高级",
+    "averageWpm": "平均 WPM",
+    "comprehension": "理解率",
+    "runSummary": "正确率 {accuracy}% · {trials, plural, other {# 次}} · {start} → {end}",
+    "readingRunSummary": "{wpm} WPM · 理解率 {comprehension}%",
+    "defaultValue": "默认 {value}",
+    "units": {
+      "ms": "{value} 毫秒",
+      "percent": "{value}%",
+      "wpm": "{value} WPM"
+    },
+    "tunes": {
+      "n-back": "时间、网格大小、N 值、匹配率",
+      "complex-span": "字母时间、作答时限、组大小",
+      "spatial-sequence": "网格大小、高亮时间、序列长度",
+      "dice-sum": "骰子面数、观看时间、骰子数量",
+      "reading": "引导速度、段落数、高亮词数"
+    },
+    "startLevel": {
+      "adaptive-nback-v0": "起始 N 值（往回几步）",
+      "complex-span-v0": "起始组大小（字母数）",
+      "visuospatial-sequence-recall-v0": "起始序列长度",
+      "dice-sum-v0": "起始骰子数量",
+      "reading-paced-adaptive-v0": "起始 WPM"
+    },
+    "levelName": {
+      "adaptive-nback-v0": "N 值",
+      "complex-span-v0": "组大小",
+      "visuospatial-sequence-recall-v0": "序列",
+      "dice-sum-v0": "骰子",
+      "reading-paced-adaptive-v0": "WPM"
+    },
+    "params": {
+      "adaptive": {
+        "label": "自适应难度",
+        "hint": "根据你的表现调整难度。关闭后将固定在起始水平。"
+      },
+      "gridSize": {
+        "label": "网格大小"
+      },
+      "trials": {
+        "label": "试次"
+      },
+      "stimulusMs": {
+        "label": "每格显示时间",
+        "hint": "每个方格亮起的时长——也是你的作答时间。"
+      },
+      "feedbackMs": {
+        "label": "反馈后停顿"
+      },
+      "matchPercent": {
+        "label": "匹配率",
+        "hint": "方格与 N 步之前相同的频率。"
+      },
+      "sets": {
+        "label": "组数"
+      },
+      "memoryDisplayMs": {
+        "label": "字母显示时间"
+      },
+      "processingLimitMs": {
+        "label": "判断每个陈述的时间"
+      },
+      "sequences": {
+        "label": "序列数"
+      },
+      "itemDisplayMs": {
+        "label": "方格高亮时间"
+      },
+      "itemGapMs": {
+        "label": "方格间隔"
+      },
+      "dieSides": {
+        "label": "骰子面数"
+      },
+      "rounds": {
+        "label": "轮数"
+      },
+      "showMs": {
+        "label": "骰子观看时间",
+        "hint": "你仍可以提前隐藏骰子。"
+      },
+      "targetWpm": {
+        "label": "引导速度",
+        "hint": "每段文字的高亮都保持这个速度。你的实际阅读速度仍会被测量，并与理解率一起显示。"
+      },
+      "passages": {
+        "label": "段落数"
+      },
+      "chunkSize": {
+        "label": "每步高亮词数"
+      }
     }
   }
 }

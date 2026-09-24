@@ -101,7 +101,8 @@
     "science": "Nauka",
     "achievements": "Osiągnięcia",
     "challenges": "Zadania i wyzwania",
-    "customize": "Dostosuj ćwiczenia"
+    "customize": "Dostosuj ćwiczenia",
+    "advanced": "Zaawansowane"
   },
   "home": {
     "todaysTraining": "DZISIEJSZY TRENING",
@@ -128,6 +129,7 @@
       "achievements": "Zobacz osiągnięcia →",
       "challenges": "Zobacz zadania i wyzwania →",
       "customize": "Dostosuj ćwiczenia →",
+      "advanced": "Trening zaawansowany →",
       "nBack": "Wypróbuj ćwiczenie N-Back →",
       "complexSpan": "Wypróbuj ćwiczenie Complex Span →",
       "diceSum": "Wypróbuj ćwiczenie Suma kości →",
@@ -552,6 +554,122 @@
       "finishedReading": "Skończyłem(-am) czytać",
       "questionOf": "Pytanie {current} z {total}",
       "bothCount": "Liczą się pamięć i zrozumienie"
+    }
+  },
+  "advanced": {
+    "title": "Trening zaawansowany",
+    "backHome": "← Start",
+    "back": "← Zaawansowane",
+    "intro": "Ustaw własne opóźnienia, rozmiary siatki, tempo czytania, długość lekcji i więcej — ćwicz dokładnie tak, jak chcesz.",
+    "separateNote": "Lekcje zaawansowane to osobna ścieżka, niezależna od głównego i codziennego treningu. Nigdy nie zmieniają zapisanego poziomu trudności, nie dają XP, nie liczą się do serii ani zadań i nie pojawiają się na stronie Postępy.",
+    "lessons": "LEKCJE",
+    "recentRuns": "OSTATNIE LEKCJE ZAAWANSOWANE",
+    "noRuns": "Brak lekcji zaawansowanych — wybierz ćwiczenie, aby zacząć.",
+    "noRunsForExercise": "Brak lekcji zaawansowanych z tym ćwiczeniem.",
+    "custom": "Własne",
+    "defaults": "Domyślne",
+    "tag": "LEKCJA ZAAWANSOWANA",
+    "notStudied": "Wartości domyślne odpowiadają standardowej lekcji. Wszystko inne wykracza poza to, co badano w badaniach nad tym ćwiczeniem — dobre do własnej praktyki, ale nie jest miarą postępów.",
+    "parameters": "PARAMETRY",
+    "resetDefaults": "Przywróć domyślne",
+    "start": "Rozpocznij lekcję zaawansowaną",
+    "lessonComplete": "Lekcja zaawansowana ukończona",
+    "notCounted": "Zapisano tylko w historii zaawansowanej — nie liczy się do codziennego treningu, XP, serii ani postępów.",
+    "resultNotSaved": "Nie udało się zapisać wyniku w historii.",
+    "runAgain": "Powtórz",
+    "changeSettings": "Zmień ustawienia",
+    "backToAdvanced": "Wróć do zaawansowanych",
+    "averageWpm": "ŚR. SŁ./MIN",
+    "comprehension": "ROZUMIENIE",
+    "runSummary": "{accuracy}% trafności · {trials, plural, one {# próba} few {# próby} many {# prób} other {# próby}} · {start} → {end}",
+    "readingRunSummary": "{wpm} sł./min · {comprehension}% rozumienia",
+    "defaultValue": "domyślnie {value}",
+    "units": {
+      "ms": "{value} ms",
+      "percent": "{value}%",
+      "wpm": "{value} sł./min"
+    },
+    "tunes": {
+      "n-back": "Tempo, rozmiar siatki, N, częstość powtórzeń",
+      "complex-span": "Czas liter, limit odpowiedzi, rozmiar zestawu",
+      "spatial-sequence": "Rozmiar siatki, czas podświetlenia, długość sekwencji",
+      "dice-sum": "Liczba ścianek, czas oglądania, liczba kości",
+      "reading": "Tempo przewodnika (sł./min), fragmenty, rozmiar podświetlenia"
+    },
+    "startLevel": {
+      "adaptive-nback-v0": "Początkowe N (ile wstecz)",
+      "complex-span-v0": "Początkowy rozmiar zestawu (litery)",
+      "visuospatial-sequence-recall-v0": "Początkowa długość sekwencji",
+      "dice-sum-v0": "Początkowa liczba kości",
+      "reading-paced-adaptive-v0": "Początkowe tempo"
+    },
+    "levelName": {
+      "adaptive-nback-v0": "N",
+      "complex-span-v0": "ZESTAW",
+      "visuospatial-sequence-recall-v0": "SEKWENCJA",
+      "dice-sum-v0": "KOŚCI",
+      "reading-paced-adaptive-v0": "SŁ./MIN"
+    },
+    "params": {
+      "adaptive": {
+        "label": "Adaptacyjna trudność",
+        "hint": "Podnosi lub obniża poziom zależnie od wyników. Wyłączona utrzymuje stały poziom początkowy."
+      },
+      "gridSize": {
+        "label": "Rozmiar siatki"
+      },
+      "trials": {
+        "label": "Próby"
+      },
+      "stimulusMs": {
+        "label": "Czas na pole",
+        "hint": "Jak długo każde pole jest podświetlone — to także czas na reakcję."
+      },
+      "feedbackMs": {
+        "label": "Pauza po informacji zwrotnej"
+      },
+      "matchPercent": {
+        "label": "Częstość powtórzeń",
+        "hint": "Jak często pole powtarza to sprzed N kroków."
+      },
+      "sets": {
+        "label": "Zestawy"
+      },
+      "memoryDisplayMs": {
+        "label": "Czas wyświetlania litery"
+      },
+      "processingLimitMs": {
+        "label": "Czas na ocenę zdania"
+      },
+      "sequences": {
+        "label": "Sekwencje"
+      },
+      "itemDisplayMs": {
+        "label": "Czas podświetlenia pola"
+      },
+      "itemGapMs": {
+        "label": "Przerwa między polami"
+      },
+      "dieSides": {
+        "label": "Liczba ścianek"
+      },
+      "rounds": {
+        "label": "Rundy"
+      },
+      "showMs": {
+        "label": "Czas oglądania kości",
+        "hint": "Nadal możesz ukryć kości wcześniej."
+      },
+      "targetWpm": {
+        "label": "Tempo przewodnika",
+        "hint": "Podświetlenie utrzymuje to tempo w każdym fragmencie. Twoje rzeczywiste tempo czytania jest nadal mierzone, razem z rozumieniem."
+      },
+      "passages": {
+        "label": "Fragmenty"
+      },
+      "chunkSize": {
+        "label": "Słowa na krok podświetlenia"
+      }
     }
   }
 }

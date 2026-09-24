@@ -61,12 +61,21 @@ const SETTINGS_ICON = (
   </svg>
 );
 
+const SLIDERS_ICON = (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    <circle cx="16" cy="7" r="2" stroke="currentColor" strokeWidth="1.5" />
+    <circle cx="10" cy="17" r="2" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+);
+
 const NAV_ITEMS = [
   { href: "/", labelKey: "home", icon: HOME_ICON },
   { href: "/progress", labelKey: "progress", icon: CHART_ICON },
   { href: "/science", labelKey: "science", icon: FLASK_ICON },
   { href: "/achievements", labelKey: "achievements", icon: TROPHY_ICON },
   { href: "/challenges", labelKey: "challenges", icon: TARGET_ICON },
+  { href: "/advanced", labelKey: "advanced", icon: SLIDERS_ICON },
   { href: "/settings/exercises", labelKey: "customize", icon: SETTINGS_ICON },
 ] as const;
 

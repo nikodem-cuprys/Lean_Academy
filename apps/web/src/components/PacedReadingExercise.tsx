@@ -15,6 +15,7 @@ import {
   type SessionModeProps,
   type TrialInput,
 } from "@/lib/session-types";
+import type { ReadingAdvanced } from "@/lib/advanced-settings";
 
 // Adapted from prototype/ExerciseReading.dc.html: a passage is shown
 // with a visual pace guide (a highlight that sweeps forward through
@@ -97,11 +98,11 @@ function sleep(ms: number, signal: AbortSignal): Promise<void> {
   });
 }
 
-function chunkWords(text: string): string[][] {
+function chunkWords(text: string, chunkSize: number = CHUNK_SIZE): string[][] {
   const words = text.trim().split(/\s+/);
   const chunks: string[][] = [];
-  for (let i = 0; i < words.length; i += CHUNK_SIZE) {
-    chunks.push(words.slice(i, i + CHUNK_SIZE));
+  for (let i = 0; i < words.length; i += chunkSize) {
+    chunks.push(words.slice(i, i + chunkSize));
   }
   return chunks;
 }
@@ -121,9 +122,22 @@ interface Results {
   comprehensionAccuracy: { correct: number; total: number };
 }
 
-export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionModeProps = {}) {
+interface PacedReadingExerciseProps extends SessionModeProps {
+  /**
+   * Advanced-tab lesson parameters (see apps/web/src/lib/advanced-settings.ts).
+   * The pace guide holds at exactly advanced.targetWpm for every passage
+   * instead of following the adaptive WPM ladder; comprehension and
+   * actual WPM are still measured and reported exactly as normal.
+   */
+  advanced?: ReadingAdvanced;
+}
+
+export function PacedReadingExercise({ initialDifficulty, onComplete, advanced, exitHref = "/" }: PacedReadingExerciseProps = {}) {
   const t = useTranslations("reading");
   const tx = useTranslations("exercise");
+  const totalPassages = advanced?.passages ?? TOTAL_PASSAGES;
+  const chunkSize = advanced?.chunkSize ?? CHUNK_SIZE;
+  const feedbackMs = advanced?.feedbackMs ?? FEEDBACK_MS;
   const locale = useLocale();
   const [phase, setPhase] = useState<Phase>("reading");
   const [passageNumber, setPassageNumber] = useState(0);
@@ -211,11 +225,11 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
       const startDifficulty = task.getCurrentDifficulty();
       const startDifficultyWpm = task.getCurrentTargetWpm();
 
-      for (let p = 0; p < TOTAL_PASSAGES; p++) {
+      for (let p = 0; p < totalPassages; p++) {
         if (controller.signal.aborted) return;
 
         const nextPassage = task.nextPassage();
-        const wpm = task.getCurrentTargetWpm();
+        const wpm = advanced?.targetWpm ?? task.getCurrentTargetWpm();
         const difficultyAtTrial = task.getCurrentDifficulty();
         setPassageNumber(p + 1);
         setPassage(nextPassage);
@@ -226,7 +240,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
         setPhase("reading");
 
         stopPacerRef.current = false;
-        runPacer(chunkWords(nextPassage.text), wpm);
+        runPacer(chunkWords(nextPassage.text, chunkSize), wpm);
         readingStartRef.current = performance.now();
 
         await waitForFinishReading();
@@ -259,7 +273,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
           correctText: nextPassage.question.choices[nextPassage.question.correctIndex],
         });
         setPhase("feedback");
-        await sleep(FEEDBACK_MS, controller.signal);
+        await sleep(feedbackMs, controller.signal);
         if (controller.signal.aborted) return;
       }
 
@@ -314,7 +328,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
       className={`flex w-full flex-1 flex-col px-5 py-5 transition-[max-width] ${wideText ? "max-w-[640px]" : "max-w-[390px]"}`}
     >
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label={tx("exit")}>
+        <Link href={exitHref} aria-label={tx("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
@@ -322,13 +336,13 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
         <div className="mx-4 h-1 flex-1 rounded-full bg-surface-2">
           <div
             className="h-full rounded-full bg-reading transition-all"
-            style={{ width: `${(passageNumber / TOTAL_PASSAGES) * 100}%` }}
+            style={{ width: `${(passageNumber / totalPassages) * 100}%` }}
           />
         </div>
         <div className="w-[18px]" />
       </div>
       <div className="mb-4 text-center text-xs text-text-3">
-        {t("passageOf", { current: passageNumber, total: TOTAL_PASSAGES })}
+        {t("passageOf", { current: passageNumber, total: totalPassages })}
       </div>
 
       <h1 className="sr-only">{t("srTitle")}</h1>
@@ -393,7 +407,7 @@ export function PacedReadingExercise({ initialDifficulty, onComplete }: SessionM
             </div>
           </div>
           <div lang="en" className={`flex-1 overflow-y-auto leading-relaxed text-text-2 ${TEXT_SIZE_CLASS[textSize]}`}>
-            {chunkWords(passage.text).map((chunk, i) => (
+            {chunkWords(passage.text, chunkSize).map((chunk, i) => (
               <span
                 key={i}
                 style={{

@@ -9,7 +9,9 @@ import {
   perfToEpochMs,
   type SessionModeProps,
   type TrialInput,
+  advancedDifficultyBounds,
 } from "@/lib/session-types";
+import type { DiceSumAdvanced } from "@/lib/advanced-settings";
 
 // Adapted from prototype/ExerciseDiceSum.dc.html: dice are shown for a
 // fixed viewing window (with an early-exit "I've got it" button, same
@@ -116,12 +118,17 @@ function Die({ face, dieSides }: { face: number; dieSides: number }) {
 interface DiceSumExerciseProps extends SessionModeProps {
   /** Free customization (see apps/web/src/lib/exercise-preferences.ts) — defaults to the standard 6-sided die when omitted, same as session mode always gets. */
   dieSides?: DiceSides;
+  /** Advanced-tab lesson parameters (see apps/web/src/lib/advanced-settings.ts) — each overrides the matching constant/preset above. */
+  advanced?: DiceSumAdvanced;
 }
 
-export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: DiceSumExerciseProps = {}) {
+export function DiceSumExercise({ initialDifficulty, onComplete, dieSides, advanced, exitHref = "/" }: DiceSumExerciseProps = {}) {
   const t = useTranslations("diceSum");
   const tx = useTranslations("exercise");
-  const effectiveDieSides = dieSides ?? 6;
+  const effectiveDieSides = advanced?.dieSides ?? dieSides ?? 6;
+  const totalRounds = advanced?.rounds ?? TOTAL_ROUNDS;
+  const showMs = advanced?.showMs ?? SHOW_MS;
+  const feedbackMs = advanced?.feedbackMs ?? FEEDBACK_MS;
   const maxTypedDigits = String(effectiveDieSides * DICE_SUM_MAX_COUNT).length;
   const [phase, setPhase] = useState<Phase>("show");
   const [roundNumber, setRoundNumber] = useState(0);
@@ -138,6 +145,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
     const controller = new AbortController();
     const task = new DiceSumTask({
       ...(initialDifficulty !== undefined ? { initialDifficulty } : {}),
+      ...advancedDifficultyBounds(advanced),
       dieSides: effectiveDieSides,
     });
     const startDifficulty = task.getCurrentDifficulty();
@@ -156,7 +164,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
           resolve();
         };
         showResolveRef.current = finish;
-        const timer = setTimeout(finish, SHOW_MS);
+        const timer = setTimeout(finish, showMs);
         // See NBackExercise.tsx's identical fix: without this, an
         // aborted run (React Strict Mode's dev-only double-invoke of
         // this effect) keeps waiting out its own full SHOW_MS timer
@@ -173,7 +181,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
     }
 
     async function run() {
-      for (let r = 0; r < TOTAL_ROUNDS; r++) {
+      for (let r = 0; r < totalRounds; r++) {
         if (controller.signal.aborted) return;
 
         const roundStartedAt = performance.now();
@@ -210,7 +218,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
         });
         setFeedback(summary);
         setPhase("feedback");
-        await sleep(FEEDBACK_MS, controller.signal);
+        await sleep(feedbackMs, controller.signal);
         if (controller.signal.aborted) return;
       }
 
@@ -266,7 +274,7 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
       data-die-sides={effectiveDieSides}
     >
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label={tx("exit")}>
+        <Link href={exitHref} aria-label={tx("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
@@ -274,13 +282,13 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
         <div className="mx-4 h-1 flex-1 rounded-full bg-surface-2">
           <div
             className="h-full rounded-full bg-wm transition-all"
-            style={{ width: `${(roundNumber / TOTAL_ROUNDS) * 100}%` }}
+            style={{ width: `${(roundNumber / totalRounds) * 100}%` }}
           />
         </div>
         <div className="w-[18px]" />
       </div>
       <div className="mb-4 text-center text-xs text-text-3">
-        {tx("roundOf", { current: roundNumber, total: TOTAL_ROUNDS })}
+        {tx("roundOf", { current: roundNumber, total: totalRounds })}
       </div>
 
       <h1 className="sr-only">{t("srTitle")}</h1>
@@ -296,14 +304,14 @@ export function DiceSumExercise({ initialDifficulty, onComplete, dieSides }: Dic
           </div>
           <div className="mb-2 text-center text-[12.5px] text-text-3">
             {effectiveDieSides === 6
-              ? t("shownFor", { count: dice.length, seconds: SHOW_MS / 1000 })
-              : t("shownForSided", { count: dice.length, sides: effectiveDieSides, seconds: SHOW_MS / 1000 })}
+              ? t("shownFor", { count: dice.length, seconds: showMs / 1000 })
+              : t("shownForSided", { count: dice.length, sides: effectiveDieSides, seconds: showMs / 1000 })}
           </div>
           <div className="mb-9 h-[5px] overflow-hidden rounded-full bg-surface-2">
             <div
               key={roundNumber}
               className="h-full rounded-full bg-wm animate-dice-countdown"
-              style={{ animationDuration: `${SHOW_MS}ms` }}
+              style={{ animationDuration: `${showMs}ms` }}
             />
           </div>
           <div className="flex flex-1 flex-wrap items-center justify-center gap-3" data-testid="dice-display">

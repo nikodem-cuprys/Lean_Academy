@@ -215,6 +215,14 @@ function LatestAchievementCard({ achievement }: { achievement: LatestAchievement
   );
 }
 
+const SLIDERS_ICON = (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    <circle cx="16" cy="7" r="2" stroke="currentColor" strokeWidth="1.5" />
+    <circle cx="10" cy="17" r="2" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+);
+
 function QuickLinksGrid({ links }: { links: QuickLink[] }) {
   const t = useTranslations("home");
   return (
@@ -362,6 +370,7 @@ export default async function HomePage() {
     { href: "/achievements", label: t("links.achievements"), icon: TROPHY_ICON },
     { href: "/challenges", label: t("links.challenges"), icon: TARGET_ICON },
     { href: "/settings/exercises", label: t("links.customize"), icon: SETTINGS_ICON },
+    { href: "/advanced", label: t("links.advanced"), icon: SLIDERS_ICON },
     { href: "/train/n-back", label: t("links.nBack"), domain: "WORKING_MEMORY" },
     { href: "/train/complex-span", label: t("links.complexSpan"), domain: "WORKING_MEMORY" },
     { href: "/train/dice-sum", label: t("links.diceSum"), domain: "WORKING_MEMORY" },

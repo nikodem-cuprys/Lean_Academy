@@ -101,7 +101,8 @@
     "science": "Science",
     "achievements": "Achievements",
     "challenges": "Quests & Challenges",
-    "customize": "Customize exercises"
+    "customize": "Customize exercises",
+    "advanced": "Advanced"
   },
   "home": {
     "todaysTraining": "TODAY’S TRAINING",
@@ -128,6 +129,7 @@
       "achievements": "View achievements →",
       "challenges": "View quests & challenges →",
       "customize": "Customize exercises →",
+      "advanced": "Advanced training →",
       "nBack": "Try the N-Back exercise →",
       "complexSpan": "Try the Complex Span exercise →",
       "diceSum": "Try the Dice Sum exercise →",
@@ -610,6 +612,122 @@
       "finishedReading": "I’ve finished reading",
       "questionOf": "Question {current} of {total}",
       "bothCount": "Memory & comprehension both count"
+    }
+  },
+  "advanced": {
+    "title": "Advanced training",
+    "backHome": "← Home",
+    "back": "← Advanced",
+    "intro": "Set your own delays, grid sizes, reading speed, lesson length and more, and practice exactly the way you want.",
+    "separateNote": "Advanced lessons are a separate track from your main and daily training. They never change your saved difficulty, earn XP, count toward streaks or quests, or show up on your Progress page.",
+    "lessons": "LESSONS",
+    "recentRuns": "RECENT ADVANCED LESSONS",
+    "noRuns": "No advanced lessons yet — pick an exercise to start one.",
+    "noRunsForExercise": "No advanced lessons with this exercise yet.",
+    "custom": "Custom",
+    "defaults": "Defaults",
+    "tag": "ADVANCED LESSON",
+    "notStudied": "Default values match the standard lesson. Anything else is outside what this exercise's research studied — fine for personal practice, but not a measure of progress.",
+    "parameters": "PARAMETERS",
+    "resetDefaults": "Reset to defaults",
+    "start": "Start advanced lesson",
+    "lessonComplete": "Advanced lesson complete",
+    "notCounted": "Saved to your advanced history only — not counted toward daily training, XP, streaks, or progress.",
+    "resultNotSaved": "Couldn’t save this result to your history.",
+    "runAgain": "Run again",
+    "changeSettings": "Change settings",
+    "backToAdvanced": "Back to Advanced",
+    "averageWpm": "AVG WPM",
+    "comprehension": "COMPREHENSION",
+    "runSummary": "{accuracy}% accuracy · {trials, plural, one {# trial} other {# trials}} · {start} → {end}",
+    "readingRunSummary": "{wpm} WPM · {comprehension}% comprehension",
+    "defaultValue": "default {value}",
+    "units": {
+      "ms": "{value} ms",
+      "percent": "{value}%",
+      "wpm": "{value} WPM"
+    },
+    "tunes": {
+      "n-back": "Timing, grid size, N, match rate",
+      "complex-span": "Letter timing, answer time limit, set size",
+      "spatial-sequence": "Grid size, highlight timing, sequence length",
+      "dice-sum": "Die sides, viewing time, number of dice",
+      "reading": "Pace-guide WPM, passages, highlight size"
+    },
+    "startLevel": {
+      "adaptive-nback-v0": "Starting N (items back)",
+      "complex-span-v0": "Starting set size (letters)",
+      "visuospatial-sequence-recall-v0": "Starting sequence length",
+      "dice-sum-v0": "Starting number of dice",
+      "reading-paced-adaptive-v0": "Starting WPM"
+    },
+    "levelName": {
+      "adaptive-nback-v0": "N",
+      "complex-span-v0": "SET SIZE",
+      "visuospatial-sequence-recall-v0": "SEQUENCE",
+      "dice-sum-v0": "DICE",
+      "reading-paced-adaptive-v0": "WPM"
+    },
+    "params": {
+      "adaptive": {
+        "label": "Adaptive difficulty",
+        "hint": "Moves the level up or down with your performance. Off keeps it fixed at the starting level."
+      },
+      "gridSize": {
+        "label": "Grid size"
+      },
+      "trials": {
+        "label": "Trials"
+      },
+      "stimulusMs": {
+        "label": "Time per square",
+        "hint": "How long each square stays lit — also your response window."
+      },
+      "feedbackMs": {
+        "label": "Pause after feedback"
+      },
+      "matchPercent": {
+        "label": "Match rate",
+        "hint": "How often a square is set to repeat the one N steps back."
+      },
+      "sets": {
+        "label": "Sets"
+      },
+      "memoryDisplayMs": {
+        "label": "Letter display time"
+      },
+      "processingLimitMs": {
+        "label": "Time to judge each statement"
+      },
+      "sequences": {
+        "label": "Sequences"
+      },
+      "itemDisplayMs": {
+        "label": "Square highlight time"
+      },
+      "itemGapMs": {
+        "label": "Gap between squares"
+      },
+      "dieSides": {
+        "label": "Die sides"
+      },
+      "rounds": {
+        "label": "Rounds"
+      },
+      "showMs": {
+        "label": "Dice viewing time",
+        "hint": "You can still hide the dice early."
+      },
+      "targetWpm": {
+        "label": "Pace-guide speed",
+        "hint": "The highlight holds at this speed for every passage. Your actual reading speed is still measured, alongside comprehension."
+      },
+      "passages": {
+        "label": "Passages"
+      },
+      "chunkSize": {
+        "label": "Words per highlight step"
+      }
     }
   }
 }

@@ -101,7 +101,8 @@
     "science": "Ciencia",
     "achievements": "Logros",
     "challenges": "Misiones y retos",
-    "customize": "Personalizar ejercicios"
+    "customize": "Personalizar ejercicios",
+    "advanced": "Avanzado"
   },
   "home": {
     "todaysTraining": "ENTRENAMIENTO DE HOY",
@@ -128,6 +129,7 @@
       "achievements": "Ver logros →",
       "challenges": "Ver misiones y retos →",
       "customize": "Personalizar ejercicios →",
+      "advanced": "Entrenamiento avanzado →",
       "nBack": "Probar el ejercicio N-Back →",
       "complexSpan": "Probar el ejercicio Complex Span →",
       "diceSum": "Probar el ejercicio Suma de dados →",
@@ -552,6 +554,122 @@
       "finishedReading": "He terminado de leer",
       "questionOf": "Pregunta {current} de {total}",
       "bothCount": "Cuentan la memoria y la comprensión"
+    }
+  },
+  "advanced": {
+    "title": "Entrenamiento avanzado",
+    "backHome": "← Inicio",
+    "back": "← Avanzado",
+    "intro": "Ajusta tus propios tiempos, tamaños de cuadrícula, velocidad de lectura, duración de la lección y más, y practica exactamente como quieras.",
+    "separateNote": "Las lecciones avanzadas son un recorrido aparte de tu entrenamiento principal y diario. Nunca cambian tu dificultad guardada, no dan XP, no cuentan para rachas ni misiones y no aparecen en tu página de Progreso.",
+    "lessons": "LECCIONES",
+    "recentRuns": "LECCIONES AVANZADAS RECIENTES",
+    "noRuns": "Aún no hay lecciones avanzadas: elige un ejercicio para empezar.",
+    "noRunsForExercise": "Aún no hay lecciones avanzadas con este ejercicio.",
+    "custom": "Personalizado",
+    "defaults": "Predeterminado",
+    "tag": "LECCIÓN AVANZADA",
+    "notStudied": "Los valores predeterminados coinciden con la lección estándar. Cualquier otro valor queda fuera de lo estudiado en la investigación de este ejercicio: sirve para practicar a tu manera, pero no mide el progreso.",
+    "parameters": "PARÁMETROS",
+    "resetDefaults": "Restablecer valores predeterminados",
+    "start": "Empezar lección avanzada",
+    "lessonComplete": "Lección avanzada completada",
+    "notCounted": "Guardado solo en tu historial avanzado: no cuenta para el entrenamiento diario, XP, rachas ni progreso.",
+    "resultNotSaved": "No se pudo guardar este resultado en tu historial.",
+    "runAgain": "Repetir",
+    "changeSettings": "Cambiar ajustes",
+    "backToAdvanced": "Volver a Avanzado",
+    "averageWpm": "PPM MEDIA",
+    "comprehension": "COMPRENSIÓN",
+    "runSummary": "{accuracy}% de acierto · {trials, plural, one {# intento} other {# intentos}} · {start} → {end}",
+    "readingRunSummary": "{wpm} PPM · {comprehension}% de comprensión",
+    "defaultValue": "predet. {value}",
+    "units": {
+      "ms": "{value} ms",
+      "percent": "{value}%",
+      "wpm": "{value} PPM"
+    },
+    "tunes": {
+      "n-back": "Tiempos, cuadrícula, N, tasa de coincidencias",
+      "complex-span": "Tiempo de letras, límite de respuesta, tamaño del conjunto",
+      "spatial-sequence": "Cuadrícula, tiempo de resaltado, longitud de secuencia",
+      "dice-sum": "Caras del dado, tiempo de visualización, número de dados",
+      "reading": "PPM de la guía, pasajes, tamaño del resaltado"
+    },
+    "startLevel": {
+      "adaptive-nback-v0": "N inicial (posiciones atrás)",
+      "complex-span-v0": "Tamaño inicial del conjunto (letras)",
+      "visuospatial-sequence-recall-v0": "Longitud inicial de la secuencia",
+      "dice-sum-v0": "Número inicial de dados",
+      "reading-paced-adaptive-v0": "PPM inicial"
+    },
+    "levelName": {
+      "adaptive-nback-v0": "N",
+      "complex-span-v0": "CONJUNTO",
+      "visuospatial-sequence-recall-v0": "SECUENCIA",
+      "dice-sum-v0": "DADOS",
+      "reading-paced-adaptive-v0": "PPM"
+    },
+    "params": {
+      "adaptive": {
+        "label": "Dificultad adaptativa",
+        "hint": "Sube o baja el nivel según tu rendimiento. Desactivada, lo mantiene fijo en el nivel inicial."
+      },
+      "gridSize": {
+        "label": "Tamaño de la cuadrícula"
+      },
+      "trials": {
+        "label": "Intentos"
+      },
+      "stimulusMs": {
+        "label": "Tiempo por casilla",
+        "hint": "Cuánto tiempo se ilumina cada casilla; también es tu margen de respuesta."
+      },
+      "feedbackMs": {
+        "label": "Pausa tras la respuesta"
+      },
+      "matchPercent": {
+        "label": "Tasa de coincidencias",
+        "hint": "Con qué frecuencia una casilla repite la de N pasos atrás."
+      },
+      "sets": {
+        "label": "Conjuntos"
+      },
+      "memoryDisplayMs": {
+        "label": "Tiempo de cada letra"
+      },
+      "processingLimitMs": {
+        "label": "Tiempo para juzgar cada frase"
+      },
+      "sequences": {
+        "label": "Secuencias"
+      },
+      "itemDisplayMs": {
+        "label": "Tiempo de resaltado"
+      },
+      "itemGapMs": {
+        "label": "Pausa entre casillas"
+      },
+      "dieSides": {
+        "label": "Caras del dado"
+      },
+      "rounds": {
+        "label": "Rondas"
+      },
+      "showMs": {
+        "label": "Tiempo para ver los dados",
+        "hint": "Aún puedes ocultar los dados antes."
+      },
+      "targetWpm": {
+        "label": "Velocidad de la guía",
+        "hint": "El resaltado mantiene esta velocidad en cada pasaje. Tu velocidad real de lectura se sigue midiendo, junto con la comprensión."
+      },
+      "passages": {
+        "label": "Pasajes"
+      },
+      "chunkSize": {
+        "label": "Palabras por paso de resaltado"
+      }
     }
   }
 }

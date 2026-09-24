@@ -9,8 +9,10 @@ import {
   perfToEpochMs,
   type SessionModeProps,
   type TrialInput,
+  advancedDifficultyBounds,
 } from "@/lib/session-types";
 import type { PacePreset } from "@/lib/exercise-preferences";
+import type { NBackAdvanced } from "@/lib/advanced-settings";
 
 // Adapted from prototype/Exercise.dc.html + prototype/ExerciseResults.dc.html.
 // One real, honest deviation from the mockup: the prototype's "Exercise 1
@@ -52,12 +54,20 @@ interface Results {
 interface NBackExerciseProps extends SessionModeProps {
   /** Free customization — defaults to STANDARD (the studied pace) when omitted, same as session mode always gets. */
   pace?: PacePreset;
+  /** Advanced-tab lesson parameters (see apps/web/src/lib/advanced-settings.ts) — each overrides the matching constant/preset above. */
+  advanced?: NBackAdvanced;
 }
 
-export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExerciseProps = {}) {
+const GRID_WIDTH_PX_BY_CELLS: Record<number, number> = { 9: 250, 16: 280, 25: 320 };
+
+export function NBackExercise({ initialDifficulty, onComplete, pace, advanced, exitHref = "/" }: NBackExerciseProps = {}) {
   const t = useTranslations("nBack");
   const tx = useTranslations("exercise");
-  const stimulusMs = STIMULUS_MS_BY_PACE[pace ?? "STANDARD"];
+  const stimulusMs = advanced?.stimulusMs ?? STIMULUS_MS_BY_PACE[pace ?? "STANDARD"];
+  const totalTrials = advanced?.trials ?? TOTAL_TRIALS;
+  const feedbackMs = advanced?.feedbackMs ?? FEEDBACK_MS;
+  const gridCells = advanced?.gridSize ?? 9;
+  const gridColumns = Math.sqrt(gridCells);
   const [phase, setPhase] = useState<"stimulus" | "feedback" | "done">("stimulus");
   const [stimulus, setStimulus] = useState<NBackStimulus | null>(null);
   const [currentN, setCurrentN] = useState<number | null>(null);
@@ -78,14 +88,18 @@ export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExer
 
   useEffect(() => {
     const controller = new AbortController();
-    const task = new NBackTask(initialDifficulty !== undefined ? { initialDifficulty } : {});
+    const task = new NBackTask({
+      ...(initialDifficulty !== undefined ? { initialDifficulty } : {}),
+      ...advancedDifficultyBounds(advanced),
+      ...(advanced ? { gridSize: advanced.gridSize, matchProbability: advanced.matchPercent / 100 } : {}),
+    });
     const startDifficulty = task.getCurrentDifficulty();
     const offsetMs = epochOffsetMs();
     const trials: TrialInput[] = [];
 
     async function run() {
       setCurrentN(task.getCurrentN());
-      for (let i = 0; i < TOTAL_TRIALS; i++) {
+      for (let i = 0; i < totalTrials; i++) {
         if (controller.signal.aborted) return;
 
         const stim = task.nextStimulus();
@@ -164,7 +178,7 @@ export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExer
         }
 
         setPhase("feedback");
-        await sleep(FEEDBACK_MS, controller.signal);
+        await sleep(feedbackMs, controller.signal);
         if (controller.signal.aborted) return;
       }
 
@@ -205,7 +219,7 @@ export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExer
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5" data-testid="n-back-exercise" data-pace={pace ?? "STANDARD"}>
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label={tx("exit")}>
+        <Link href={exitHref} aria-label={tx("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path
               d="M6 6l12 12M18 6L6 18"
@@ -218,13 +232,13 @@ export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExer
         <div className="h-1 flex-1 mx-4 rounded-full bg-surface-2">
           <div
             className="h-full rounded-full bg-wm transition-all"
-            style={{ width: `${(trialNumber / TOTAL_TRIALS) * 100}%` }}
+            style={{ width: `${(trialNumber / totalTrials) * 100}%` }}
           />
         </div>
         <div className="w-[18px]" />
       </div>
       <div className="mb-5 text-center text-xs text-text-3">
-        {tx("trialOf", { current: trialNumber, total: TOTAL_TRIALS })}
+        {tx("trialOf", { current: trialNumber, total: totalTrials })}
       </div>
 
       <h1 className="sr-only">{t("srTitle")}</h1>
@@ -244,8 +258,12 @@ export function NBackExercise({ initialDifficulty, onComplete, pace }: NBackExer
       </div>
 
       <div className="flex flex-1 items-center justify-center">
-        <div className="grid w-[250px] grid-cols-3 gap-3.5">
-          {Array.from({ length: 9 }, (_, i) => {
+        <div
+          data-testid="n-back-grid"
+          className="grid gap-3.5"
+          style={{ width: GRID_WIDTH_PX_BY_CELLS[gridCells] ?? 250, gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` }}
+        >
+          {Array.from({ length: gridCells }, (_, i) => {
             const active = phase === "stimulus" && stimulus?.position === i;
             return (
               <div

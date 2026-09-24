@@ -61,6 +61,8 @@ export interface NBackTaskConfig {
   maxDifficulty?: Difficulty;
   /** Probability that a given scoreable trial is forced to be a match. */
   matchProbability?: number;
+  /** Total grid cells (9 = 3x3, 16 = 4x4, 25 = 5x5) — defaults to the standard 3x3 GRID_SIZE. */
+  gridSize?: number;
   /** Injectable for deterministic tests; defaults to Math.random. */
   random?: () => number;
 }
@@ -74,6 +76,7 @@ export class NBackTask {
   private readonly adaptiveEngine: RollingWindowAdaptiveEngine;
   private readonly matchProbability: number;
   private readonly random: () => number;
+  private readonly gridSize: number;
 
   private history: number[] = [];
   /** The N in effect when each history entry was generated. */
@@ -89,6 +92,7 @@ export class NBackTask {
   constructor(config: NBackTaskConfig = {}) {
     this.matchProbability = config.matchProbability ?? DEFAULT_MATCH_PROBABILITY;
     this.random = config.random ?? Math.random;
+    this.gridSize = config.gridSize ?? GRID_SIZE;
 
     this.adaptiveEngine = new RollingWindowAdaptiveEngine({
       initialDifficulty: config.initialDifficulty ?? NBACK_DEFAULT_INITIAL_DIFFICULTY,
@@ -130,7 +134,7 @@ export class NBackTask {
     if (isScoreable && this.random() < this.matchProbability) {
       position = this.history[trialIndex - n];
     } else {
-      position = Math.floor(this.random() * GRID_SIZE);
+      position = Math.floor(this.random() * this.gridSize);
     }
 
     this.history.push(position);

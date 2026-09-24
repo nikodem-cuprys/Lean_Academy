@@ -34,7 +34,7 @@ test("sign up, play a full N-Back run, and see an honest results screen", async 
   await expect(page.getByText("WORKING MEMORY · N-BACK")).toBeVisible();
 
   // The 3x3 stimulus grid is really there.
-  await expect(page.locator(".grid.w-\\[250px\\] > div")).toHaveCount(9);
+  await expect(page.getByTestId("n-back-grid").locator("> div")).toHaveCount(9);
 
   const respondButton = page.getByTestId("respond-button");
 

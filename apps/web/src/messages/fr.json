@@ -101,7 +101,8 @@
     "science": "Science",
     "achievements": "Succès",
     "challenges": "Quêtes et défis",
-    "customize": "Personnaliser les exercices"
+    "customize": "Personnaliser les exercices",
+    "advanced": "Avancé"
   },
   "home": {
     "todaysTraining": "ENTRAÎNEMENT DU JOUR",
@@ -128,6 +129,7 @@
       "achievements": "Voir les succès →",
       "challenges": "Voir les quêtes et défis →",
       "customize": "Personnaliser les exercices →",
+      "advanced": "Entraînement avancé →",
       "nBack": "Essayer l’exercice N-Back →",
       "complexSpan": "Essayer l’exercice Complex Span →",
       "diceSum": "Essayer l’exercice Somme des dés →",
@@ -552,6 +554,122 @@
       "finishedReading": "J’ai fini de lire",
       "questionOf": "Question {current} sur {total}",
       "bothCount": "La mémoire et la compréhension comptent toutes les deux"
+    }
+  },
+  "advanced": {
+    "title": "Entraînement avancé",
+    "backHome": "← Accueil",
+    "back": "← Avancé",
+    "intro": "Réglez vos propres délais, tailles de grille, vitesse de lecture, durée de leçon et plus encore, et entraînez-vous exactement comme vous le souhaitez.",
+    "separateNote": "Les leçons avancées forment un parcours distinct de votre entraînement principal et quotidien. Elles ne modifient jamais votre difficulté enregistrée, ne rapportent pas d’XP, ne comptent ni pour les séries ni pour les quêtes et n’apparaissent pas sur votre page Progrès.",
+    "lessons": "LEÇONS",
+    "recentRuns": "LEÇONS AVANCÉES RÉCENTES",
+    "noRuns": "Aucune leçon avancée pour l’instant — choisissez un exercice pour commencer.",
+    "noRunsForExercise": "Aucune leçon avancée avec cet exercice pour l’instant.",
+    "custom": "Personnalisé",
+    "defaults": "Par défaut",
+    "tag": "LEÇON AVANCÉE",
+    "notStudied": "Les valeurs par défaut correspondent à la leçon standard. Toute autre valeur sort du cadre étudié par la recherche sur cet exercice — idéal pour une pratique personnelle, mais pas une mesure de progrès.",
+    "parameters": "PARAMÈTRES",
+    "resetDefaults": "Rétablir les valeurs par défaut",
+    "start": "Commencer la leçon avancée",
+    "lessonComplete": "Leçon avancée terminée",
+    "notCounted": "Enregistré uniquement dans votre historique avancé — ne compte ni pour l’entraînement quotidien, ni pour l’XP, les séries ou les progrès.",
+    "resultNotSaved": "Impossible d’enregistrer ce résultat dans votre historique.",
+    "runAgain": "Recommencer",
+    "changeSettings": "Modifier les réglages",
+    "backToAdvanced": "Retour à Avancé",
+    "averageWpm": "MOTS/MIN MOY.",
+    "comprehension": "COMPRÉHENSION",
+    "runSummary": "{accuracy} % de précision · {trials, plural, one {# essai} other {# essais}} · {start} → {end}",
+    "readingRunSummary": "{wpm} mots/min · {comprehension} % de compréhension",
+    "defaultValue": "défaut {value}",
+    "units": {
+      "ms": "{value} ms",
+      "percent": "{value} %",
+      "wpm": "{value} mots/min"
+    },
+    "tunes": {
+      "n-back": "Rythme, taille de grille, N, taux de correspondance",
+      "complex-span": "Durée des lettres, temps de réponse, taille de série",
+      "spatial-sequence": "Taille de grille, durée de surbrillance, longueur de séquence",
+      "dice-sum": "Faces du dé, temps d’affichage, nombre de dés",
+      "reading": "Vitesse du guide, passages, taille de la surbrillance"
+    },
+    "startLevel": {
+      "adaptive-nback-v0": "N de départ (positions en arrière)",
+      "complex-span-v0": "Taille de série de départ (lettres)",
+      "visuospatial-sequence-recall-v0": "Longueur de séquence de départ",
+      "dice-sum-v0": "Nombre de dés de départ",
+      "reading-paced-adaptive-v0": "Mots/min de départ"
+    },
+    "levelName": {
+      "adaptive-nback-v0": "N",
+      "complex-span-v0": "SÉRIE",
+      "visuospatial-sequence-recall-v0": "SÉQUENCE",
+      "dice-sum-v0": "DÉS",
+      "reading-paced-adaptive-v0": "MOTS/MIN"
+    },
+    "params": {
+      "adaptive": {
+        "label": "Difficulté adaptative",
+        "hint": "Ajuste le niveau selon vos performances. Désactivée, le niveau reste fixé au niveau de départ."
+      },
+      "gridSize": {
+        "label": "Taille de la grille"
+      },
+      "trials": {
+        "label": "Essais"
+      },
+      "stimulusMs": {
+        "label": "Durée par case",
+        "hint": "Durée d’allumage de chaque case — c’est aussi votre fenêtre de réponse."
+      },
+      "feedbackMs": {
+        "label": "Pause après le retour"
+      },
+      "matchPercent": {
+        "label": "Taux de correspondance",
+        "hint": "Fréquence à laquelle une case répète celle d’il y a N étapes."
+      },
+      "sets": {
+        "label": "Séries"
+      },
+      "memoryDisplayMs": {
+        "label": "Durée d’affichage des lettres"
+      },
+      "processingLimitMs": {
+        "label": "Temps pour juger chaque énoncé"
+      },
+      "sequences": {
+        "label": "Séquences"
+      },
+      "itemDisplayMs": {
+        "label": "Durée de surbrillance"
+      },
+      "itemGapMs": {
+        "label": "Pause entre les cases"
+      },
+      "dieSides": {
+        "label": "Faces du dé"
+      },
+      "rounds": {
+        "label": "Manches"
+      },
+      "showMs": {
+        "label": "Temps d’observation des dés",
+        "hint": "Vous pouvez toujours masquer les dés plus tôt."
+      },
+      "targetWpm": {
+        "label": "Vitesse du guide",
+        "hint": "La surbrillance garde cette vitesse pour chaque passage. Votre vitesse de lecture réelle est toujours mesurée, avec la compréhension."
+      },
+      "passages": {
+        "label": "Passages"
+      },
+      "chunkSize": {
+        "label": "Mots par étape de surbrillance"
+      }
     }
   }
 }

@@ -101,7 +101,8 @@
     "science": "Wissenschaft",
     "achievements": "Erfolge",
     "challenges": "Quests & Challenges",
-    "customize": "Übungen anpassen"
+    "customize": "Übungen anpassen",
+    "advanced": "Erweitert"
   },
   "home": {
     "todaysTraining": "HEUTIGES TRAINING",
@@ -128,6 +129,7 @@
       "achievements": "Erfolge ansehen →",
       "challenges": "Quests & Challenges ansehen →",
       "customize": "Übungen anpassen →",
+      "advanced": "Erweitertes Training →",
       "nBack": "N-Back-Übung ausprobieren →",
       "complexSpan": "Complex-Span-Übung ausprobieren →",
       "diceSum": "Würfelsummen-Übung ausprobieren →",
@@ -610,6 +612,122 @@
       "finishedReading": "Ich bin fertig mit Lesen",
       "questionOf": "Frage {current} von {total}",
       "bothCount": "Gedächtnis & Verständnis zählen beide"
+    }
+  },
+  "advanced": {
+    "title": "Erweitertes Training",
+    "backHome": "← Start",
+    "back": "← Erweitert",
+    "intro": "Lege eigene Verzögerungen, Rastergrößen, Lesetempo, Lektionslänge und mehr fest und übe genau so, wie du willst.",
+    "separateNote": "Erweiterte Lektionen sind ein eigener Bereich, getrennt von deinem Haupt- und Tagestraining. Sie ändern nie deine gespeicherte Schwierigkeit, bringen keine XP, zählen nicht für Serien oder Quests und erscheinen nicht auf deiner Fortschrittsseite.",
+    "lessons": "LEKTIONEN",
+    "recentRuns": "LETZTE ERWEITERTE LEKTIONEN",
+    "noRuns": "Noch keine erweiterten Lektionen – wähle eine Übung, um zu starten.",
+    "noRunsForExercise": "Noch keine erweiterten Lektionen mit dieser Übung.",
+    "custom": "Angepasst",
+    "defaults": "Standard",
+    "tag": "ERWEITERTE LEKTION",
+    "notStudied": "Die Standardwerte entsprechen der normalen Lektion. Alles andere liegt außerhalb dessen, was in der Forschung zu dieser Übung untersucht wurde – gut zum persönlichen Üben, aber kein Maß für Fortschritt.",
+    "parameters": "PARAMETER",
+    "resetDefaults": "Auf Standard zurücksetzen",
+    "start": "Erweiterte Lektion starten",
+    "lessonComplete": "Erweiterte Lektion abgeschlossen",
+    "notCounted": "Nur in deinem erweiterten Verlauf gespeichert – zählt nicht für Tagestraining, XP, Serien oder Fortschritt.",
+    "resultNotSaved": "Dieses Ergebnis konnte nicht in deinem Verlauf gespeichert werden.",
+    "runAgain": "Noch einmal",
+    "changeSettings": "Einstellungen ändern",
+    "backToAdvanced": "Zurück zu Erweitert",
+    "averageWpm": "Ø WPM",
+    "comprehension": "VERSTÄNDNIS",
+    "runSummary": "{accuracy}% Genauigkeit · {trials, plural, one {# Durchgang} other {# Durchgänge}} · {start} → {end}",
+    "readingRunSummary": "{wpm} WPM · {comprehension}% Verständnis",
+    "defaultValue": "Standard {value}",
+    "units": {
+      "ms": "{value} ms",
+      "percent": "{value}%",
+      "wpm": "{value} WPM"
+    },
+    "tunes": {
+      "n-back": "Timing, Rastergröße, N, Trefferquote",
+      "complex-span": "Buchstaben-Timing, Antwortzeit, Setgröße",
+      "spatial-sequence": "Rastergröße, Leuchtdauer, Sequenzlänge",
+      "dice-sum": "Würfelseiten, Anzeigedauer, Anzahl Würfel",
+      "reading": "Tempo der Leseführung, Texte, Markierungsgröße"
+    },
+    "startLevel": {
+      "adaptive-nback-v0": "Start-N (Schritte zurück)",
+      "complex-span-v0": "Start-Setgröße (Buchstaben)",
+      "visuospatial-sequence-recall-v0": "Start-Sequenzlänge",
+      "dice-sum-v0": "Start-Anzahl Würfel",
+      "reading-paced-adaptive-v0": "Start-WPM"
+    },
+    "levelName": {
+      "adaptive-nback-v0": "N",
+      "complex-span-v0": "SETGRÖSSE",
+      "visuospatial-sequence-recall-v0": "SEQUENZ",
+      "dice-sum-v0": "WÜRFEL",
+      "reading-paced-adaptive-v0": "WPM"
+    },
+    "params": {
+      "adaptive": {
+        "label": "Adaptive Schwierigkeit",
+        "hint": "Passt das Level an deine Leistung an. Aus bleibt es fest auf dem Startlevel."
+      },
+      "gridSize": {
+        "label": "Rastergröße"
+      },
+      "trials": {
+        "label": "Durchgänge"
+      },
+      "stimulusMs": {
+        "label": "Zeit pro Feld",
+        "hint": "Wie lange jedes Feld leuchtet – zugleich dein Antwortfenster."
+      },
+      "feedbackMs": {
+        "label": "Pause nach Rückmeldung"
+      },
+      "matchPercent": {
+        "label": "Trefferquote",
+        "hint": "Wie oft ein Feld das von vor N Schritten wiederholt."
+      },
+      "sets": {
+        "label": "Sets"
+      },
+      "memoryDisplayMs": {
+        "label": "Anzeigedauer pro Buchstabe"
+      },
+      "processingLimitMs": {
+        "label": "Zeit zum Beurteilen jeder Aussage"
+      },
+      "sequences": {
+        "label": "Sequenzen"
+      },
+      "itemDisplayMs": {
+        "label": "Leuchtdauer pro Feld"
+      },
+      "itemGapMs": {
+        "label": "Pause zwischen Feldern"
+      },
+      "dieSides": {
+        "label": "Würfelseiten"
+      },
+      "rounds": {
+        "label": "Runden"
+      },
+      "showMs": {
+        "label": "Anzeigedauer der Würfel",
+        "hint": "Du kannst die Würfel weiterhin früher ausblenden."
+      },
+      "targetWpm": {
+        "label": "Tempo der Leseführung",
+        "hint": "Die Markierung hält dieses Tempo bei jedem Text. Dein tatsächliches Lesetempo wird weiterhin gemessen, zusammen mit dem Verständnis."
+      },
+      "passages": {
+        "label": "Texte"
+      },
+      "chunkSize": {
+        "label": "Wörter pro Markierungsschritt"
+      }
     }
   }
 }

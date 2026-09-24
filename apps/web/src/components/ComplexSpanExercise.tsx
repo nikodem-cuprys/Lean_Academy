@@ -12,8 +12,10 @@ import {
   perfToEpochMs,
   type SessionModeProps,
   type TrialInput,
+  advancedDifficultyBounds,
 } from "@/lib/session-types";
 import type { PacePreset } from "@/lib/exercise-preferences";
+import type { ComplexSpanAdvanced } from "@/lib/advanced-settings";
 
 // Adapted from prototype/ExerciseComplexSpan.dc.html, which only shows
 // one representative moment (the processing step) — the recall UI is
@@ -77,12 +79,17 @@ interface Results {
 interface ComplexSpanExerciseProps extends SessionModeProps {
   /** Free customization — defaults to STANDARD (the studied pace) when omitted, same as session mode always gets. */
   pace?: PacePreset;
+  /** Advanced-tab lesson parameters (see apps/web/src/lib/advanced-settings.ts) — each overrides the matching constant/preset above. */
+  advanced?: ComplexSpanAdvanced;
 }
 
-export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: ComplexSpanExerciseProps = {}) {
+export function ComplexSpanExercise({ initialDifficulty, onComplete, pace, advanced, exitHref = "/" }: ComplexSpanExerciseProps = {}) {
   const t = useTranslations("complexSpan");
   const tx = useTranslations("exercise");
-  const memoryDisplayMs = MEMORY_DISPLAY_MS_BY_PACE[pace ?? "STANDARD"];
+  const memoryDisplayMs = advanced?.memoryDisplayMs ?? MEMORY_DISPLAY_MS_BY_PACE[pace ?? "STANDARD"];
+  const totalSets = advanced?.sets ?? TOTAL_SETS;
+  const processingMs = advanced?.processingLimitMs ?? PROCESSING_MS;
+  const feedbackMs = advanced?.feedbackMs ?? FEEDBACK_MS;
   const [phase, setPhase] = useState<Phase>("processing");
   const [setNumber, setSetNumber] = useState(0);
   const [setSize, setSetSize] = useState<number | null>(null);
@@ -110,7 +117,10 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
 
   useEffect(() => {
     const controller = new AbortController();
-    const task = new ComplexSpanTask(initialDifficulty !== undefined ? { initialDifficulty } : {});
+    const task = new ComplexSpanTask({
+      ...(initialDifficulty !== undefined ? { initialDifficulty } : {}),
+      ...advancedDifficultyBounds(advanced),
+    });
     const startDifficulty = task.getCurrentDifficulty();
     const sets: SetSummary[] = [];
     const offsetMs = epochOffsetMs();
@@ -134,7 +144,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
         };
         document.addEventListener("visibilitychange", onVis);
         respondRef.current = finish;
-        const timer = setTimeout(() => finish(false), PROCESSING_MS);
+        const timer = setTimeout(() => finish(false), processingMs);
       });
       return { said: lastAnswer, interrupted };
     }
@@ -147,7 +157,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
     }
 
     async function run() {
-      for (let s = 0; s < TOTAL_SETS; s++) {
+      for (let s = 0; s < totalSets; s++) {
         if (controller.signal.aborted) return;
 
         const setStartedAt = performance.now();
@@ -209,7 +219,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
         });
         setSetFeedback(summary);
         setPhase("feedback");
-        await sleep(FEEDBACK_MS, controller.signal);
+        await sleep(feedbackMs, controller.signal);
         if (controller.signal.aborted) return;
       }
 
@@ -264,7 +274,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
   return (
     <div className="flex w-full max-w-[390px] flex-1 flex-col px-5 py-5" data-testid="complex-span-exercise" data-pace={pace ?? "STANDARD"}>
       <div className="mb-2 flex items-center justify-between">
-        <Link href="/" aria-label={tx("exit")}>
+        <Link href={exitHref} aria-label={tx("exit")}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M6 6l12 12M18 6L6 18" stroke="var(--color-text-3)" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
@@ -272,13 +282,13 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
         <div className="mx-4 h-1 flex-1 rounded-full bg-surface-2">
           <div
             className="h-full rounded-full bg-wm transition-all"
-            style={{ width: `${(setNumber / TOTAL_SETS) * 100}%` }}
+            style={{ width: `${(setNumber / totalSets) * 100}%` }}
           />
         </div>
         <div className="w-[18px]" />
       </div>
       <div className="mb-4 text-center text-xs text-text-3">
-        {t("setOf", { current: setNumber, total: TOTAL_SETS })}
+        {t("setOf", { current: setNumber, total: totalSets })}
       </div>
 
       <h1 className="sr-only">{t("srTitle")}</h1>
@@ -352,7 +362,7 @@ export function ComplexSpanExercise({ initialDifficulty, onComplete, pace }: Com
                 <div
                   key={`${setNumber}-${shownLetters.length}`}
                   className="h-full rounded-full bg-wm animate-dice-countdown"
-                  style={{ animationDuration: `${PROCESSING_MS}ms` }}
+                  style={{ animationDuration: `${processingMs}ms` }}
                 />
               )}
             </div>

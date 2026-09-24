@@ -72,6 +72,7 @@ model User {
   devices                 Device[]
   notificationPreference  NotificationPreference?
   exercisePreferences     ExercisePreference[]
+  advancedRuns            AdvancedRun[]
 }
 
 model Account {
@@ -499,6 +500,29 @@ model ExercisePreference {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, method])
+}
+
+// One completed Advanced-tab lesson (apps/web/src/lib/advanced-settings.ts).
+// Deliberately its own table, never a TrainingSession/Trial row: advanced
+// lessons run with user-chosen parameters outside what each exercise's
+// evidence base studied, so they must not feed DifficultyState, XP,
+// streaks, quests, or /progress. `settings` is the exact parameter set
+// the lesson ran with; `summary` holds per-method extras (e.g. reading's
+// average WPM alongside its comprehension figure).
+model AdvancedRun {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  method       String
+  settings     Json
+  trialCount   Int
+  correctCount Int
+  startLevel   Int
+  endLevel     Int
+  summary      Json?
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 // ---------- Evidence (relational mirror of data/evidence-registry.json) ----------

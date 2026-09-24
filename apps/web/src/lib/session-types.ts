@@ -38,6 +38,8 @@ export interface SessionModeProps {
   initialDifficulty?: number;
   /** When provided, the component runs once, skips its own results screen, and calls this instead of rendering one. */
   onComplete?: (outcome: ExerciseSessionOutcome) => void;
+  /** Where the exercise's exit (✕) link goes — defaults to Home. The Advanced tab points it back at /advanced. */
+  exitHref?: string;
 }
 
 /** Offset between performance.now() (monotonic, page-load-relative) and Date.now() (epoch) — compute once per component instance. */
@@ -47,4 +49,16 @@ export function epochOffsetMs(): number {
 
 export function perfToEpochMs(perfMs: number, offsetMs: number): number {
   return Math.round(offsetMs + perfMs);
+}
+
+/**
+ * Engine bounds for an Advanced-tab lesson (apps/web/src/lib/advanced-settings.ts):
+ * starts at the chosen level, and with adaptation switched off pins
+ * min = max = that level so the task stays fixed for the whole run.
+ */
+export function advancedDifficultyBounds(advanced: { startLevel: number; adaptive: boolean } | undefined) {
+  if (!advanced) return {};
+  return advanced.adaptive
+    ? { initialDifficulty: advanced.startLevel }
+    : { initialDifficulty: advanced.startLevel, minDifficulty: advanced.startLevel, maxDifficulty: advanced.startLevel };
 }

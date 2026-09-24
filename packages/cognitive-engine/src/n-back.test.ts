@@ -167,3 +167,17 @@ describe("NBackTask — sequence generation produces a controlled match rate", (
     }
   });
 });
+
+describe("NBackTask — configurable grid size", () => {
+  it("draws positions across the whole configured grid, never outside it", () => {
+    const task = new NBackTask({ gridSize: 25, matchProbability: 0 });
+    const seen = new Set<number>();
+    for (let i = 0; i < 2000; i++) {
+      const { position } = task.nextStimulus();
+      expect(position).toBeGreaterThanOrEqual(0);
+      expect(position).toBeLessThan(25);
+      seen.add(position);
+    }
+    expect(seen.size).toBe(25);
+  });
+});
