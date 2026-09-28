@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@lean-academy/db";
-import { auth } from "@/lib/auth";
+import { getRequestUserId } from "@/lib/mobile-auth";
 import { recordActiveDayForStreak } from "@/lib/streak";
 import { checkSessionCompletionAchievements } from "@/lib/achievements";
 import { recordSessionCompletionXp } from "@/lib/xp";
@@ -13,14 +13,14 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const userId = await getRequestUserId(request);
+  if (!userId) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
   const { id } = await params;
 
   const trainingSession = await prisma.trainingSession.findUnique({ where: { id } });
-  if (!trainingSession || trainingSession.userId !== session.user.id) {
+  if (!trainingSession || trainingSession.userId !== userId) {
     return NextResponse.json({ error: "Training session not found." }, { status: 404 });
   }
 
@@ -39,11 +39,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     },
   });
 
-  const streak = await recordActiveDayForStreak(session.user.id);
-  await checkSessionCompletionAchievements(session.user.id, streak.currentStreakDays);
-  const xp = await recordSessionCompletionXp(session.user.id, id, streak.currentStreakDays);
-  await syncWeeklyChallengeProgress(session.user.id);
-  await syncDailyQuestProgress(session.user.id);
+  const streak = await recordActiveDayForStreak(userId);
+  await checkSessionCompletionAchievements(userId, streak.currentStreakDays);
+  const xp = await recordSessionCompletionXp(userId, id, streak.currentStreakDays);
+  await syncWeeklyChallengeProgress(userId);
+  await syncDailyQuestProgress(userId);
 
   return NextResponse.json({ success: true, streak, xp });
 }

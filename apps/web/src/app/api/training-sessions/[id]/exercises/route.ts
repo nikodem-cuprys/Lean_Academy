@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma, Prisma } from "@lean-academy/db";
-import { auth } from "@/lib/auth";
+import { getRequestUserId } from "@/lib/mobile-auth";
 import { checkExerciseAchievements } from "@/lib/achievements";
 import { recordNewDomainXpIfFirstTime } from "@/lib/xp";
 import { syncWeeklyChallengeProgress } from "@/lib/weekly-challenges";
@@ -30,14 +30,14 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const userId = await getRequestUserId(request);
+  if (!userId) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
   const { id } = await params;
 
   const trainingSession = await prisma.trainingSession.findUnique({ where: { id } });
-  if (!trainingSession || trainingSession.userId !== session.user.id) {
+  if (!trainingSession || trainingSession.userId !== userId) {
     return NextResponse.json({ error: "Training session not found." }, { status: 404 });
   }
 
@@ -74,13 +74,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   await prisma.difficultyState.upsert({
-    where: { userId_taskVersionId: { userId: session.user.id, taskVersionId: taskVersion.id } },
-    create: { userId: session.user.id, taskVersionId: taskVersion.id, currentDifficulty: endDifficulty },
+    where: { userId_taskVersionId: { userId, taskVersionId: taskVersion.id } },
+    create: { userId, taskVersionId: taskVersion.id, currentDifficulty: endDifficulty },
     update: { currentDifficulty: endDifficulty },
   });
 
   const { newPersonalBest } = await checkExerciseAchievements({
-    userId: session.user.id,
+    userId,
     method,
     domain: definition!.domain,
     taskVersionId: taskVersion.id,
@@ -90,9 +90,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     sessionCorrect: trials.filter((t) => t.correct).length,
     sessionTotal: trials.length,
   });
-  await recordNewDomainXpIfFirstTime(session.user.id, taskVersion.id, id);
-  await syncWeeklyChallengeProgress(session.user.id, new Date(), { newPersonalBestThisCall: newPersonalBest });
-  await syncDailyQuestProgress(session.user.id);
+  await recordNewDomainXpIfFirstTime(userId, taskVersion.id, id);
+  await syncWeeklyChallengeProgress(userId, new Date(), { newPersonalBestThisCall: newPersonalBest });
+  await syncDailyQuestProgress(userId);
 
   return NextResponse.json({ success: true, newPersonalBest });
 }

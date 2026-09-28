@@ -88,6 +88,7 @@ XS = hours, S = ~1 day, M = ~2-4 days, L = ~1-2 weeks, XL = ~3+ weeks, all assum
 **Exit criteria:** Matches MOBILE SUCCESS CRITERIA in `project_prompt.txt` — install, log into the same account, synchronized progress, complete training, native-quality interactions, optional reminders, same achievements, seamless continuation across web/mobile.
 **Dependencies:** Phase 3 (web MVP must be validated first — do not start mobile before this per the spec).
 **Size:** XL.
+**Status:** Started. Expo was confirmed, and the first Android slice (shared account, synced Home, native N-Back) is done. See `docs/kanban.md`.
 
 ## Phase 9 — Mobile Expansion
 

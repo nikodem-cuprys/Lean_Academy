@@ -2,7 +2,7 @@
 
 _Phase 8-9 planning, per `project_prompt.txt`. Mobile development begins only after the web MVP (Phase 3) demonstrates a successful core experience — this document is prepared early so the shared-architecture decisions in Phase 2 don't accidentally foreclose mobile options later._
 
-**Status:** Still accurate as a Phase 8-9 early-prepared plan — no implementation has started, nothing to reconcile yet. Re-confirm the ecosystem evaluation for real at the start of Phase 8 (already noted below).
+**Status:** Phase 8 started (2026-09-28). The recommendation below was re-confirmed: Expo SDK 57, in `apps/mobile`. Built so far: shared account (bearer-token login), synced Home data, and a native N-Back. Everything else in the Phase 8 breakdown is tracked in `docs/kanban.md`'s Backlog.
 
 ## Cross-platform technology evaluation
 
